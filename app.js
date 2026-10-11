@@ -784,11 +784,13 @@ function renderCanvas() {
     }
 
     itemCard.innerHTML = `
-      <div class="item-order-hint" aria-hidden="true">ลำดับ ${idx + 1}</div>
       <div class="item-controls">
-        <button type="button" class="ctrl-btn ctrl-move" data-dir="up"${isFirst ? ' disabled' : ''} title="ย้ายขึ้น (ไปลำดับก่อนหน้า)" aria-label="ย้ายองค์ประกอบนี้ขึ้นหนึ่งลำดับ" onclick="event.stopPropagation(); moveElement('${safeId(item.id)}', -1)"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
-        <button type="button" class="ctrl-btn ctrl-move" data-dir="down"${isLast ? ' disabled' : ''} title="ย้ายลง (ไปลำดับถัดไป)" aria-label="ย้ายองค์ประกอบนี้ลงหนึ่งลำดับ" onclick="event.stopPropagation(); moveElement('${safeId(item.id)}', 1)"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
-        <button type="button" class="ctrl-btn ctrl-delete" title="ลบองค์ประกอบนี้" aria-label="ลบองค์ประกอบนี้" onclick="event.stopPropagation(); removeElement('${safeId(item.id)}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <span class="item-order-hint" aria-hidden="true">ลำดับ ${idx + 1}</span>
+        <span class="item-btn-group">
+          <button type="button" class="ctrl-btn ctrl-move" data-dir="up"${isFirst ? ' disabled' : ''} title="ย้ายขึ้น (ไปลำดับก่อนหน้า)" aria-label="ย้ายองค์ประกอบนี้ขึ้นหนึ่งลำดับ" onclick="event.stopPropagation(); moveElement('${safeId(item.id)}', -1)"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+          <button type="button" class="ctrl-btn ctrl-move" data-dir="down"${isLast ? ' disabled' : ''} title="ย้ายลง (ไปลำดับถัดไป)" aria-label="ย้ายองค์ประกอบนี้ลงหนึ่งลำดับ" onclick="event.stopPropagation(); moveElement('${safeId(item.id)}', 1)"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
+          <button type="button" class="ctrl-btn ctrl-delete" title="ลบองค์ประกอบนี้" aria-label="ลบองค์ประกอบนี้" onclick="event.stopPropagation(); removeElement('${safeId(item.id)}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </span>
       </div>
       ${contentHTML}
     `;

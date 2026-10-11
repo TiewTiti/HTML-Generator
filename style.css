@@ -471,7 +471,9 @@ body {
   background-color: var(--surface-panel);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 12px;
+  /* เผื่อที่ด้านบน 18px ให้แถวควบคุม (ปุ่มขึ้น/ลง/ลบ + ป้ายลำดับ) ที่เกาะขอบบน
+     → ปุ่มไม่ทับหัวข้อ/ช่องกรอก/ปุ่มข้างใน (บั๊กที่ผู้ใช้เจอ) */
+  padding: 18px 12px 12px;
   position: relative;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -495,39 +497,72 @@ body {
 
 .canvas-item .item-controls {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  /* เกาะขอบบนของการ์ด (ครึ่งใน ครึ่งนอก) → ไม่ทับเนื้อหาข้างในเลย
+     การ์ดเผื่อ padding-top 18px ไว้ให้แล้ว (ดู .canvas-item) */
+  top: -12px;
+  left: 10px;
+  right: 10px;
   display: flex;
-  gap: 4px;
-  z-index: 2;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  z-index: 3;
+  /* ปล่อยให้ช่องว่างตรงกลางคลิกทะลุได้ ให้เฉพาะป้าย/ปุ่มที่กดได้จริง */
+  pointer-events: none;
+}
+
+.canvas-item .item-controls > * {
+  pointer-events: auto;
 }
 
 .canvas-item .ctrl-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
-  background: var(--surface-panel);
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* รวมปุ่มลูกศร/ลบเป็นกล่องเดียว เกาะขอบการ์ด (ไม่ลอยทับเนื้อหา) */
+.canvas-item .item-btn-group {
+  display: flex;
+  align-items: stretch;
+  background: var(--surface-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.canvas-item .ctrl-btn + .ctrl-btn {
+  border-left: 1px solid var(--border-color);
+}
+
+.canvas-item.selected .item-btn-group,
+.canvas-item:hover .item-btn-group {
+  border-color: var(--border-hover);
+}
+
+.canvas-item.selected .item-btn-group {
+  border-color: var(--accent-primary);
+}
+
 /* ปุ่มเลื่อนตำแหน่ง (ขึ้น/ลง) — โทนฟ้า */
 .canvas-item .ctrl-btn.ctrl-move:hover:not(:disabled) {
   background-color: #e0f2fe;
   color: #0369a1;
-  border-color: #7dd3fc;
 }
 
 /* ปุ่มลบ — โทนแดง (อันตราย) */
 .canvas-item .ctrl-btn.ctrl-delete:hover {
   background-color: #fee2e2;
   color: #dc2626;
-  border-color: #fca5a5;
 }
 
 .canvas-item .ctrl-btn:disabled {
@@ -537,7 +572,7 @@ body {
 
 .canvas-item .ctrl-btn:focus-visible {
   outline: 2px solid var(--accent-primary);
-  outline-offset: 1px;
+  outline-offset: -2px;
 }
 
 /* ลากการ์ดเพื่อสลับตำแหน่ง (นอกจากกดปุ่มลูกศร) */
@@ -549,25 +584,32 @@ body {
 .canvas-item.drop-before { box-shadow: 0 -3px 0 0 var(--sky-color), var(--shadow-sm); }
 .canvas-item.drop-after { box-shadow: 0 3px 0 0 var(--sky-color), var(--shadow-sm); }
 
+/* ป้ายลำดับ — อยู่ในแถวควบคุมบนขอบการ์ด (ไม่กินพื้นที่เนื้อหาข้างใน) */
 .canvas-item .item-order-hint {
-  position: absolute;
-  top: -9px;
-  left: 10px;
-  background: var(--surface-subtle);
+  background: var(--surface-panel);
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  padding: 0 7px;
+  padding: 0 8px;
   font-size: 10px;
   font-weight: 600;
   color: var(--text-muted);
-  line-height: 16px;
-  pointer-events: none;
+  line-height: 20px;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
 }
 
 .canvas-item.selected .item-order-hint {
   color: var(--accent-primary);
   border-color: var(--accent-primary);
   background: var(--accent-light);
+}
+
+/* จอสัมผัส: ปุ่ม 22px เล็กเกินไปกดยาก → ขยายเป็น 30px เผื่อที่ด้านบนการ์ดเพิ่มให้พ้นเนื้อหา */
+@media (hover: none), (pointer: coarse) {
+  .canvas-item .ctrl-btn { width: 30px; height: 30px; font-size: 12px; }
+  .canvas-item { padding-top: 26px; }
+  .canvas-item .item-controls { top: -14px; }
+  .canvas-item .item-order-hint { line-height: 28px; }
 }
 
 /* Inspector Form Controls */
@@ -1404,7 +1446,8 @@ body {
   .inspector-sidebar,
   .studio-controls-sidebar { padding: 12px; }
 
-  .canvas-dropzone { padding: 14px; gap: 10px; }
+  /* gap ต้อง ≥ ความสูงของแถวควบคุมบนขอบการ์ด (12px) เพื่อไม่ให้ชนการ์ดใบก่อนหน้า */
+  .canvas-dropzone { padding: 14px; gap: 14px; }
 
   .canvas-item.col-6,
   .canvas-item.col-4 { grid-column: span 12; }
