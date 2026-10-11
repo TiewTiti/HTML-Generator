@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login & Register Studio — เรียน HTML/CSS/JS ชั้น ม.5 (ไม่มีหลังบ้าน)</title>
+
+  <!-- FontAwesome & Google Fonts (ใช้เฉพาะ "ตัวเครื่องมือ" — ไฟล์ที่ export ไม่มีลิงก์พวกนี้) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;600;700&family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation / Header -->
+  <header class="app-header">
+    <div class="header-branding">
+      <div class="brand-icon"><i class="fa-solid fa-cubes" aria-hidden="true"></i></div>
+      <div class="brand-info">
+        <h1>Login &amp; Register Studio</h1>
+        <p>เครื่องมือออกแบบและสร้างฟอร์มสำหรับนักเรียน ชั้นมัธยมศึกษาปีที่ 5 — เรียน HTML/CSS/JS โดยไม่ต้องมีหลังบ้าน</p>
+      </div>
+    </div>
+
+    <div class="step-navigator" role="tablist" aria-label="ขั้นตอนการทำงาน">
+      <button id="step1-tab-btn" class="step-tab-btn active" role="tab" aria-selected="true" onclick="switchMainStep(1)">
+        <span class="step-number">1</span>
+        <span class="step-label">Visual Builder (สร้าง HTML)</span>
+      </button>
+      <div class="step-divider"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
+      <button id="step2-tab-btn" class="step-tab-btn" role="tab" aria-selected="false" onclick="switchMainStep(2)">
+        <span class="step-number">2</span>
+        <span class="step-label">CSS &amp; JS Studio (ตกแต่ง &amp; Export)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Work Area -->
+  <main class="app-container">
+
+    <!-- ==================== STEP 1: VISUAL HTML BUILDER ==================== -->
+    <section id="step1-panel" class="step-panel active">
+      <div class="builder-layout">
+
+        <!-- Left Sidebar: Form Component Toolbox (ย่อ/ขยายได้) -->
+        <aside class="toolbox-sidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-heading">
+              <h2><i class="fa-solid fa-toolbox" aria-hidden="true"></i> เครื่องมือองค์ประกอบ</h2>
+              <p>คลิกเพื่อเพิ่มองค์ประกอบลงในฟอร์ม</p>
+            </div>
+          </div>
+
+          <div class="sidebar-body" id="panel-toolbox-body">
+            <div class="view-target-selector">
+              <span id="target-label" class="selector-label"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> กำหนดเป้าหมายฟอร์ม:</span>
+              <div class="target-btn-group" role="group" aria-labelledby="target-label">
+                <button id="target-login-btn" class="target-btn active" onclick="setBuilderTarget('login')">
+                  <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> ฝั่ง Login
+                </button>
+                <button id="target-register-btn" class="target-btn" onclick="setBuilderTarget('register')">
+                  <i class="fa-solid fa-user-plus" aria-hidden="true"></i> ฝั่ง Register
+                </button>
+              </div>
+            </div>
+
+            <div class="component-category">
+              <span class="category-title">องค์ประกอบพื้นฐาน (คลิกเพื่อเพิ่ม)</span>
+              <!-- สร้างจาก COMPONENTS ใน app.js (ที่เดียวกับแถบ "เพิ่มเร็ว" บนจอมือถือ) -->
+              <div class="component-grid" id="component-grid"></div>
+            </div>
+
+            <div class="preset-templates-box">
+              <button class="btn btn-outline-full" onclick="loadDefaultFormStructure()">
+                <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> โหลดโครงสร้างฟอร์มมาตรฐาน
+              </button>
+              <button class="btn btn-outline-full" onclick="resetSavedData()">
+                <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> ล้างข้อมูลที่บันทึกไว้ทั้งหมด
+              </button>
+              <p class="sidebar-note" id="autosave-note">งานของคุณถูกบันทึกอัตโนมัติในเบราว์เซอร์เครื่องนี้</p>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Center Canvas: Interactive Builder View -->
+        <div class="canvas-viewport">
+
+          <!-- แถบ "เพิ่มเร็ว" สำหรับจอเล็ก (เห็นพร้อมกระดานตั้งแต่หน้าจอแรก) -->
+          <div class="quickbar" aria-label="เพิ่มองค์ประกอบเร็ว">
+            <span class="quickbar-label">เพิ่มเร็ว:</span>
+            <div class="quickbar-grid" id="quickbar-grid"></div>
+          </div>
+
+          <div class="canvas-header">
+            <div class="canvas-title-group">
+              <h2><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> พื้นที่ออกแบบฟอร์ม (Interactive Canvas)</h2>
+              <span id="active-target-badge" class="badge badge-sky">กำลังแก้ไข: ฟอร์ม Login</span>
+            </div>
+            <div class="header-actions">
+              <!-- ปุ่มเปิด/ปิดแถบ อยู่ในแถบหัวเรื่อง → ตำแหน่งคงที่ทั้งตอนเปิดและปิด (แถบซ่อนเป็นค่าเริ่มต้น ทุกขนาดจอ) -->
+              <button type="button" id="panel-toolbox-toggle" class="btn btn-secondary btn-sm panel-open-btn" data-label="แถบเครื่องมือ"
+                      aria-expanded="false" aria-controls="panel-toolbox-body"
+                      onclick="togglePanel('toolbox', event)">
+                <i class="fa-solid fa-toolbox" aria-hidden="true"></i> เครื่องมือ
+              </button>
+              <button type="button" id="panel-inspector-toggle" class="btn btn-secondary btn-sm panel-open-btn" data-label="แถบคุณสมบัติ"
+                      aria-expanded="false" aria-controls="panel-inspector-body"
+                      onclick="togglePanel('inspector', event)">
+                <i class="fa-solid fa-sliders" aria-hidden="true"></i> คุณสมบัติ
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="clearCanvas()">
+                <i class="fa-solid fa-trash-can" aria-hidden="true"></i> ล้างกระดาน
+              </button>
+            </div>
+          </div>
+
+          <div class="canvas-dropzone" id="builder-canvas">
+            <!-- Dynamic elements generated here -->
+          </div>
+        </div>
+
+        <!-- Right Sidebar: Inspector Panel & Forward Control (ย่อ/ขยายได้) -->
+        <aside class="inspector-sidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-heading">
+              <h2><i class="fa-solid fa-sliders" aria-hidden="true"></i> คุณสมบัติองค์ประกอบ</h2>
+              <p>ปรับแต่งค่าขององค์ประกอบที่เลือก</p>
+            </div>
+          </div>
+
+          <div class="sidebar-body" id="panel-inspector-body">
+            <div id="inspector-properties" class="properties-body">
+              <div class="empty-inspector-state">
+                <i class="fa-solid fa-arrow-pointer" aria-hidden="true"></i>
+                <p>คลิกเลือกองค์ประกอบในพื้นที่ออกแบบเพื่อปรับแต่งคุณสมบัติ</p>
+              </div>
+            </div>
+
+            <div class="forward-action-card">
+              <h3>พร้อมนำไปตกแต่งต่อ?</h3>
+              <p>ส่งโครงสร้าง HTML ที่ออกแบบเรียบร้อยแล้วไปยังขั้นตอนที่ 2</p>
+              <button class="btn btn-primary btn-lg btn-full" onclick="forwardToStep2()">
+                ส่งไปยังขั้นตอนที่ 2 (CSS &amp; JS Studio) <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- ==================== STEP 2: CSS & JS STUDIO ==================== -->
+    <section id="step2-panel" class="step-panel">
+      <div class="studio-layout">
+
+        <!-- Studio Controls Sidebar: จัดเป็น "กลุ่ม" ที่ย่อ/ขยายได้ หาง่าย ไม่ต้องลากยาว -->
+        <aside class="studio-controls-sidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-heading">
+              <h2><i class="fa-solid fa-palette" aria-hidden="true"></i> ตกแต่งสไตล์ &amp; อนิเมชัน</h2>
+              <p>ทุกอย่างเปลี่ยนทันทีทั้งในหน้าตัวอย่าง และในโค้ดที่ export</p>
+            </div>
+          </div>
+
+          <div class="sidebar-body" id="panel-controls-body">
+
+            <div class="group-tools">
+              <span class="group-tools-label"><i class="fa-solid fa-list-ul" aria-hidden="true"></i> 5 กลุ่มตั้งค่า — กดหัวข้อเพื่อเปิดดู (เริ่มต้นพับไว้ เห็นแค่หัวข้อใหญ่)</span>
+              <div class="group-tools-btns">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setAllGroups(false)">
+                  <i class="fa-solid fa-compress" aria-hidden="true"></i> ย่อทุกกลุ่ม
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="setAllGroups(true)">
+                  <i class="fa-solid fa-expand" aria-hidden="true"></i> ขยายทุกกลุ่ม
+                </button>
+              </div>
+            </div>
+
+            <!-- กลุ่ม 1: ชื่อหน้าเว็บ -->
+            <div class="control-group">
+              <button type="button" class="group-header" id="group-page-header" aria-expanded="false" aria-controls="group-page-body"
+                      data-open-label="กลุ่มชื่อหน้าเว็บ" onclick="toggleGroup('page', event)">
+                <span class="group-index">1</span>
+                <span class="group-name"><i class="fa-solid fa-heading" aria-hidden="true"></i> ชื่อหน้าเว็บ (แท็ก &lt;title&gt;)</span>
+                <i class="fa-solid fa-chevron-down group-chevron" aria-hidden="true"></i>
+              </button>
+              <div class="group-body" id="group-page-body" role="group" aria-labelledby="group-page-header" hidden>
+                <div class="input-field-unit">
+                  <label for="page-title-input">ชื่อที่แสดงบนแท็บเบราว์เซอร์:</label>
+                  <input type="text" id="page-title-input" value="ฟอร์มเข้าสู่ระบบและสมัครสมาชิก" onchange="updateStudioStyles()">
+                </div>
+              </div>
+            </div>
+
+            <!-- กลุ่ม 2: ชุดธีมสำเร็จรูป -->
+            <div class="control-group">
+              <button type="button" class="group-header" id="group-theme-header" aria-expanded="false" aria-controls="group-theme-body"
+                      data-open-label="กลุ่มชุดธีมสำเร็จรูป" onclick="toggleGroup('theme', event)">
+                <span class="group-index">2</span>
+                <span class="group-name"><i class="fa-solid fa-swatchbook" aria-hidden="true"></i> ชุดธีมสำเร็จรูป (10 ชุด)</span>
+                <i class="fa-solid fa-chevron-down group-chevron" aria-hidden="true"></i>
+              </button>
+              <div class="group-body" id="group-theme-body" role="group" aria-labelledby="group-theme-header" hidden>
+                <p class="control-hint">แต่ละชุดเปลี่ยน <strong>สี • ฟอนต์ • ความมน • ความเบลอ • พื้นหลัง • อนิเมชัน</strong> พร้อมกัน
+                  (ตัวอย่างย่อด้านล่างใช้ค่าจริงของธีมนั้น) — ถ้าใส่รูปพื้นหลังไว้ รูปจะยังอยู่ทับไล่สีของธีม</p>
+                <!-- สร้างจาก THEME_PRESETS ใน app.js พร้อมตัวอย่างย่อ (swatch) -->
+                <div class="theme-presets-grid" id="theme-presets-grid" role="group" aria-label="ชุดธีมสำเร็จรูป"></div>
+              </div>
+            </div>
+
+            <!-- กลุ่ม 3: สี + พื้นหลัง + ความโปร่งแสง/ความเบลอ (รวมเป็นกลุ่มเดียว เพราะนักเรียนใช้ด้วยกันบ่อย) -->
+            <div class="control-group">
+              <button type="button" class="group-header" id="group-appearance-header" aria-expanded="false" aria-controls="group-appearance-body"
+                      data-open-label="กลุ่มสี พื้นหลัง และความโปร่งแสง/เบลอ" onclick="toggleGroup('appearance', event)">
+                <span class="group-index">3</span>
+                <span class="group-name"><i class="fa-solid fa-palette" aria-hidden="true"></i> สี • พื้นหลัง • ความโปร่งแสง &amp; ความเบลอของการ์ด</span>
+                <i class="fa-solid fa-chevron-down group-chevron" aria-hidden="true"></i>
+              </button>
+              <div class="group-body" id="group-appearance-body" role="group" aria-labelledby="group-appearance-header" hidden>
+                <p class="control-hint">กลุ่มนี้รวมทุกอย่างที่กำหนด <strong>หน้าตาของการ์ด</strong> ไว้ที่เดียว:
+                   สี 4 ตำแหน่ง · รูปพื้นหลัง (URL / เลือกจากเครื่อง / ลากมาวาง) · พื้นหลังสำเร็จรูป 6 แบบ · ความโปร่งแสง · ความเบลอ</p>
+
+                <div class="color-picker-grid">
+                  <div class="picker-item">
+                    <label for="color-accent">สีเน้นหลัก (Accent):</label>
+                    <input type="color" id="color-accent" value="#2563eb" onchange="updateStudioStyles()">
+                  </div>
+                  <div class="picker-item">
+                    <label for="color-card-bg">พื้นหลังการ์ด (Card BG):</label>
+                    <input type="color" id="color-card-bg" value="#ffffff" onchange="updateStudioStyles()">
+                  </div>
+                  <div class="picker-item">
+                    <label for="color-text">สีข้อความหลัก (Text):</label>
+                    <input type="color" id="color-text" value="#0f172a" onchange="updateStudioStyles()">
+                  </div>
+                  <div class="picker-item">
+                    <label for="color-border">เส้นขอบอินพุต (Border):</label>
+                    <input type="color" id="color-border" value="#cbd5e1" onchange="updateStudioStyles()">
+                  </div>
+                </div>
+
+                <!-- ตรวจว่าสีที่เลือกอ่านง่ายไหม (คำนวณให้ทันที ไม่ต้องมีหลังบ้าน) -->
+                <div class="contrast-note" id="contrast-note" role="status" aria-live="polite"></div>
+
+                <div class="field-stack">
+                  <label for="bg-image-url">รูปพื้นหลังจาก URL (ถ้ามี):</label>
+                  <input type="text" id="bg-image-url" value="" placeholder="วางที่อยู่ของไฟล์รูป เช่น https://... (เว้นว่างได้)" onchange="onBgUrlChanged()">
+                  <p class="control-hint">ต้องเป็นที่อยู่ของ <strong>"ไฟล์รูปโดยตรง"</strong> (เช่น ลิงก์ที่ลงท้าย .jpg/.png หรือลิงก์รูปตรง ๆ) —
+                     ถ้าเป็นลิงก์หน้าเว็บที่รูปไปอยู่ข้างใน จะใช้ไม่ได้ · วางลิงก์ปุ๊บระบบจะตรวจว่ามีรูปจริงไหมให้ทันที (ถ้าไม่ผ่านจะมีคำอธิบายเป็นภาษาไทย)
+                     · ลากรูปจากแท็บอื่นหรือลากไฟล์จากเครื่องมาวางในช่องนี้ก็ได้</p>
+                  <div class="bg-actions">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="pickBgFile()">
+                      <i class="fa-solid fa-folder-open" aria-hidden="true"></i> เลือกรูปจากเครื่อง
+                    </button>
+                    <button type="button" class="btn btn-outline-full btn-sm" id="bg-image-clear" onclick="clearBackgroundImage()" disabled>
+                      <i class="fa-solid fa-eraser" aria-hidden="true"></i> ลบรูปพื้นหลัง
+                    </button>
+                  </div>
+                  <input type="file" id="bg-image-file" class="sr-only" accept="image/*" onchange="handleBgFileInput(this.files)">
+                </div>
+
+                <div class="bg-dropzone" id="bg-drop-zone" tabindex="0" role="button"
+                     aria-label="ลากรูปมาวางที่นี่ หรือกด Enter เพื่อเลือกไฟล์จากเครื่อง">
+                  <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+                  <span>ลากรูปมาวางที่นี่ (ฝังรูปไว้ในไฟล์ → เปิดใช้ได้แม้ไม่มีเน็ต)</span>
+                </div>
+
+                <div class="bg-status" id="bg-status" role="status" aria-live="polite"></div>
+
+                <div class="bg-thumb-row" id="bg-thumb-row" hidden>
+                  <img id="bg-thumb" class="bg-thumb" alt="ตัวอย่างรูปพื้นหลังที่ใช้อยู่">
+                  <span id="bg-thumb-info" class="control-hint"></span>
+                </div>
+
+                <div class="field-stack">
+                  <span class="mini-label">พื้นหลังสำเร็จรูป (ไม่ต้องใช้เน็ต):</span>
+                  <div class="gradient-presets" id="gradient-presets" role="group" aria-label="พื้นหลังสำเร็จรูป"></div>
+                </div>
+
+                <div class="slider-field-unit">
+                  <div class="slider-info">
+                    <label for="slider-card-opacity">ความโปร่งแสงการ์ด (Opacity):</label>
+                    <span id="val-card-opacity">95%</span>
+                  </div>
+                  <input type="range" id="slider-card-opacity" min="40" max="100" value="95" oninput="updateStudioStyles()">
+                </div>
+                <div class="slider-field-unit">
+                  <div class="slider-info">
+                    <label for="slider-card-blur">ความเบลอพื้นหลังการ์ด (Blur):</label>
+                    <span id="val-card-blur">16px</span>
+                  </div>
+                  <input type="range" id="slider-card-blur" min="0" max="40" value="16" oninput="updateStudioStyles()">
+                </div>
+                <p class="control-hint">เว้นว่างทั้งช่อง URL และไม่มีรูปที่ฝังไว้ = ใช้พื้นหลังไล่สี (ค่าเริ่มต้น) — กดพื้นหลังสำเร็จรูป หรือลากรูปมาวางทับหน้าตัวอย่างได้เลย
+                  · รูปที่เลือกจากเครื่อง (หรือลากมาวาง) จะถูก <strong>ฝังไว้ในไฟล์</strong> → เปิดใช้ได้แม้ไม่มีเน็ต</p>
+              </div>
+            </div>
+
+            <!-- กลุ่ม 4: ปุ่มสลับ + เอฟเฟกต์ -->
+            <div class="control-group">
+              <button type="button" class="group-header" id="group-switcher-header" aria-expanded="false" aria-controls="group-switcher-body"
+                      data-open-label="กลุ่มปุ่มสลับและอนิเมชัน" onclick="toggleGroup('switcher', event)">
+                <span class="group-index">4</span>
+                <span class="group-name"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> รูปแบบปุ่มสลับ &amp; อนิเมชัน</span>
+                <i class="fa-solid fa-chevron-down group-chevron" aria-hidden="true"></i>
+              </button>
+              <div class="group-body" id="group-switcher-body" role="group" aria-labelledby="group-switcher-header" hidden>
+                <div class="select-field-unit">
+                  <label for="switcher-style-select">สไตล์ปุ่มสลับ:</label>
+                  <select id="switcher-style-select" onchange="updateStudioStyles()">
+                    <option value="tabs">แท็บสี่เหลี่ยมมาตรฐาน (Tabs)</option>
+                    <option value="sliding">เลื่อนไสลด์ร่วม (Sliding Segment)</option>
+                    <option value="minimal">ลิงก์ข้อความมินิมอล (Minimal Link)</option>
+                    <option value="pill">ปุ่มทรงแคปซูล (Pill Buttons)</option>
+                  </select>
+                </div>
+                <div class="select-field-unit">
+                  <label for="transition-fx-select">เอฟเฟกต์สลับหน้า:</label>
+                  <select id="transition-fx-select" onchange="updateStudioStyles()">
+                    <option value="slide">เลื่อนสไลด์แนวนอน (Sliding Animation)</option>
+                    <option value="fade">ค่อยๆ จางเปลี่ยนหน้า (Smooth Fade)</option>
+                    <option value="flip">พลิกการ์ดสามมิติ (3D Card Flip)</option>
+                    <option value="zoom">ย่อ-ขยายซูม (Zoom &amp; Scale)</option>
+                    <option value="bounce">เด้งยืดหยุ่น (Spring Bounce)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- กลุ่ม 5: ฟอนต์ + ความมน -->
+            <div class="control-group">
+              <button type="button" class="group-header" id="group-typography-header" aria-expanded="false" aria-controls="group-typography-body"
+                      data-open-label="กลุ่มฟอนต์และความมน" onclick="toggleGroup('typography', event)">
+                <span class="group-index">5</span>
+                <span class="group-name"><i class="fa-solid fa-text-height" aria-hidden="true"></i> ฟอนต์ &amp; ความมนของการ์ด</span>
+                <i class="fa-solid fa-chevron-down group-chevron" aria-hidden="true"></i>
+              </button>
+              <div class="group-body" id="group-typography-body" role="group" aria-labelledby="group-typography-header" hidden>
+                <div class="select-field-unit">
+                  <label for="font-family-select">ฟอนต์ตัวอักษร:</label>
+                  <select id="font-family-select" onchange="updateStudioStyles()">
+                    <option value="Prompt">Prompt (ยอดนิยม)</option>
+                    <option value="Inter">Inter (สากล)</option>
+                    <option value="Sarabun">Sarabun (ทางการ)</option>
+                    <option value="Kanit">Kanit (โมเดิร์น)</option>
+                    <option value="system">ฟอนต์ในเครื่อง (ไม่ต้องโหลดจากเน็ต)</option>
+                  </select>
+                </div>
+                <div class="slider-field-unit">
+                  <div class="slider-info">
+                    <label for="slider-card-radius">ความโค้งมนการ์ด (Border Radius):</label>
+                    <span id="val-card-radius">16px</span>
+                  </div>
+                  <input type="range" id="slider-card-radius" min="0" max="32" value="16" oninput="updateStudioStyles()">
+                </div>
+                <p class="control-hint">ความมนตัวเดียวคุมทั้งการ์ด ปุ่มสลับ ช่องกรอก และปุ่มส่ง</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Compute Code Action -->
+          <div class="compute-action-card">
+            <button class="btn btn-sky btn-lg btn-full" onclick="processAndCompileCode()">
+              <i class="fa-solid fa-gears" aria-hidden="true"></i> ประมวลผลและสร้างโค้ด (อัปเดตอัตโนมัติอยู่แล้ว)
+            </button>
+          </div>
+        </aside>
+
+        <!-- Live Interactive Preview Canvas -->
+        <div class="studio-preview-viewport">
+          <div class="preview-toolbar">
+            <div class="toolbar-left">
+              <h2><i class="fa-solid fa-desktop" aria-hidden="true"></i> ตัวอย่างหน้าเว็บจริง (Live Canvas)</h2>
+            </div>
+            <div class="toolbar-right">
+              <!-- ปุ่มเปิด/ปิดแถบตกแต่ง อยู่ในแถบหัวเรื่อง → ตำแหน่งคงที่ทั้งตอนเปิดและปิด -->
+              <button type="button" id="panel-controls-toggle" class="btn btn-secondary btn-sm panel-open-btn" data-label="แถบตกแต่ง"
+                      aria-expanded="false" aria-controls="panel-controls-body"
+                      onclick="togglePanel('controls', event)">
+                <i class="fa-solid fa-palette" aria-hidden="true"></i> ตกแต่ง
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="openModalPreview()">
+                <i class="fa-solid fa-expand" aria-hidden="true"></i> พรีวิว Pop-up Modal เต็มจอ
+              </button>
+            </div>
+          </div>
+
+          <div class="preview-stage-container" id="preview-stage">
+            <!-- สร้างการ์ด Login/Register จาก JavaScript (ที่เดียวกับที่ใช้ export) -->
+            <div id="preview-stage-root"></div>
+          </div>
+
+          <!-- Full Page Code Generator & Exporter Hub -->
+          <div class="code-exporter-panel">
+            <div class="exporter-header">
+              <div class="exporter-title">
+                <h3><i class="fa-solid fa-code" aria-hidden="true"></i> โค้ดฉบับสมบูรณ์พร้อมรัน (ไฟล์ HTML ไฟล์เดียว)</h3>
+                <p>โค้ดนี้คือไฟล์เดียวที่รวม HTML5 + CSS (CSS Variables) + JavaScript (สลับหน้า Login/Register) ไว้ครบ
+                   ทำงานได้โดยไม่ต้องมีหลังบ้าน และไม่ต้องต่ออินเทอร์เน็ต — ก๊อปวางในไฟล์ <code>index.html</code> แล้วดับเบิลคลิกเปิดได้เลย
+                   (โค้ดด้านล่างอัปเดตตามทุกครั้งที่แก้ไข) <span id="code-size-note" class="code-size-note"></span></p>
+              </div>
+              <div class="exporter-actions">
+                <button id="panel-code-toggle" class="btn btn-secondary btn-sm panel-toggle-inline" data-label="โค้ด"
+                        aria-expanded="true" aria-controls="panel-code-body" onclick="togglePanel('code', event)">
+                  <i class="fa-solid fa-eye-slash" aria-hidden="true"></i> <span class="toggle-text">ซ่อนโค้ด</span>
+                </button>
+                <button id="panel-teach-toggle" class="btn btn-secondary btn-sm panel-toggle-inline" data-label="โหมดสอนอ่านโค้ด"
+                        aria-expanded="false" aria-controls="panel-teach-body" onclick="togglePanel('teach', event)">
+                  <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> <span class="toggle-text">โหมดสอนอ่านโค้ด</span>
+                </button>
+                <button id="copy-standalone-btn" class="btn btn-success btn-md" onclick="copyFullStandaloneHTML()">
+                  <i class="fa-solid fa-copy" aria-hidden="true"></i> คัดลอกโค้ดทั้งหน้าเว็บ (Full Page Code)
+                </button>
+                <button id="download-standalone-btn" class="btn btn-sky btn-md" onclick="downloadStandaloneHTML()">
+                  <i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลดเป็นไฟล์ index.html
+                </button>
+              </div>
+            </div>
+
+            <div class="code-editor-box" id="panel-code-body">
+              <label class="sr-only" for="standalone-code-output">โค้ด HTML ที่สร้างได้</label>
+              <textarea id="standalone-code-output" readonly spellcheck="false" placeholder="โค้ดจะปรากฏที่นี่..."></textarea>
+            </div>
+
+            <!-- โหมดสอนอ่านโค้ด: แยกโค้ดเป็นส่วน + คำอธิบายภาษาไทย + คัดลอกเฉพาะส่วน (สอนทีละ concept) -->
+            <div class="teach-code-panel" id="panel-teach-body" hidden>
+              <p class="teach-intro"><strong>โหมดสอนอ่านโค้ด</strong> — โค้ดชุดเดียวกับกล่องด้านบน แต่แยกเป็นส่วน ๆ
+                พร้อมคำอธิบายว่าส่วนนั้นทำอะไร (โค้ดที่แสดงตัดให้สั้นเพื่ออ่านง่าย — ปุ่ม “คัดลอกส่วนนี้” จะได้โค้ดเต็ม)</p>
+              <div id="teach-code-parts"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Fullscreen Modal Preview -->
+  <div id="preview-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-title"><i class="fa-solid fa-eye" aria-hidden="true"></i> ตัวอย่างการทำงานแบบเต็มจอ (Pop-up Modal Preview)</h3>
+        <button class="modal-close-btn" aria-label="ปิดหน้าต่างตัวอย่าง (หรือกด Esc)" onclick="closeModalPreview()"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </div>
+      <div class="modal-body" id="modal-preview-stage">
+        <!-- สร้างการ์ดใหม่จาก JavaScript ตอนเปิด (ไม่ใช้การ copy DOM → ไม่มี id ซ้ำ) -->
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
