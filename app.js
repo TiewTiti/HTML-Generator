@@ -142,6 +142,7 @@ let selectedElementId = null;
 let previewView = 'login';        // หน้าที่แสดงในตัวอย่าง (ใช้ร่วมกันทั้งหน้าตัวอย่างและ modal)
 let idSeq = 100;                  // ตัวนับ id (แยกจาก el-1..el-9 ของฟอร์มตัวอย่าง เพื่อไม่ให้ id ซ้ำ)
 let pageTitle = 'ฟอร์มเข้าสู่ระบบและสมัครสมาชิก';
+let dragSourceId = null;          // id ของการ์ดที่กำลังลากเพื่อสลับตำแหน่ง (null = ไม่ได้ลากอยู่)
 
 const DEFAULT_LOGIN = () => ([
   { id: 'el-1', type: 'heading',  label: 'เข้าสู่ระบบ', subtitle: 'กรอกบัญชีผู้ใช้เพื่อเข้าสู่ระบบ', colSpan: 12 },
@@ -664,6 +665,41 @@ function removeElement(id) {
   commitAll();
 }
 
+// --------------------------------------------------------------------------
+// ย้ายตำแหน่งองค์ประกอบในฟอร์ม (สลับลำดับ) — ไม่ต้องลบแล้วสร้างใหม่ให้เสียเวลา
+// ลำดับในอาร์เรย์ = ลำดับที่แสดงบนกระดาน และลำดับที่ออกมาในโค้ด HTML
+// --------------------------------------------------------------------------
+function moveElement(id, dir) {
+  const list = getActiveList();
+  const from = list.findIndex((el) => el.id === id);
+  if (from < 0) return;
+  const to = from + dir;
+  if (to < 0 || to >= list.length) return;   // อยู่บนสุด/ล่างสุดแล้ว ไม่ต้องทำอะไร
+  const [moved] = list.splice(from, 1);
+  list.splice(to, 0, moved);
+  selectedElementId = moved.id;
+  commitAll();
+}
+
+// ย้าย id ไปไว้ "ก่อน/หลัง" เป้าหมาย (ใช้ตอนลากการ์ดวางทับ)
+function reorderElement(sourceId, targetId, placeBefore) {
+  const list = getActiveList();
+  const from = list.findIndex((el) => el.id === sourceId);
+  if (from < 0 || sourceId === targetId) return;
+  if (!list.some((el) => el.id === targetId)) return;
+  const [moved] = list.splice(from, 1);
+  let to = list.findIndex((el) => el.id === targetId);
+  if (!placeBefore) to += 1;
+  list.splice(to, 0, moved);
+  selectedElementId = moved.id;
+  commitAll();
+}
+
+function clearDropMarkers() {
+  document.querySelectorAll('#builder-canvas .canvas-item.drop-before, #builder-canvas .canvas-item.drop-after')
+    .forEach((el) => el.classList.remove('drop-before', 'drop-after'));
+}
+
 function selectElement(id) {
   selectedElementId = id;
   renderCanvas();
@@ -683,16 +719,55 @@ function renderCanvas() {
     return;
   }
 
-  list.forEach((item) => {
+  list.forEach((item, idx) => {
+    const isFirst = idx === 0;
+    const isLast = idx === list.length - 1;
     const itemCard = document.createElement('div');
     itemCard.className = `canvas-item col-${item.colSpan || 12} ${selectedElementId === item.id ? 'selected' : ''}`;
     itemCard.tabIndex = 0;
-    itemCard.setAttribute('aria-label', `องค์ประกอบ ${item.type} : ${item.label || ''} — กด Enter เพื่อเลือก กด Delete เพื่อลบ`);
+    itemCard.dataset.elementId = item.id;
+    itemCard.setAttribute('aria-label', `องค์ประกอบ ${item.type} : ${item.label || ''} — ลำดับที่ ${idx + 1} จาก ${list.length}`);
+    itemCard.title = 'ลากการ์ดนี้เพื่อสลับตำแหน่งได้เลย';
     itemCard.onclick = (e) => { e.stopPropagation(); selectElement(item.id); };
     itemCard.onkeydown = (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectElement(item.id); }
       if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); removeElement(item.id); }
+      // ย้ายตำแหน่งด้วยคีย์บอร์ด: Alt + ลูกศรขึ้น/ลง
+      if (e.altKey && e.key === 'ArrowUp') { e.preventDefault(); moveElement(item.id, -1); }
+      if (e.altKey && e.key === 'ArrowDown') { e.preventDefault(); moveElement(item.id, 1); }
     };
+
+    // ----- ลากการ์ดเพื่อสลับตำแหน่ง (ทางเลือกเสริมจากปุ่มลูกศร) -----
+    itemCard.draggable = true;
+    itemCard.addEventListener('dragstart', (e) => {
+      dragSourceId = item.id;
+      itemCard.classList.add('dragging');
+      try { e.dataTransfer.setData('text/plain', item.id); e.dataTransfer.effectAllowed = 'move'; } catch (err) {}
+    });
+    itemCard.addEventListener('dragend', () => {
+      dragSourceId = null;
+      itemCard.classList.remove('dragging');
+      clearDropMarkers();
+    });
+    itemCard.addEventListener('dragover', (e) => {
+      if (!dragSourceId || dragSourceId === item.id) return;
+      e.preventDefault();
+      try { e.dataTransfer.dropEffect = 'move'; } catch (err) {}
+      const rect = itemCard.getBoundingClientRect();
+      const placeBefore = (e.clientY - rect.top) < rect.height / 2;
+      clearDropMarkers();
+      itemCard.classList.add(placeBefore ? 'drop-before' : 'drop-after');
+    });
+    itemCard.addEventListener('drop', (e) => {
+      if (!dragSourceId || dragSourceId === item.id) return;
+      e.preventDefault();
+      const rect = itemCard.getBoundingClientRect();
+      const placeBefore = (e.clientY - rect.top) < rect.height / 2;
+      const sourceId = dragSourceId;
+      dragSourceId = null;
+      clearDropMarkers();
+      reorderElement(sourceId, item.id, placeBefore);
+    });
 
     let contentHTML = '';
     if (item.type === 'heading') {
@@ -709,8 +784,11 @@ function renderCanvas() {
     }
 
     itemCard.innerHTML = `
+      <div class="item-order-hint" aria-hidden="true">ลำดับ ${idx + 1}</div>
       <div class="item-controls">
-        <button class="ctrl-btn" aria-label="ลบองค์ประกอบนี้" onclick="event.stopPropagation(); removeElement('${safeId(item.id)}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <button type="button" class="ctrl-btn ctrl-move" data-dir="up"${isFirst ? ' disabled' : ''} title="ย้ายขึ้น (ไปลำดับก่อนหน้า)" aria-label="ย้ายองค์ประกอบนี้ขึ้นหนึ่งลำดับ" onclick="event.stopPropagation(); moveElement('${safeId(item.id)}', -1)"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+        <button type="button" class="ctrl-btn ctrl-move" data-dir="down"${isLast ? ' disabled' : ''} title="ย้ายลง (ไปลำดับถัดไป)" aria-label="ย้ายองค์ประกอบนี้ลงหนึ่งลำดับ" onclick="event.stopPropagation(); moveElement('${safeId(item.id)}', 1)"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
+        <button type="button" class="ctrl-btn ctrl-delete" title="ลบองค์ประกอบนี้" aria-label="ลบองค์ประกอบนี้" onclick="event.stopPropagation(); removeElement('${safeId(item.id)}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
       ${contentHTML}
     `;
@@ -760,7 +838,7 @@ function renderInspector() {
         <option value="4" ${item.colSpan === 4 ? 'selected' : ''}>หนึ่งในสาม (33%)</option>
       </select>
     </div>
-    <p class="inspector-hint">แก้ข้อความแล้วหน้าตัวอย่าง/โค้ดด้านล่างจะเปลี่ยนตามทันที</p>
+    <p class="inspector-hint">แก้ข้อความแล้วหน้าตัวอย่าง/โค้ดด้านล่างจะเปลี่ยนตามทันที — ย้ายลำดับขององค์ประกอบได้โดยกดปุ่มลูกศรขึ้น/ลงบนการ์ด หรือลากการ์ดไปวางในตำแหน่งที่ต้องการ</p>
   `;
 }
 

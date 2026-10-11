@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login & Register Studio — เรียน HTML/CSS/JS ชั้น ม.5 (ไม่มีหลังบ้าน)</title>
+  <title>HTML Generator — เรียน HTML/CSS/JS ชั้น ม.5</title>
 
   <!-- FontAwesome & Google Fonts (ใช้เฉพาะ "ตัวเครื่องมือ" — ไฟล์ที่ export ไม่มีลิงก์พวกนี้) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,8 +21,9 @@
       <div class="brand-icon"><i class="fa-solid fa-cubes" aria-hidden="true"></i></div>
       <div class="brand-info">
         <h1>Login &amp; Register Studio</h1>
-        <p>เครื่องมือออกแบบและสร้างฟอร์มสำหรับนักเรียน ชั้นมัธยมศึกษาปีที่ 5 — เรียน HTML/CSS/JS โดยไม่ต้องมีหลังบ้าน</p>
+        <p>HTML Generator — เรียน HTML/CSS/JS ชั้น ม.5</p>
       </div>
+      
     </div>
 
     <div class="step-navigator" role="tablist" aria-label="ขั้นตอนการทำงาน">
@@ -50,7 +51,6 @@
           <div class="sidebar-header">
             <div class="sidebar-heading">
               <h2><i class="fa-solid fa-toolbox" aria-hidden="true"></i> เครื่องมือองค์ประกอบ</h2>
-              <p>คลิกเพื่อเพิ่มองค์ประกอบลงในฟอร์ม</p>
             </div>
           </div>
 
@@ -58,10 +58,10 @@
             <div class="view-target-selector">
               <span id="target-label" class="selector-label"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> กำหนดเป้าหมายฟอร์ม:</span>
               <div class="target-btn-group" role="group" aria-labelledby="target-label">
-                <button id="target-login-btn" class="target-btn active" onclick="setBuilderTarget('login')">
+                <button id="target-login-btn" class="target-btn target-btn-login active" onclick="setBuilderTarget('login')" title="แก้ไขฟอร์มฝั่ง Login (สีฟ้า)">
                   <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> ฝั่ง Login
                 </button>
-                <button id="target-register-btn" class="target-btn" onclick="setBuilderTarget('register')">
+                <button id="target-register-btn" class="target-btn target-btn-register" onclick="setBuilderTarget('register')" title="แก้ไขฟอร์มฝั่ง Register (สีเขียว)">
                   <i class="fa-solid fa-user-plus" aria-hidden="true"></i> ฝั่ง Register
                 </button>
               </div>
@@ -74,10 +74,10 @@
             </div>
 
             <div class="preset-templates-box">
-              <button class="btn btn-outline-full" onclick="loadDefaultFormStructure()">
+              <button class="btn btn-outline-full btn-tone-info" onclick="loadDefaultFormStructure()">
                 <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> โหลดโครงสร้างฟอร์มมาตรฐาน
               </button>
-              <button class="btn btn-outline-full" onclick="resetSavedData()">
+              <button class="btn btn-outline-full btn-tone-danger" onclick="resetSavedData()">
                 <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> ล้างข้อมูลที่บันทึกไว้ทั้งหมด
               </button>
               <p class="sidebar-note" id="autosave-note">งานของคุณถูกบันทึกอัตโนมัติในเบราว์เซอร์เครื่องนี้</p>

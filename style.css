@@ -91,6 +91,14 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 20px;
+  overflow: hidden;
+}
+
+.brand-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .brand-info h1 {
@@ -318,10 +326,48 @@ body {
 }
 
 .target-btn.active {
-  background-color: var(--accent-light);
+  background-color: var(--accent-primary);
   border-color: var(--accent-primary);
-  color: var(--accent-primary);
+  color: #fff;
   font-weight: 600;
+}
+
+/* ปุ่มเลือกเป้าหมายฟอร์ม — เห็นสีตลอดเวลา ไม่ต้องเดาว่ากำลังแก้ฝั่งไหน
+   Login = ฟ้า / Register = เขียว (ตอนเลือกอยู่ = สีเข้มทึบ, ตอนยังไม่เลือก = สีอ่อน) */
+.target-btn.target-btn-login {
+  border-color: #7dd3fc;
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+.target-btn.target-btn-login:hover {
+  background-color: #bae6fd;
+  border-color: #38bdf8;
+  color: #075985;
+}
+.target-btn.target-btn-login.active,
+.target-btn.target-btn-login.active:hover {
+  background-color: var(--sky-color);
+  border-color: var(--sky-color);
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25);
+}
+
+.target-btn.target-btn-register {
+  border-color: #6ee7b7;
+  background-color: #d1fae5;
+  color: #047857;
+}
+.target-btn.target-btn-register:hover {
+  background-color: #a7f3d0;
+  border-color: #34d399;
+  color: #065f46;
+}
+.target-btn.target-btn-register.active,
+.target-btn.target-btn-register.active:hover {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
 }
 
 /* Component Buttons Grid */
@@ -453,6 +499,7 @@ body {
   right: 8px;
   display: flex;
   gap: 4px;
+  z-index: 2;
 }
 
 .canvas-item .ctrl-btn {
@@ -469,10 +516,58 @@ body {
   justify-content: center;
 }
 
-.canvas-item .ctrl-btn:hover {
+/* ปุ่มเลื่อนตำแหน่ง (ขึ้น/ลง) — โทนฟ้า */
+.canvas-item .ctrl-btn.ctrl-move:hover:not(:disabled) {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-color: #7dd3fc;
+}
+
+/* ปุ่มลบ — โทนแดง (อันตราย) */
+.canvas-item .ctrl-btn.ctrl-delete:hover {
   background-color: #fee2e2;
   color: #dc2626;
   border-color: #fca5a5;
+}
+
+.canvas-item .ctrl-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.canvas-item .ctrl-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 1px;
+}
+
+/* ลากการ์ดเพื่อสลับตำแหน่ง (นอกจากกดปุ่มลูกศร) */
+.canvas-item.dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+}
+
+.canvas-item.drop-before { box-shadow: 0 -3px 0 0 var(--sky-color), var(--shadow-sm); }
+.canvas-item.drop-after { box-shadow: 0 3px 0 0 var(--sky-color), var(--shadow-sm); }
+
+.canvas-item .item-order-hint {
+  position: absolute;
+  top: -9px;
+  left: 10px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0 7px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  line-height: 16px;
+  pointer-events: none;
+}
+
+.canvas-item.selected .item-order-hint {
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  background: var(--accent-light);
 }
 
 /* Inspector Form Controls */
@@ -581,6 +676,29 @@ body {
 
 .btn-outline-full { width: 100%; border-color: var(--border-color); background: transparent; color: var(--text-main); }
 .btn-outline-full:hover { background-color: var(--surface-subtle); }
+
+/* ปุ่มโทนสีในกล่อง "โครงสร้างฟอร์มมาตรฐาน / ล้างข้อมูล" — ฟ้า = โหลด, แดง = ล้าง (อันตราย) */
+.btn-outline-full.btn-tone-info {
+  border-color: #93c5fd;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+.btn-outline-full.btn-tone-info:hover {
+  background-color: #dbeafe;
+  border-color: #60a5fa;
+  color: #1e40af;
+}
+
+.btn-outline-full.btn-tone-danger {
+  border-color: #fca5a5;
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+.btn-outline-full.btn-tone-danger:hover {
+  background-color: #fee2e2;
+  border-color: #f87171;
+  color: #991b1b;
+}
 
 .btn-sm { padding: 6px 10px; font-size: 12px; }
 .btn-md { padding: 10px 16px; font-size: 13px; }
