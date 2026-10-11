@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shiro_hompage</title>
+  <!-- ธีมที่ใช้: Resort Sky — อยากเปลี่ยนก็แก้ค่าใน :root ด้านล่างได้เลย -->
+
+  <!-- อยากได้ฟอนต์สวย ๆ (Prompt / Kanit / Sarabun)? ให้ลบเครื่องหมายคอมเมนต์บรรทัดล่างออก
+       หมายเหตุ: ต้องต่ออินเทอร์เน็ต ถ้าไม่มี เบราว์เซอร์จะใช้ฟอนต์ในเครื่องให้อัตโนมัติ
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap"> -->
+
+  <style>
+  /* ---------- พื้นหลังของทั้งหน้า ---------- */
+  * { box-sizing: border-box; }
+  html { height: 100%; }
+  body {
+    margin: 0;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 88px 24px 24px;
+    background-image: url("https://upload.wikimedia.org/wikipedia/commons/b/bf/NOAA_arctic_spring_1950_corp1104-2.jpg?utm_source=th.wikipedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled"), linear-gradient(160deg, #38bdf8, #0369a1 60%, #082f49);
+    background-size: cover;
+    background-position: center;
+    background-color: #0f172a;
+  }
+
+  /* ---------- ค่าที่เปลี่ยนได้ (CSS Variables) แก้ตัวเลขตรงนี้แล้วทั้งหน้าเปลี่ยน ---------- */
+  :root{
+    --card-accent: #0284c7;
+    --card-accent-soft: rgba(2, 132, 199, 0.18);
+    --card-bg: rgba(255, 255, 255, 0.92);
+    --card-text: #0c4a6e;
+    --card-border: #7dd3fc;
+    --card-edge: rgba(255,255,255,.65);
+    --card-shadow: 0 24px 40px -12px rgba(2,132,199,.45);
+    --card-input-bg: #f0f9ff;
+    --card-muted: #0369a1;
+    --card-switcher-bg: rgba(2,132,199,.1);
+    --card-radius: 32px;
+    --card-blur: 18px;
+    --card-font: 'Prompt', -apple-system, 'Segoe UI', 'Noto Sans Thai', sans-serif;
+  }
+
+  /* ---------- สไตล์ของการ์ดและฟอร์ม ---------- */
+/* ===== การ์ดฟอร์ม ===== */
+.auth-card-wrapper{
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 32px;
+  border-radius: var(--card-radius, 16px);
+  background-color: var(--card-bg, rgba(255,255,255,.95));
+  -webkit-backdrop-filter: blur(var(--card-blur, 16px));
+  backdrop-filter: blur(var(--card-blur, 16px));
+  border: 1px solid var(--card-edge, rgba(255,255,255,.35));
+  box-shadow: var(--card-shadow, 0 20px 25px -5px rgba(0,0,0,.28));
+  color: var(--card-text, #0f172a);
+  font-family: var(--card-font, 'Prompt', -apple-system, 'Segoe UI', 'Noto Sans Thai', sans-serif);
+}
+
+/* ===== ปุ่มสลับ Login / Register (4 แบบ เลือกด้วยคลาส style-xxxx) ===== */
+.auth-switcher-container{
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 22px;
+  background-color: var(--card-switcher-bg, rgba(15,23,42,.06));
+  border-radius: calc(var(--card-radius, 16px) * 0.62);
+}
+.switcher-tab{
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: calc(var(--card-radius, 16px) * 0.5);
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--card-muted, #64748b);
+  cursor: pointer;
+  transition: background-color .25s ease, color .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+.switcher-tab.active{ background-color: var(--card-accent, #2563eb); color: #fff; font-weight: 600; }
+/* แบบ sliding: แท็บที่เลือกดูเหมือนลอยขึ้นเล็กน้อย */
+.style-sliding .switcher-tab.active{ box-shadow: 0 6px 14px rgba(15,23,42,.22); transform: translateY(-1px); }
+/* แบบ minimal: เป็นลิงก์ข้อความ มีขีดเส้นใต้เฉพาะอันที่เลือก */
+.style-minimal .auth-switcher-container{ background: transparent; border-radius: 0; padding: 0 0 8px; gap: 20px; border-bottom: 1px solid var(--card-border, #cbd5e1); }
+.style-minimal .switcher-tab{ flex: 0 0 auto; padding: 4px 2px; border-radius: 0; }
+.style-minimal .switcher-tab.active{ background: transparent; color: var(--card-accent, #2563eb); box-shadow: none; border-bottom: 2px solid var(--card-accent, #2563eb); margin-bottom: -10px; }
+/* แบบ pill: ปุ่มแคปซูล */
+.style-pill .auth-switcher-container{ background: transparent; padding: 0; gap: 8px; }
+.style-pill .switcher-tab{ border: 1px solid var(--card-border, #cbd5e1); border-radius: 999px; padding: 8px 14px; }
+.style-pill .switcher-tab.active{ border-color: var(--card-accent, #2563eb); }
+
+/* ===== สลับหน้า Login / Register (5 เอฟเฟกต์ เลือกด้วยคลาส fx-xxxx) ===== */
+.auth-views-viewport{ position: relative; perspective: 900px; }
+.auth-view-pane{ display: none; }
+.auth-view-pane.active{ display: block; animation: viewSwitch .34s ease both; }
+@keyframes viewSwitch{ from{ opacity:0; transform: translateX(26px); } to{ opacity:1; transform: none; } }
+.fx-fade   .auth-view-pane.active{ animation-name: viewSwitchFade; }
+.fx-flip   .auth-view-pane.active{ animation-name: viewSwitchFlip; }
+.fx-zoom   .auth-view-pane.active{ animation-name: viewSwitchZoom; }
+.fx-bounce .auth-view-pane.active{ animation-name: viewSwitchBounce; }
+@keyframes viewSwitchFade{ from{ opacity:0; } to{ opacity:1; } }
+@keyframes viewSwitchFlip{ from{ opacity:0; transform: rotateY(90deg); } to{ opacity:1; transform: rotateY(0); } }
+@keyframes viewSwitchZoom{ from{ opacity:0; transform: scale(.92); } to{ opacity:1; transform: scale(1); } }
+@keyframes viewSwitchBounce{ 0%{ opacity:0; transform: translateY(-22px); } 70%{ transform: translateY(6px); } 100%{ opacity:1; transform: translateY(0); } }
+
+/* ===== องค์ประกอบในฟอร์ม (กริด 12 คอลัมน์ เหมือนหน้าออกแบบ) ===== */
+.pane-content{ display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; align-items: start; }
+.form-row{ grid-column: span 12; display: flex; flex-direction: column; gap: 6px; }
+.form-row.col-6{ grid-column: span 6; }
+.form-row.col-4{ grid-column: span 4; }
+.form-heading{ font-size: 20px; font-weight: 700; line-height: 1.3; }
+.form-subtitle{ font-size: 13px; color: var(--card-muted, #64748b); }
+.form-label{ font-size: 13px; font-weight: 600; }
+.form-label .req{ color: #e11d48; }
+.form-input{
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: calc(var(--card-radius, 16px) * 0.5);
+  border: 1px solid var(--card-border, #cbd5e1);
+  background-color: var(--card-input-bg, #fff);
+  color: inherit;
+  font-family: inherit;   /* สำคัญ: input ไม่รับค่าฟอนต์จากพ่อแม่โดยอัตโนมัติ */
+  font-size: 13px;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.form-input:focus{ outline: none; border-color: var(--card-accent, #2563eb); box-shadow: 0 0 0 3px var(--card-accent-soft, rgba(37,99,235,.18)); }
+.form-btn{
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: calc(var(--card-radius, 16px) * 0.5);
+  background-color: var(--card-accent, #2563eb);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter .2s ease;
+}
+.form-btn:hover{ filter: brightness(.93); }
+.form-check{ display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.form-divider{ border: 0; border-top: 1px solid var(--card-border, #cbd5e1); margin: 2px 0; }
+
+.navbar{
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 10;
+  background: rgba(8, 47, 73, .72);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,.2);
+  color: #fff;
+  font-family: var(--card-font, sans-serif);
+  }
+.navbar-content{
+  width: min(100%, 1120px);
+  min-height: 64px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.navbar-brand{
+  color: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.navbar-actions{ display: flex; align-items: center; gap: 10px; }
+.navbar-link{
+  padding: 9px 14px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.navbar-link:hover{ background: rgba(255,255,255,.12); }
+.navbar-link.primary{
+  background: #fff;
+  color: #075985;
+  font-weight: 600;
+}
+.navbar-link.primary:hover{ background: #e0f2fe; }
+
+/* จอเล็ก: ทุกช่องกลับมาเต็มความกว้าง + ลดขนาดปุ่มสลับให้พอดี */
+@media (max-width: 560px){
+.form-row.col-6, .form-row.col-4{ grid-column: span 12; }
+.switcher-tab{ font-size: 12px; padding: 8px 6px; gap: 4px; }
+.navbar-content{ min-height: 60px; padding: 8px 12px; gap: 8px; }
+.navbar-brand{ font-size: 16px; }
+.navbar-actions{ gap: 4px; }
+.navbar-link{ padding: 8px 10px; font-size: 12px; }
+}
+
+/* ---------- จอเล็ก ---------- */
+@media (max-width: 560px){
+  body { padding: 80px 12px 12px; }
+  .auth-card-wrapper { padding: 20px; }
+}
+  </style>
+
+  
+</head>
+<body>
+
+  <nav class="navbar" aria-label="เมนูหลัก">
+    <div class="navbar-content">
+      <a class="navbar-brand" href="#">Shiro</a>
+      <div class="navbar-actions">
+        <button class="navbar-link" type="button" data-view="login">เข้าสู่ระบบ</button>
+        <button class="navbar-link primary" type="button" data-view="register">สมัครสมาชิก</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- การ์ดฟอร์ม: เปลี่ยนคลาส style-... / fx-... เพื่อสลับรูปแบบปุ่มและเอฟเฟกต์ -->
+  <div class="auth-card-wrapper style-minimal fx-bounce">
+
+      <div class="auth-switcher-container" role="tablist" aria-label="สลับระหว่างหน้าเข้าสู่ระบบและสมัครสมาชิก">
+      <button type="button" class="switcher-tab " role="tab" aria-selected="false" data-view="login">
+      เข้าสู่ระบบ (Login)
+      </button>
+      <button type="button" class="switcher-tab active" role="tab" aria-selected="true" data-view="register">
+      สมัครสมาชิก (Register)
+      </button>
+      </div><div class="auth-views-viewport">
+      <form class="auth-form auth-view-pane " role="tabpanel" data-pane="login">
+      <div class="pane-content">
+      <div class="form-row col-12">
+      <h3 class="form-heading">Log-in</h3>
+      <p class="form-subtitle">รายละเอียด</p>
+      </div>
+      <div class="form-row col-12">
+      <hr class="form-divider">
+      </div>
+      <div class="form-row col-12">
+      <label class="form-label" for="field-el-104">อีเมล <span class="req">*</span></label>
+      <input class="form-input" id="field-el-104" name="field-el-104" type="email" placeholder="name@example.com" required>
+      </div>
+      <div class="form-row col-12">
+      <label class="form-label" for="field-el-105">รหัสผ่าน <span class="req">*</span></label>
+      <input class="form-input" id="field-el-105" name="field-el-105" type="password" placeholder="••••••••" required>
+      </div>
+      <div class="form-row col-12">
+      <label class="form-check"><input type="checkbox" id="field-el-106" name="field-el-106"> ยอมรับเงื่อนไขการใช้งาน</label>
+      </div>
+      <div class="form-row col-12">
+      <button class="form-btn" type="submit">ปุ่มกด</button>
+      </div></div>
+      </form>
+      <form class="auth-form auth-view-pane active" role="tabpanel" data-pane="register">
+      <div class="pane-content">
+      <div class="form-row col-12">
+      <h3 class="form-heading">สมัครสมาชิก</h3>
+      <p class="form-subtitle">สร้างบัญชีผู้ใช้ใหม่สำหรับชั้น ม.5</p>
+      </div>
+      <div class="form-row col-12">
+      <label class="form-label" for="field-el-6">ชื่อ-นามสกุล <span class="req">*</span></label>
+      <input class="form-input" id="field-el-6" name="field-el-6" type="text" placeholder="นายสมชาย ใจดี" required>
+      </div>
+      <div class="form-row col-12">
+      <label class="form-label" for="field-el-7">อีเมล <span class="req">*</span></label>
+      <input class="form-input" id="field-el-7" name="field-el-7" type="email" placeholder="student@school.ac.th" required>
+      </div>
+      <div class="form-row col-12">
+      <label class="form-label" for="field-el-8">ตั้งรหัสผ่าน <span class="req">*</span></label>
+      <input class="form-input" id="field-el-8" name="field-el-8" type="password" placeholder="••••••••" required>
+      </div>
+      <div class="form-row col-12">
+      <label class="form-label" for="field-el-108">ยืนยันรหัสผ่าน <span class="req">*</span></label>
+      <input class="form-input" id="field-el-108" name="field-el-108" type="password" placeholder="••••••••" required>
+      </div>
+      <div class="form-row col-12">
+      <button class="form-btn" type="submit">ปุ่มกด</button>
+      </div></div>
+      </form></div>
+  </div>
+
+  <script>
+  // ===== 1) สลับระหว่างหน้า Login และ Register =====
+  var tabs  = document.querySelectorAll('.switcher-tab');
+  var panes = document.querySelectorAll('.auth-view-pane');
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+
+      panes.forEach(function (pane) {
+        pane.classList.toggle('active', pane.dataset.pane === tab.dataset.view);
+      });
+    });
+  });
+
+  document.querySelectorAll('.navbar-link[data-view]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var matchingTab = document.querySelector('.switcher-tab[data-view="' + button.dataset.view + '"]');
+      if (matchingTab) matchingTab.click();
+    });
+  });
+
+  // ===== 2) ไม่มีหลังบ้าน: กดปุ่มแล้วแสดงข้อความตัวอย่าง =====
+  // (ถ้าเว้นช่องที่ required ไว้ เบราว์เซอร์จะเตือนให้กรอกก่อน ตามที่เขียนไว้)
+  document.querySelectorAll('.auth-form').forEach(function (form) {
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();   // กันไม่ให้หน้าเว็บรีเฟรช/เปลี่ยนหน้า
+      var which = form.dataset.pane === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+      alert('ตัวอย่างการทำงาน: ฟอร์ม "' + which + '" ส่งข้อมูลได้แล้ว\n\nแต่ไฟล์นี้ไม่มีหลังบ้าน จึงยังไม่มีการบันทึกข้อมูลจริง');
+    });
+  });
+  </script>
+</body>
+</html>
