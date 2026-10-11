@@ -33,6 +33,11 @@
   padding: 0;
 }
 
+/* กติกากลาง: element ที่มี attribute `hidden` ต้องไม่แสดงเสมอ
+   (จำเป็นเพราะสไตล์ของเราใส่ display ให้หลายกล่อง เช่น display:flex ซึ่งจะ "ทับ" กฎ [hidden] ของเบราว์เซอร์
+    ทำให้กดปิดแล้วค่า hidden=true แต่ยังเห็นอยู่ — เจอบั๊กนี้ที่ "โหมดสอนอ่านโค้ด" ปิดไม่ได้) */
+[hidden] { display: none !important; }
+
 body {
   font-family: var(--font-main);
   background-color: var(--bg-app);
@@ -692,7 +697,6 @@ body {
   padding: 6px 0 4px;
 }
 
-.group-body[hidden] { display: none; }
 
 .control-label {
   font-size: 13px;
@@ -822,7 +826,6 @@ body {
 .bg-status-link:hover { color: var(--accent-primary); }
 
 .bg-thumb-row { display: flex; align-items: center; gap: 8px; }
-.bg-thumb-row[hidden] { display: none; }
 
 .bg-thumb {
   flex: 0 0 auto;
