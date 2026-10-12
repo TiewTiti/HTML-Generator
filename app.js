@@ -161,8 +161,8 @@ const DEFAULT_REGISTER = () => ([
   { id: 'el-9', type: 'button',   label: 'ยืนยันการสมัครสมาชิก', colSpan: 12 }
 ]);
 
-let loginElements = DEFAULT_LOGIN();
-let registerElements = DEFAULT_REGISTER();
+let loginElements = [];
+let registerElements = [];
 
 const DEFAULT_CONFIG = () => ({
   themePreset: 'corporate',
@@ -433,10 +433,11 @@ function loadState() {
 }
 
 function resetSavedData() {
-  if (!confirm('ล้างข้อมูลที่บันทึกไว้ทั้งหมด และเริ่มจากฟอร์มตัวอย่างใช่หรือไม่? (คืนค่าไม่ได้)')) return;
+  if (!confirm('ล้างข้อมูลที่บันทึกไว้ทั้งหมด และเริ่มจากกระดานว่างใช่หรือไม่? (คืนค่าไม่ได้)')) return;
   try { localStorage.removeItem(STORE_KEY); localStorage.removeItem(UI_KEY); } catch (e) {}
-  loginElements = DEFAULT_LOGIN();
-  registerElements = DEFAULT_REGISTER();
+  // เริ่มจากกระดานว่าง (ไม่มี Canvas item) — ถ้าต้องการฟอร์มตัวอย่างกลับ กดปุ่ม "โหลดโครงสร้างฟอร์มมาตรฐาน"
+  loginElements = [];
+  registerElements = [];
   studioConfig = DEFAULT_CONFIG();
   pageTitle = 'ฟอร์มเข้าสู่ระบบและสมัครสมาชิก';
   idSeq = 100;
@@ -448,7 +449,7 @@ function resetSavedData() {
   syncBgUi();
   syncThemeActive(studioConfig.themePreset, null);
   commitAll();
-  toast('เริ่มใหม่จากฟอร์มตัวอย่างแล้ว');
+  toast('ล้างข้อมูลเดิมแล้ว — กระดานว่าง เริ่มสร้างฟอร์มใหม่ได้เลย');
 }
 
 // ==========================================================================
@@ -522,27 +523,28 @@ function setAllGroups(open) {
 }
 
 // ย่อ/ขยายแถบด้านข้าง (และกล่องโค้ด) — จำเป็นบนจอเล็กที่พื้นที่จำกัด
-function togglePanel(key, ev) {
-  const wasOpen = isPanelOpen(key);
-  uiState.panels[key] = !wasOpen;
+function togglePanel(panel, e) {
+  // Ensure only one side panel (toolbox or inspector) is open at a time in step1
+  // (Removed exclusive logic to allow both panels open simultaneously for layout test)
+  const wasOpen = isPanelOpen(panel);
+  uiState.panels[panel] = !wasOpen;
+  // No mutual exclusivity enforced here
   saveUiState();
-  applyPanelState(key);
-  // กดจาก "รางเปิดแถบ" (จอใหญ่): พอแถบเปิด ปุ่มในรางจะหายไปทั้งปุ่ม โฟกัสจะหลุด → ย้ายไปปุ่มในหัวเรื่อง
-  const fromRail = ev && ev.currentTarget && ev.currentTarget.classList && ev.currentTarget.classList.contains('rail-btn');
+  applyPanelState(panel);
+  const fromRail = e && e.currentTarget && e.currentTarget.classList && e.currentTarget.classList.contains('rail-btn');
   if (fromRail && !wasOpen) {
-    const headerBtn = document.getElementById('panel-' + key + '-toggle');
+    const headerBtn = document.getElementById('panel-' + panel + '-toggle');
     if (headerBtn && headerBtn.focus) headerBtn.focus({ preventScroll: true });
   }
-  // บนจอที่เรียงเป็นคอลัมน์ (≤1100px) แถบจะไปอยู่ "ต่อจาก" กระดาน/หน้าตัวอย่าง
-  // ถ้าเพิ่งกดเปิดแล้วแถบยังอยู่นอกจอ ให้เลื่อนไปให้เห็น (ไม่งั้นนักเรียนจะคิดว่ากดแล้วไม่มีอะไรเกิดขึ้น)
-  if (isPanelOpen(key) && window.matchMedia('(max-width: 1100px)').matches) {
-    const sel = { toolbox: '.toolbox-sidebar', inspector: '.inspector-sidebar', controls: '.studio-controls-sidebar' }[key];
+  if (isPanelOpen(panel) && window.matchMedia('(max-width: 1100px)').matches) {
+    const sel = { toolbox: '.toolbox-sidebar', inspector: '.inspector-sidebar', controls: '.studio-controls-sidebar' }[panel];
     const el = sel ? document.querySelector(sel) : null;
     if (el && el.getBoundingClientRect().top > window.innerHeight - 80 && el.scrollIntoView) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 }
+
 function applyPanelState(key) {
   const open = isPanelOpen(key);
   const body = document.getElementById('panel-' + key + '-body');
@@ -732,7 +734,7 @@ function renderCanvas() {
   if (list.length === 0) {
     canvas.innerHTML = `<div style="grid-column: span 12; text-align: center; color: var(--text-muted); padding: 40px;">
       <i class="fa-solid fa-plus-circle" aria-hidden="true" style="font-size: 32px; margin-bottom: 8px;"></i>
-      <p>ยังไม่มีองค์ประกอบในฟอร์ม ${esc(builderTarget)} คลิกเครื่องมือด้านซ้ายเพื่อเพิ่มองค์ประกอบ</p>
+      <p>ยังไม่มีองค์ประกอบในฟอร์ม ${esc(builderTarget)} คลิกเครื่องมือด้านซ้ายเพื่อเพิ่มองค์ประกอบ — หรือกด «โหลดโครงสร้างฟอร์มมาตรฐาน» ถ้าอยากเริ่มจากตัวอย่าง</p>
     </div>`;
     return;
   }
@@ -1073,6 +1075,78 @@ function updateStudioStyles() {
   syncGradientActive();
   regenerateCode();
   saveState();
+  // ถ้ามีสีที่ยังไม่กด "ตกลง" ค้างอยู่ แล้วผู้ใช้ไปแก้อย่างอื่น (ธีม/สไลเดอร์/สลับหน้า) = ถือว่ายืนยันสีนั้นไปด้วย
+  if (pendingColors) clearPendingColors();
+}
+
+// ==========================================================================
+// ยืนยัน/ยกเลิกการเปลี่ยนสี (รอบที่ 16 ตามคำขอผู้ใช้: พาเลชต้องมีปุ่ม ตกลง / ยกเลิก)
+// หลักการ: เลือกสี → เห็นผลทันทีในตัวอย่าง + คำเตือนคอนทราสต์ แต่ยังไม่เข้าโค้ด/ไม่บันทึก
+//          กด "ตกลง" = สร้างโค้ดใหม่ + บันทึกอัตโนมัติ · กด "ยกเลิก" = คืนค่าสีที่ใช้อยู่ก่อนเริ่มแก้
+// ==========================================================================
+const COLOR_FIELDS = [
+  { id: 'color-accent', key: 'accentColor', label: 'สีเน้นหลัก' },
+  { id: 'color-card-bg', key: 'cardBgColor', label: 'พื้นหลังการ์ด' },
+  { id: 'color-text', key: 'textColor', label: 'สีข้อความ' },
+  { id: 'color-border', key: 'borderColor', label: 'เส้นขอบอินพุต' },
+];
+let pendingColors = null;   // สำเนา studioConfig ตอน "เริ่มแก้สี" ครั้งแรก (ใช้ตอนกดยกเลิก)
+
+function readColorInputs() {
+  COLOR_FIELDS.forEach((f) => {
+    const el = document.getElementById(f.id);
+    if (el) studioConfig[f.key] = el.value;
+  });
+}
+
+function onColorInput() {
+  if (!pendingColors) pendingColors = Object.assign({}, studioConfig);   // ค่าที่ใช้อยู่จริงก่อนเริ่มแก้
+  readColorInputs();
+  // วาดผลให้เห็นทันที (ตัวอย่าง + modal + คำเตือนคอนทราสต์) แต่ยังไม่สร้างโค้ด/ไม่บันทึก
+  document.querySelectorAll('.auth-card-wrapper').forEach(applyCardVars);
+  updateStageBackground();
+  updateContrastNote();
+  showColorConfirmBar();
+}
+
+function showColorConfirmBar() {
+  const bar = document.getElementById('picker-confirm-bar');
+  const note = document.getElementById('picker-confirm-note');
+  if (!bar) return;
+  const changed = COLOR_FIELDS.filter((f) => studioConfig[f.key] !== pendingColors[f.key])
+    .map((f) => `${f.label} ${pendingColors[f.key]} → ${studioConfig[f.key]}`);
+  if (note) {
+    note.textContent = changed.length
+      ? `ยังไม่บันทึก — ${changed.join(' · ')}`
+      : 'ยังไม่บันทึก — เลือกสีใหม่แล้วกด "ตกลง" เพื่อใช้ หรือ "ยกเลิก" เพื่อคืนค่าเดิม';
+  }
+  bar.hidden = false;
+}
+
+function clearPendingColors() {
+  pendingColors = null;
+  const bar = document.getElementById('picker-confirm-bar');
+  if (bar) bar.hidden = true;
+}
+
+// กด "ตกลง": สีถูกใช้ในตัวอย่างอยู่แล้ว → สร้างโค้ดใหม่ + บันทึก แล้วปิดแถบ
+function commitPendingColors() {
+  if (!pendingColors) return;
+  pendingColors = null;
+  updateStudioStyles();
+  clearPendingColors();
+  toast('ใช้สีใหม่แล้ว (โค้ดด้านล่างอัปเดตตามเรียบร้อย)');
+}
+
+// กด "ยกเลิก": คืนค่าสีทั้งหมดกลับเป็นชุดก่อนเริ่มแก้
+function cancelPendingColors() {
+  if (!pendingColors) return;
+  Object.assign(studioConfig, pendingColors);
+  pendingColors = null;
+  applyConfigToControls();
+  updateStudioStyles();
+  clearPendingColors();
+  toast('คืนค่าสีก่อนหน้าแล้ว');
 }
 
 // เขียนค่าลงตัวควบคุมทั้งหมด (ใช้ตอนโหลดงานที่บันทึกไว้ / กดธีม / รีเซ็ต)
@@ -1331,6 +1405,7 @@ function syncBgUi() {
       : 'ยังไม่มีรูป — ใช้พื้นหลังไล่สีด้านล่างแทน';
   }
   syncGradientActive();
+  syncUrlFieldClear();   // รอบที่ 17: ให้ปุ่มล้างในช่องตรงกับค่าจริง (พิมพ์/ฝังรูป/โหลดงานเก่า)
 }
 
 // เลือกไฟล์จากเครื่อง (ปุ่ม + ลากมาวาง)
@@ -1429,6 +1504,22 @@ async function handleBgFileInput(files, opts) {
 
 // URL ที่พิมพ์/วาง: ต้องทำความสะอาดลิงก์ก่อน แล้ว "ลองโหลดจริง" (Image onload/onerror)
 // ไม่ปล่อยให้เงียบ — และไม่ดัดแปลง URL หลังตรวจแล้ว (URL ที่ตรวจ = URL ที่ใช้จริง)
+// ปุ่มล้างในช่อง URL (รอบที่ 17): โผล่เฉพาะเมื่อมีข้อความ · กดแล้วล้างช่องและเข้าทางเดิม (ว่าง = กลับไปใช้พื้นหลังไล่สี)
+function syncUrlFieldClear() {
+  const input = document.getElementById('bg-image-url');
+  const btn = document.getElementById('bg-url-clear');
+  if (input && btn) btn.hidden = input.value.trim().length === 0;
+}
+
+function clearBgUrlField() {
+  const input = document.getElementById('bg-image-url');
+  if (!input) return;
+  input.value = '';
+  syncUrlFieldClear();
+  scheduleBgUrlCheck(0);   // ตรวจทันที (ยกเลิก timer ของการพิมพ์ก่อนหน้า)
+  input.focus();
+}
+
 let bgUrlTimer = null;
 let bgUrlCheckToken = 0;
 
@@ -1503,6 +1594,7 @@ function onBgUrlChanged() {
 
   // 1) เว้นว่าง = ใช้พื้นหลังไล่สี (พฤติกรรมเดิม)
   if (!url) {
+    bgUrlCheckToken++;   // รอบที่ 17: ยกเลิกผลตรวจของ URL ที่เพิ่งล้างไป (ไม่งั้นคำเตือนของ URL เก่าโผล่ทีหลัง = หลอกผู้ใช้)
     studioConfig.bgImageUrl = '';
     syncBgUi();
     updateStudioStyles();
@@ -1546,6 +1638,7 @@ function onBgUrlChanged() {
 
 function clearBackgroundImage() {
   const had = effectiveBgUrl();
+  bgUrlCheckToken++;   // รอบที่ 17: ยกเลิกผลตรวจที่ค้างอยู่ของ URL ที่กำลังจะลบ
   studioConfig.bgImageUrl = '';
   studioConfig.bgImageData = '';
   const box = document.getElementById('bg-image-url');
@@ -1607,8 +1700,8 @@ function bindBackgroundEvents() {
   // → วางลิงก์แล้วจ้องดูตัวอย่าง จะไม่มีอะไรเกิดขึ้น ตอนนี้ตรวจให้ทันทีหลังวาง/พิมพ์เสร็จ
   const urlBox = document.getElementById('bg-image-url');
   if (urlBox) {
-    urlBox.addEventListener('paste', () => scheduleBgUrlCheck(80));
-    urlBox.addEventListener('input', () => scheduleBgUrlCheck(700));
+    urlBox.addEventListener('paste', () => { scheduleBgUrlCheck(80); syncUrlFieldClear(); });
+    urlBox.addEventListener('input', () => { scheduleBgUrlCheck(700); syncUrlFieldClear(); });
     urlBox.addEventListener('blur', () => scheduleBgUrlCheck(0));
     urlBox.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); scheduleBgUrlCheck(0); } });
   }

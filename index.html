@@ -76,7 +76,7 @@
             </div>
 
             <div class="preset-templates-box">
-              <button class="btn btn-outline-full btn-tone-info" onclick="loadDefaultFormStructure()">
+              <button class="btn btn-outline-full btn-tone-info" style="background-color:#eff6ff;color:#1d4ed8;" onclick="loadDefaultFormStructure()">
                 <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> โหลดโครงสร้างฟอร์มมาตรฐาน
               </button>
               <button class="btn btn-outline-full btn-tone-danger" onclick="resetSavedData()">
@@ -235,7 +235,7 @@
               <button type="button" class="group-header" id="group-appearance-header" aria-expanded="false" aria-controls="group-appearance-body"
                       data-open-label="กลุ่มสี พื้นหลัง และความโปร่งแสง/เบลอ" onclick="toggleGroup('appearance', event)">
                 <span class="group-index">3</span>
-                <span class="group-name"><i class="fa-solid fa-palette" aria-hidden="true"></i> สี • พื้นหลัง • ความโปร่งแสง &amp; ความเบลอของการ์ด</span>
+                <span class="group-name"><i class="fa-solid fa-palette" aria-hidden="true"></i> ตกแต่งสี • พื้นหลัง </span>
                 <i class="fa-solid fa-chevron-down group-chevron" aria-hidden="true"></i>
               </button>
               <div class="group-body" id="group-appearance-body" role="group" aria-labelledby="group-appearance-header" hidden>
@@ -245,20 +245,34 @@
                 <div class="color-picker-grid">
                   <div class="picker-item">
                     <label for="color-accent">สีเน้นหลัก (Accent):</label>
-                    <input type="color" id="color-accent" value="#2563eb" onchange="updateStudioStyles()">
+                    <input type="color" id="color-accent" value="#2563eb" oninput="onColorInput()" onchange="onColorInput()">
                   </div>
                   <div class="picker-item">
                     <label for="color-card-bg">พื้นหลังการ์ด (Card BG):</label>
-                    <input type="color" id="color-card-bg" value="#ffffff" onchange="updateStudioStyles()">
+                    <input type="color" id="color-card-bg" value="#ffffff" oninput="onColorInput()" onchange="onColorInput()">
                   </div>
                   <div class="picker-item">
                     <label for="color-text">สีข้อความหลัก (Text):</label>
-                    <input type="color" id="color-text" value="#0f172a" onchange="updateStudioStyles()">
+                    <input type="color" id="color-text" value="#0f172a" oninput="onColorInput()" onchange="onColorInput()">
                   </div>
                   <div class="picker-item">
                     <label for="color-border">เส้นขอบอินพุต (Border):</label>
-                    <input type="color" id="color-border" value="#cbd5e1" onchange="updateStudioStyles()">
+                    <input type="color" id="color-border" value="#cbd5e1" oninput="onColorInput()" onchange="onColorInput()">
                   </div>
+                </div>
+
+                <!-- ยืนยัน/ยกเลิกการเปลี่ยนสี: เลือกสีแล้วเห็นผลทันทีในหน้าตัวอย่าง แต่ยังไม่เข้าโค้ด/ไม่บันทึกจนกด "ตกลง" -->
+                <div class="picker-confirm-bar" id="picker-confirm-bar" hidden
+                     role="status" aria-live="polite" aria-label="ยืนยันการเปลี่ยนสี">
+                  <span class="picker-confirm-note" id="picker-confirm-note"></span>
+                  <span class="picker-confirm-actions">
+                    <button type="button" class="btn btn-primary btn-sm" id="color-apply-btn" onclick="commitPendingColors()">
+                      <i class="fa-solid fa-check" aria-hidden="true"></i> ตกลง
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="color-cancel-btn" onclick="cancelPendingColors()">
+                      <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> ยกเลิก
+                    </button>
+                  </span>
                 </div>
 
                 <!-- ตรวจว่าสีที่เลือกอ่านง่ายไหม (คำนวณให้ทันที ไม่ต้องมีหลังบ้าน) -->
@@ -266,7 +280,14 @@
 
                 <div class="field-stack">
                   <label for="bg-image-url">รูปพื้นหลังจาก URL (ถ้ามี):</label>
-                  <input type="text" id="bg-image-url" value="" placeholder="วางที่อยู่ของไฟล์รูป เช่น https://... (เว้นว่างได้)" onchange="onBgUrlChanged()">
+                  <div class="url-field" id="bg-url-field">
+                    <i class="fa-solid fa-link" aria-hidden="true"></i>
+                    <input type="text" id="bg-image-url" value="" placeholder="วางที่อยู่ไฟล์รูป เช่น https://... (เว้นว่าง = ใช้พื้นหลังไล่สี)" onchange="onBgUrlChanged()">
+                    <button type="button" class="url-field-clear" id="bg-url-clear" hidden
+                            aria-label="ล้างที่อยู่ในช่องนี้" title="ล้างที่อยู่ในช่องนี้" onclick="clearBgUrlField()">
+                      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                    </button>
+                  </div>
                   <p class="control-hint">ต้องเป็นที่อยู่ของ <strong>"ไฟล์รูปโดยตรง"</strong> (เช่น ลิงก์ที่ลงท้าย .jpg/.png หรือลิงก์รูปตรง ๆ) —
                      ถ้าเป็นลิงก์หน้าเว็บที่รูปไปอยู่ข้างใน จะใช้ไม่ได้ · วางลิงก์ปุ๊บระบบจะตรวจว่ามีรูปจริงไหมให้ทันที (ถ้าไม่ผ่านจะมีคำอธิบายเป็นภาษาไทย)
                      · ลากรูปจากแท็บอื่นหรือลากไฟล์จากเครื่องมาวางในช่องนี้ก็ได้</p>
