@@ -11,17 +11,27 @@
   --border-hover: #cbd5e1;
 
   --text-main: #0f172a;
-  --text-muted: #64748b;
+  --text-muted: #475569;
   --text-inverse: #ffffff;
 
   --accent-primary: #2563eb;
   --accent-hover: #1d4ed8;
   --accent-light: #eff6ff;
 
-  --success-color: #10b981;
-  --sky-color: #0284c7;
+  --success-color: #047857;
+  --sky-color: #0369a1;
 
   --font-main: 'Prompt', 'Inter', sans-serif;
+
+  /* ความสูงจริงของหัวเว็บ (ตราโรงเรียน 56px + padding บน/ล่าง 12px×2 + เส้นขอบล่าง 1px)
+     ใช้คำนวณความสูงของกระดาน/แถบด้านข้างให้ "พอดีกับจอ" พอดี
+     เดิมใช้เลข 65px (ค่าตกค้างจากหัวเว็บเวอร์ชันก่อน) → แถบด้านข้างยื่นเลยขอบล่างจอ 16px
+     ทำให้การ์ด "ส่งไปยังขั้นตอนที่ 2" ติดขอบล่างจอและแถบขาวด้านล่างถูกตัดทิ้ง */
+  --header-height: 81px;
+
+  /* ความกว้าง "รางเปิดแถบ" ที่กันไว้ด้านข้างตอนกดปิดแถบ (จอใหญ่)
+     แคบพอให้เนื้อหา (กระดาน/หน้าตัวอย่าง) ได้พื้นที่คืนเกือบเต็ม แต่ยังมีปุ่มเปิดแถบโผล่อยู่ */
+  --rail-width: 44px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -86,11 +96,11 @@ body {
      เพื่อให้ตราเต็มกรอบจริง ๆ ไม่เหลือที่ว่างข้าง ๆ มากเกินไป */
   width: 38px;
   height: 56px;
-  /* ตราโรงเรียนมีพื้นขาวของตัวเอง → ทำเป็นกรอบขาวมีเส้นขอบบาง ๆ ให้เข้าชุดกับหัวเว็บ */
-  background-color: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  /* ไม่ใส่ padding: ให้ตราเต็มกรอบเลย (พื้นหลังตราเป็นขาวเหมือนหัวเว็บ จึงกลมกลืนกัน) */
+  /* ตราโรงเรียนไฟล์ใหม่เป็น PNG โปร่งใส (ไม่มีพื้นขาวของตัวเองแล้ว)
+     → ไม่ต้องมีกรอบขาว/เส้นขอบอีก ตราจึงกลมกลืนกับพื้นหัวเว็บโดยตรง */
+  background-color: transparent;
+  border: 0;
+  /* ไม่ใส่ padding: ให้ตราเต็มกรอบเลย */
   padding: 0;
   display: flex;
   align-items: center;
@@ -152,7 +162,7 @@ body {
   border-radius: 50%;
   background-color: #cbd5e1;
   color: var(--text-main);
-  font-size: 11px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,7 +213,7 @@ body {
      กรณีที่ผู้ใช้กดซ่อนแถบใด ตัวเลขคอลัมน์จะถูกกำหนดใหม่ในบล็อกด้านล่าง (แถบที่ซ่อน = display:none) */
   grid-template-columns: 280px 1fr 320px;
   width: 100%;
-  min-height: calc(100vh - 65px);
+  min-height: calc(100vh - var(--header-height));
 }
 
 /* Sidebars Base — โครง: หัวแถบ (มีปุ่มย่อ/ขยาย) + เนื้อหาที่เลื่อนได้ */
@@ -217,7 +227,7 @@ body {
   flex-direction: column;
   gap: 10px;
   overflow: hidden;               /* ตัวเลื่อนอยู่ใน .sidebar-body */
-  max-height: calc(100vh - 65px);
+  max-height: calc(100vh - var(--header-height));
 }
 
 .inspector-sidebar {
@@ -264,20 +274,82 @@ body {
 .panel-open-btn:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
 
 /* ==========================================================================
-   แถบด้านข้างที่ "ซ่อน" = ซ่อนจริง (display:none) ไม่กินคอลัมน์ ไม่เหลือร่องว่าง
-   ของเดิมย่อเหลือแถบกว้าง 62px + ป้ายแนวตั้ง → ผู้ใช้เห็นเป็นร่องค้างอยู่
+   แถบด้านข้างที่ "ปิด" = ซ่อนเนื้อหา (display:none) แต่บนจอใหญ่จะเหลือ "รางแคบ"
+   ด้านข้างที่มีปุ่มเปิดแถบ → เนื้อหา (กระดาน/หน้าตัวอย่าง) ได้พื้นที่คืน ไม่เหลือร่องว่าง
+   (ของเดิมย่อเหลือ 62px + ป้ายแนวตั้ง เฉย ๆ ไม่มีปุ่มเปิด → ผู้ใช้เห็นเป็นร่องค้าง)
    ========================================================================== */
 .toolbox-hidden .toolbox-sidebar,
 .inspector-hidden .inspector-sidebar,
 .controls-hidden .studio-controls-sidebar { display: none; }
 
-/* ตัวเลขคอลัมน์ต้องตรงกับจำนวนแถบที่ยังแสดงอยู่ (ไม่งั้นกระดานจะไปตกช่องแคบของแถบที่ซ่อน) */
-.builder-layout.inspector-hidden:not(.toolbox-hidden) { grid-template-columns: 280px 1fr; }
-.builder-layout.toolbox-hidden:not(.inspector-hidden) { grid-template-columns: 1fr 320px; }
-.builder-layout.toolbox-hidden.inspector-hidden { grid-template-columns: 1fr; }
+/* ตัวเลขคอลัมน์ต้องตรงกับจำนวนแถบที่ยังแสดงอยู่ (ไม่งั้นกระดานจะไปตกช่องแคบของแถบที่ซ่อน)
+   แถบที่ปิดกันที่ไว้ var(--rail-width) สำหรับราง + ปุ่มเปิดแถบ */
+.builder-layout.inspector-hidden:not(.toolbox-hidden) { grid-template-columns: 280px 1fr var(--rail-width); }
+.builder-layout.toolbox-hidden:not(.inspector-hidden) { grid-template-columns: var(--rail-width) 1fr 320px; }
+.builder-layout.toolbox-hidden.inspector-hidden { grid-template-columns: var(--rail-width) 1fr var(--rail-width); }
+
+/* Step 2: ปิดแถบตกแต่ง → หน้าตัวอย่างเต็มหน้า
+   (เดิมไม่มีกฎนี้ ตัวแถบเป็น display:none แต่ตารางยังกันคอลัมน์ 360px ไว้ → พรีวิวถูกบีบเหลือ 360px) */
+.studio-layout.controls-hidden { grid-template-columns: var(--rail-width) 1fr; }
+
+/* รางเปิดแถบ: ซ่อนเป็นค่าเริ่มต้น (ใช้เฉพาะจอใหญ่ ตอนแถบนั้นถูกปิด — จอเล็กมีปุ่มเปิดในหัวเรื่องอยู่แล้ว) */
+.rail-btn { display: none; }
+
+@media (min-width: 1101px) {
+  /* รางวางแบบลอยอยู่ในเลย์เอาต์ ไม่กินคอลัมน์ของตัวเอง (คอลัมน์กันไว้แล้วใน grid-template-columns) */
+  .builder-layout,
+  .studio-layout { position: relative; }
+
+  /* จัดคอลัมน์ให้ชัดเจน: แถบที่ถูกปิดเป็น display:none ไม่กินช่องของตัวเอง
+     ถ้าปล่อยให้จัดอัตโนมัติ ช่องที่ว่างจะดึงกระดาน/หน้าตัวอย่างไปตกคอลัมน์รางแคบ ๆ (บั๊กที่เจอตอนทดสอบ) */
+  .builder-layout > .toolbox-sidebar { grid-column: 1; }
+  .builder-layout > .canvas-viewport { grid-column: 2; }
+  .builder-layout > .inspector-sidebar { grid-column: 3; }
+  .studio-layout > .studio-controls-sidebar { grid-column: 1; }
+  .studio-layout > .studio-preview-viewport { grid-column: 2; }
+
+  .rail-btn {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: var(--rail-width);
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 12px 0;
+    background-color: var(--surface-panel);
+    border: none;
+    border-right: 1px solid var(--border-color);
+    color: var(--accent-primary);
+    font-family: var(--font-main);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .rail-btn--left { left: 0; }
+
+  .rail-btn--right {
+    right: 0;
+    border-right: none;
+    border-left: 1px solid var(--border-color);
+  }
+
+  .rail-btn:hover { background-color: var(--accent-light); }
+  .rail-btn:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: -2px; }
+  .rail-btn i { font-size: 15px; }
+  .rail-label { writing-mode: vertical-rl; letter-spacing: 0.05em; }
+
+  /* โผล่เฉพาะรางของแถบที่ถูกปิดอยู่ */
+  .builder-layout.toolbox-hidden .rail-btn[data-panel="toolbox"],
+  .builder-layout.inspector-hidden .rail-btn[data-panel="inspector"],
+  .studio-layout.controls-hidden .rail-btn[data-panel="controls"] { display: flex; }
+}
 
 .sidebar-header h2 {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-main);
   display: flex;
@@ -292,7 +364,7 @@ body {
 }
 
 .sidebar-note {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
   margin-top: 8px;
   line-height: 1.4;
@@ -356,7 +428,7 @@ body {
   background-color: var(--sky-color);
   border-color: var(--sky-color);
   color: #fff;
-  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25);
+  box-shadow: 0 0 0 2px rgba(3, 105, 161, 0.25);
 }
 
 .target-btn.target-btn-register {
@@ -374,7 +446,7 @@ body {
   background-color: var(--success-color);
   border-color: var(--success-color);
   color: #fff;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 0 2px rgba(4, 120, 87, 0.25);
 }
 
 /* Component Buttons Grid */
@@ -385,7 +457,7 @@ body {
 }
 
 .category-title {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -661,7 +733,7 @@ body {
 }
 
 .inspector-hint {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
   line-height: 1.4;
 }
@@ -679,7 +751,7 @@ body {
 }
 
 .forward-action-card h3 {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--text-main);
 }
@@ -715,10 +787,10 @@ body {
 .btn-primary:hover { background-color: var(--accent-hover); }
 
 .btn-sky { background-color: var(--sky-color); color: #fff; }
-.btn-sky:hover { background-color: #0369a1; }
+.btn-sky:hover { background-color: #075985; }
 
 .btn-success { background-color: var(--success-color); color: #fff; }
-.btn-success:hover { background-color: #059669; }
+.btn-success:hover { background-color: #065f46; }
 
 .btn-secondary { background-color: var(--surface-subtle); border-color: var(--border-color); color: var(--text-main); }
 .btn-secondary:hover { background-color: var(--border-hover); }
@@ -757,7 +829,7 @@ body {
 .badge {
   padding: 2px 8px;
   border-radius: 12px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 .badge-sky { background-color: #e0f2fe; color: #0369a1; }
@@ -768,7 +840,7 @@ body {
   /* ค่าเริ่มต้น = แถบตกแต่ง "เปิด" (360px · หน้าตัวอย่าง) — ถ้ากดซ่อนจะเหลือคอลัมน์เดียว */
   grid-template-columns: 360px 1fr;
   width: 100%;
-  min-height: calc(100vh - 65px);
+  min-height: calc(100vh - var(--header-height));
 }
 
 .control-scroll-body {
@@ -833,7 +905,7 @@ body {
   border-radius: 50%;
   background-color: var(--accent-light);
   color: var(--accent-primary);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
@@ -851,7 +923,7 @@ body {
 .group-chevron {
   flex: 0 0 auto;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 12px;
   transition: transform 0.2s ease;
 }
 
@@ -875,7 +947,7 @@ body {
 }
 
 .control-hint {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
   line-height: 1.4;
 }
@@ -940,12 +1012,12 @@ body {
   overflow: hidden;
 }
 
-.theme-swatch .mini-aa { font-size: 11px; font-weight: 700; color: var(--card-text); line-height: 1; }
+.theme-swatch .mini-aa { font-size: 12px; font-weight: 700; color: var(--card-text); line-height: 1; }
 .theme-swatch .mini-line { height: 3px; border-radius: 2px; background-color: var(--card-border); opacity: 0.9; }
 .theme-swatch .mini-btn { height: 8px; border-radius: calc(var(--card-radius) * 0.35); background-color: var(--card-accent); }
 
-.theme-name { font-size: 11.5px; font-weight: 700; color: var(--text-main); line-height: 1.2; }
-.theme-hint { font-size: 10px; color: var(--text-muted); line-height: 1.3; }
+.theme-name { font-size: 12px; font-weight: 700; color: var(--text-main); line-height: 1.2; }
+.theme-hint { font-size: 11.5px; color: var(--text-muted); line-height: 1.3; }
 
 /* ----- เครื่องมือพื้นหลัง (รูปจากเครื่อง / URL / ไล่สีสำเร็จรูป) ----- */
 .field-stack { display: flex; flex-direction: column; gap: 6px; }
@@ -1036,7 +1108,7 @@ body {
 /* ----- แถบ "เพิ่มเร็ว" (จอเล็ก): หยิบองค์ประกอบได้ทันทีโดยไม่ต้องเปิดกล่องเครื่องมือ ----- */
 .quickbar { display: none; }
 
-.quickbar-label { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+.quickbar-label { font-size: 12px; font-weight: 700; color: var(--text-muted); }
 
 .quickbar-grid {
   display: flex;
@@ -1060,7 +1132,7 @@ body {
   border-radius: 8px;
   background-color: var(--surface-panel);
   font-family: var(--font-main);
-  font-size: 10.5px;
+  font-size: 12px;
   color: var(--text-main);
   cursor: pointer;
 }
@@ -1120,12 +1192,7 @@ body {
   font-size: 12px;
 }
 
-/* Compute Code Action */
-.compute-action-card {
-  margin-top: auto;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-color);
-}
+/* (รอบที่ 11) ปุ่ม "ประมวลผลและสร้างโค้ด" ถูกลบ — โค้ดอัปเดตอัตโนมัติอยู่แล้ว จึงไม่ต้องมี .compute-action-card */
 
 /* Studio Preview Viewport */
 .studio-preview-viewport {
@@ -1134,8 +1201,18 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  /* รอบที่ 14: ให้คอลัมน์นี้ "เลื่อนในตัวเอง" เหมือนแถบตกแต่ง (aside)
+     เดิมไม่จำกัดความสูง → คอลัมน์ยืดยาวตามเนื้อหา ทำให้ทั้งหน้าเลื่อน และฝั่งซ้าย (แถบตกแต่ง) เลื่อนหลุดจอ
+     ตอนนี้ทั้ง 2 ฝั่งมีความสูงเท่าจอและเลื่อนแยกกันคนละฝั่ง เหมือนกัน */
+  max-height: calc(100vh - var(--header-height));
   overflow-y: auto;
+  /* ให้เห็นว่าคอลัมน์นี้เลื่อนได้ (macOS ซ่อน scrollbar จนกว่าจะเลื่อน) */
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #0f172a;
 }
+.studio-preview-viewport::-webkit-scrollbar { width: 10px; }
+.studio-preview-viewport::-webkit-scrollbar-track { background-color: #0f172a; }
+.studio-preview-viewport::-webkit-scrollbar-thumb { background-color: #475569; border-radius: 8px; border: 2px solid #0f172a; }
 
 .preview-toolbar {
   display: flex;
@@ -1198,9 +1275,12 @@ body {
   flex-direction: column;
   gap: 10px;
 }
-.teach-intro { font-size: 12.5px; line-height: 1.6; color: #cbd5e1; margin: 0; }
+.teach-intro { max-width: 90ch; font-size: 13px; line-height: 1.65; color: #cbd5e1; margin: 0; }
+/* การ์ดบทเรียน: เรียงแถวเดียวเต็มความกว้าง (รอบที่ 12 กลับไปแบบเดิม — ตารางหลายคอลัมน์ทำให้โค้ดยาวถูกตัด
+   ต้องเลื่อนแนวนอนในทุกการ์ด อ่านยากกว่าตอนที่การ์ดกว้างเต็มบรรทัด) */
 #teach-code-parts { display: flex; flex-direction: column; gap: 12px; }
-.teach-part { background-color: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px; }
+.teach-part { background-color: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 14px 16px; }
+.teach-part:focus-within { border-color: #475569; }   /* ให้รู้ว่ากำลังอยู่ในส่วนไหนตอนกดคีย์บอร์ด */
 .teach-part-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .teach-part-no {
   flex: 0 0 auto;
@@ -1213,21 +1293,31 @@ body {
 .teach-part-title { flex: 1; min-width: 0; }
 .teach-part-title strong { font-size: 13px; color: #fff; }
 .teach-part-size { font-size: 11.5px; color: #94a3b8; }
-.teach-part-desc { font-size: 12.5px; line-height: 1.6; color: #cbd5e1; margin: 6px 0 0; }
+.teach-part-desc { max-width: 80ch; font-size: 13px; line-height: 1.65; color: #cbd5e1; margin: 6px 0 0; }   /* จำกัดความยาวบรรทัดให้อ่านสบาย */
 .teach-code {
-  margin: 8px 0 0;
-  padding: 10px;
-  max-height: 260px;
+  margin: 10px 0 0;
+  padding: 12px 14px;
+  max-height: 320px;             /* เดิม 260px — เห็นโค้ดมากขึ้นเล็กน้อย ยังเลื่อนได้ถ้ายาวกว่านี้ (คงเจตนา "ตัดให้สั้นเพื่ออ่านง่าย") */
   overflow: auto;
   background-color: #020617;
   border: 1px solid #1e293b;
   border-radius: 8px;
   color: #e2e8f0;
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 13px;               /* เดิม 12px — อ่านสบายขึ้นในโหมดสอน */
+  line-height: 1.6;
   white-space: pre;
   tab-size: 2;
+  /* ให้เห็นว่ามีโค้ดต่ออีก (macOS ซ่อน scrollbar ไว้จนกว่าจะเลื่อน) */
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #0f172a;
 }
+.teach-code::-webkit-scrollbar { width: 10px; height: 10px; }
+.teach-code::-webkit-scrollbar-track { background-color: #0f172a; border-radius: 8px; }
+.teach-code::-webkit-scrollbar-thumb { background-color: #475569; border-radius: 8px; border: 2px solid #0f172a; }
+
+/* หมายเหตุ รอบที่ 13: การ์ดบทเรียนกลับมาอยู่ในคอลัมน์หน้าตัวอย่าง (กว้าง ~960px)
+   → ตัด layout "คำอธิบายซ้าย/โค้ดขวา" ที่ใช้ตอนกล่องกว้างเต็มจอออก เพราะโค้ดจะเหลือแคบและต้องเลื่อนแนวนอน
+   คำอธิบายจึงอยู่เหนือโค้ด และจำกัดความยาวบรรทัดไว้ที่ max-width: 80ch ด้านบนแล้ว */
 @media (max-width: 700px) {
   .teach-part-head .btn { width: 100%; }
 }
@@ -1236,7 +1326,7 @@ body {
 .code-exporter-panel {
   background-color: #1e293b;
   border-radius: 12px;
-  padding: 20px;
+  padding: 24px;                 /* เดิม 20px — ใช้ 24px ให้ตรงจังหวะระยะของหน้าทั้งหน้า */
   border: 1px solid #334155;
   color: #fff;
 }
@@ -1244,25 +1334,35 @@ body {
 .exporter-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-  gap: 16px;
+  /* ปุ่มจัดให้ตรงแนวท้ายของบล็อกชื่อเรื่อง (เดิมชิดบน ทำให้แถวปุ่มลอยคนละแนวกับคำอธิบาย) */
+  align-items: flex-end;
+  margin-bottom: 12px;   /* ระยะไปหากล่องโค้ด (กล่องโค้ดคือของหลักของการ์ดนี้) */
+  gap: 12px 24px;
   flex-wrap: wrap;
 }
 
-.exporter-title h3 { font-size: 15px; font-weight: 700; color: #f8fafc; }
-.exporter-title p { font-size: 12px; color: #94a3b8; margin-top: 4px; line-height: 1.5; }
+.exporter-title h3 { font-size: 16px; font-weight: 700; color: #f8fafc; }
+/* จำกัดความยาวบรรทัดให้อ่านสบาย (เดิมยืดเต็ม 1,350px = ยาวเกิน 1 บรรทัดที่อ่านได้) */
+.exporter-title p { max-width: 68ch; font-size: 12.5px; color: #94a3b8; margin-top: 6px; line-height: 1.6; }
 .exporter-title code { background: #0f172a; padding: 1px 5px; border-radius: 4px; color: #7dd3fc; }
 
 .exporter-actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  align-items: stretch;
+  /* ที่จอกว้าง บล็อกชื่อเรื่อง+คำอธิบายยาวเกินกว่าจะอยู่แถวเดียวกับปุ่ม → ปุ่มจะตกไปแถวใหม่
+     และเดิมไปชิดซ้าย ทำให้ด้านขวาว่างโล่งไม่สมส่วน · margin-left:auto = ให้ปุ่มชิดขวาเสมอ (ทั้งตอนแถวเดียวและตกแถว) */
+  margin-left: auto;
 }
+
+/* ปุ่มในแถวเดียวกันต้องสูงเท่ากัน (เดิมปุ่มซ่อน/สอนถูกกว่า 2 ปุ่มหลัก → แถวดูไม่บาลานซ์) */
+.exporter-actions .btn { min-height: 40px; }
 
 .code-editor-box textarea {
   width: 100%;
-  height: 260px;
+  /* เดิม 260px คงที่ → บนจอกว้าง 1440 กล่องโค้ดแบนมาก (สัดส่วน 5.2:1) ใช้ตามความสูงจอแทน */
+  height: clamp(300px, 42vh, 520px);
   background-color: #0f172a;
   border: 1px solid #334155;
   border-radius: 8px;
@@ -1390,6 +1490,9 @@ body {
 
   .sidebar-body { overflow: visible; padding-right: 0; }
 
+  /* รอบที่ 14: จอเล็กเรียงเป็นคอลัมน์เดียว → ยกเลิกการเลื่อนในคอลัมน์ ให้ทั้งหน้าเลื่อนปกติ (เหมือนแถบตกแต่ง) */
+  .studio-preview-viewport { max-height: none; }
+
   /* บนจอเล็กทุกอย่างเรียงเป็นคอลัมน์เดียวเสมอ (ต้องเขียน selector ให้ specificity สูงกว่า
      กฎคอลัมน์ด้านบน ไม่งั้นแถบที่เปิดอยู่จะถูกจัดเป็นคอลัมน์แคบ ๆ แล้วล้นแนวนอน) */
   .builder-layout,
@@ -1415,8 +1518,7 @@ body {
 
   .canvas-dropzone { min-height: 320px; }
 
-  .forward-action-card,
-  .compute-action-card { margin-top: 8px; }
+  .forward-action-card { margin-top: 8px; }
 }
 
 @media (max-width: 700px) {
@@ -1430,7 +1532,7 @@ body {
   /* ย่อหัวเว็บให้เล็กลง → เห็นกระดานออกแบบเร็วขึ้นบนจอมือถือ */
   .brand-icon { width: 30px; height: 44px; border-radius: 7px; }
   .brand-info { align-items: center; }
-  .brand-info h1 { font-size: 15px; }
+  .brand-info h1 { font-size: 17px; }
   .brand-info p { display: none; }
 
   .step-navigator { width: 100%; gap: 4px; padding: 3px; }
@@ -1443,9 +1545,9 @@ body {
     gap: 6px;
   }
 
-  .step-number { width: 18px; height: 18px; font-size: 10px; }
+  .step-number { width: 18px; height: 18px; font-size: 11px; }
 
-  .step-label { white-space: normal; font-size: 10.5px; }
+  .step-label { white-space: normal; font-size: 12px; }
 
   .canvas-viewport,
   .studio-preview-viewport,

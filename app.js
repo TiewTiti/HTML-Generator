@@ -18,6 +18,9 @@
 //   --card-radius  --card-blur         --card-font
 // --card-radius ตัวเดียวคุมความมนของการ์ด ปุ่มสลับ ช่องกรอก และปุ่มส่ง (คำนวณด้วย calc)
 // --------------------------------------------------------------------------
+/** พิกเซลโปร่งใส 1×1 (ใช้เป็นค่าตั้งต้นของรูปย่อพื้นหลัง ไม่ให้เหลือ <img> ไม่มี src) */
+const BLANK_PX = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
 const CARD_CSS = `
 /* ===== การ์ดฟอร์ม ===== */
 .auth-card-wrapper{
@@ -520,9 +523,16 @@ function setAllGroups(open) {
 
 // ย่อ/ขยายแถบด้านข้าง (และกล่องโค้ด) — จำเป็นบนจอเล็กที่พื้นที่จำกัด
 function togglePanel(key, ev) {
-  uiState.panels[key] = !isPanelOpen(key);
+  const wasOpen = isPanelOpen(key);
+  uiState.panels[key] = !wasOpen;
   saveUiState();
   applyPanelState(key);
+  // กดจาก "รางเปิดแถบ" (จอใหญ่): พอแถบเปิด ปุ่มในรางจะหายไปทั้งปุ่ม โฟกัสจะหลุด → ย้ายไปปุ่มในหัวเรื่อง
+  const fromRail = ev && ev.currentTarget && ev.currentTarget.classList && ev.currentTarget.classList.contains('rail-btn');
+  if (fromRail && !wasOpen) {
+    const headerBtn = document.getElementById('panel-' + key + '-toggle');
+    if (headerBtn && headerBtn.focus) headerBtn.focus({ preventScroll: true });
+  }
   // บนจอที่เรียงเป็นคอลัมน์ (≤1100px) แถบจะไปอยู่ "ต่อจาก" กระดาน/หน้าตัวอย่าง
   // ถ้าเพิ่งกดเปิดแล้วแถบยังอยู่นอกจอ ให้เลื่อนไปให้เห็น (ไม่งั้นนักเรียนจะคิดว่ากดแล้วไม่มีอะไรเกิดขึ้น)
   if (isPanelOpen(key) && window.matchMedia('(max-width: 1100px)').matches) {
@@ -549,6 +559,14 @@ function applyPanelState(key) {
   const layoutSel = PANEL_LAYOUT[key];
   const layout = layoutSel ? document.querySelector(layoutSel) : null;
   if (layout) layout.classList.toggle(key + '-hidden', !open);
+  // ปุ่มในรางเปิดแถบ (จอใหญ่): บอกสถานะให้ถูก — ตอนนี้แถบปิดอยู่ กดแล้วจะเปิด
+  const rail = document.getElementById('panel-' + key + '-rail');
+  if (rail) {
+    const railLabel = rail.getAttribute('data-label') || 'แถบนี้';
+    rail.setAttribute('aria-expanded', open ? 'true' : 'false');
+    rail.setAttribute('aria-label', 'เปิด' + railLabel);
+    rail.setAttribute('title', 'เปิด' + railLabel);
+  }
   if (key === 'teach' && open) renderTeachCode();   // วาดเนื้อหาโหมดสอนอ่านโค้ดตอนเปิด (ไม่กินเวลาเมื่อปิดอยู่)
 }
 function applyUiState() {
@@ -1303,7 +1321,8 @@ function syncBgUi() {
   if (row) row.hidden = !url;
   if (img) {
     if (url) img.src = url;
-    else img.removeAttribute('src');
+    else img.src = BLANK_PX;   // พิกเซลโปร่งใส 1×1 — ไม่ทิ้ง <img> ที่ไม่มี src (รูปย่อถูกซ่อนด้วยแถวเมื่อไม่มีรูป)
+
   }
   if (info) {
     const kb = url ? fmtSize(Math.round(url.length * 0.75)) : '';   // ประมาณขนาดไฟล์จริงจาก base64
@@ -1865,12 +1884,6 @@ function regenerateCode() {
     note.textContent = `ขนาดโค้ด ≈ ${fmtSize(code.length)}${embedded ? ' (ใหญ่เพราะฝังรูปพื้นหลังจากเครื่องไว้ในไฟล์)' : ''}`;
   }
   return code;
-}
-
-// ปุ่ม "ประมวลผลและสร้างโค้ด" — โค้ดถูกสร้างใหม่อัตโนมัติอยู่แล้ว ปุ่มนี้แค่ยืนยันให้เห็น
-function processAndCompileCode() {
-  regenerateCode();
-  toast('สร้างโค้ดล่าสุดแล้ว (โค้ดด้านล่างอัปเดตอัตโนมัติทุกครั้งที่แก้ไข)');
 }
 
 function copyFullStandaloneHTML() {
