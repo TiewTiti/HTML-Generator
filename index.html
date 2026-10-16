@@ -463,6 +463,17 @@
               </div>
             </div>
 
+            <!-- รูปแบบโค้ดที่ส่งออก: ไฟล์เดียวจบ (ทั้งหน้า) หรือชิ้นส่วนสำหรับแปะในหน้าเดิมที่มี Navbar อยู่แล้ว -->
+            <div class="export-mode-row">
+              <div class="export-mode-group" role="group" aria-label="รูปแบบโค้ดที่ส่งออก">
+                <button type="button" class="export-mode-btn active" data-mode="full" onclick="setExportMode('full')"
+                        title="ไฟล์ HTML เดียวจบ เปิดเดี่ยว ๆ ได้เต็มหน้าจอ">ไฟล์เดียวจบ (ทั้งหน้า)</button>
+                <button type="button" class="export-mode-btn" data-mode="embed" onclick="setExportMode('embed')"
+                        title="ชิ้นส่วนสำหรับแปะใน main ของหน้าเว็บเดิมที่มี Navbar อยู่แล้ว (สไตล์ไม่ทับกัน)">แปะในหน้าเดิม (body &gt; main)</button>
+              </div>
+              <p class="export-mode-note" id="export-mode-note">ไฟล์เดียวจบ: คัดลอกไปวางในไฟล์ index.html แล้วดับเบิลคลิกเปิดได้เลย (เต็มหน้าจอ)</p>
+            </div>
+
             <div class="code-editor-box" id="panel-code-body">
               <label class="sr-only" for="standalone-code-output">โค้ด HTML ที่สร้างได้</label>
               <textarea id="standalone-code-output" readonly spellcheck="false" placeholder="โค้ดจะปรากฏที่นี่..."></textarea>

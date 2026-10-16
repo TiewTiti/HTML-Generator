@@ -1197,6 +1197,24 @@ body {
 
 .code-size-note { color: #7dd3fc; font-weight: 600; }
 
+/* แถบเลือกรูปแบบโค้ดที่ส่งออก: ไฟล์เดียวจบ (ทั้งหน้า) / ชิ้นส่วนแปะในหน้าเดิม */
+.export-mode-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.export-mode-group { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; }
+.export-mode-btn {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.export-mode-btn:hover { color: var(--text-main); }
+.export-mode-btn.active { background: var(--accent-primary); color: var(--text-inverse); font-weight: 600; }
+.export-mode-note { margin: 0; font-size: 12px; color: var(--text-muted); }
+
 .color-picker-grid {
   display: flex;
   flex-direction: column;

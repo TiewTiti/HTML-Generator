@@ -170,6 +170,7 @@ let previewView = 'login';        // หน้าที่แสดงในต�
 let idSeq = 100;                  // ตัวนับ id (แยกจาก el-1..el-9 ของฟอร์มตัวอย่าง เพื่อไม่ให้ id ซ้ำ)
 let pageTitle = 'ฟอร์มเข้าสู่ระบบและสมัครสมาชิก';
 let dragSourceId = null;          // id ของการ์ดที่กำลังลากเพื่อสลับตำแหน่ง (null = ไม่ได้ลากอยู่)
+let exportMode = 'full';          // 'full' = ไฟล์เดียวจบทั้งหน้า | 'embed' = ชิ้นส่วนสำหรับแปะใน <body><main> ของหน้าเดิม
 
 const DEFAULT_LOGIN = () => ([
   { id: 'el-1', type: 'heading',  label: 'เข้าสู่ระบบ', subtitle: 'กรอกบัญชีผู้ใช้เพื่อเข้าสู่ระบบ', colSpan: 12 },
@@ -1816,9 +1817,10 @@ function closeModalPreview() {
 // CODE GENERATOR — หัวใจของเครื่องมือนี้: ได้ไฟล์ HTML เดียวที่รันได้จริง
 // ==========================================================================
 // ค่าที่ปรับได้ทั้งหมด → CSS Variables สำหรับไฟล์ที่ export (แหล่งเดียวกับหน้าตัวอย่าง)
-function varsToCssBlock(indent = '    ') {
+//   selector: ':root' = ไฟล์เดียวจบ | '.auth-embed' = โหมดแปะในหน้าเดิม (ไม่ไปทับตัวแปรของหน้าแม่)
+function varsToCssBlock(indent = '    ', selector = ':root') {
   const vars = cardVarMap(studioVars());
-  return `  :root{
+  return `  ${selector}{
 ${Object.keys(vars).map((k) => `${indent}${k}: ${vars[k]};`).join('\n')}
   }`;
 }
@@ -1832,7 +1834,67 @@ function indentBlock(text, base) {
   return lines.map((l) => (l.trim() ? base + l.slice(min) : '')).join('\n');
 }
 
-function buildStandaloneHTML() {
+// เติม prefix ".auth-embed " หน้าทุก selector ของ CARD_CSS (ใช้เฉพาะโหมดแปะในหน้าเดิม)
+// เพื่อให้ (1) สไตล์ของหน้าแม่ไม่ทับการ์ดของเรา และ (2) การ์ดของเราไม่ไปทับ Navbar/ฟอร์มอื่นของหน้าแม่
+// ข้ามบล็อก @keyframes (ข้างในเป็น from/to ไม่ใช่ selector)
+function scopeCss(css, prefix) {
+  let depth = 0, inKeyframes = false;
+  return css.split('\n').map((line) => {
+    depth += (line.match(/\{/g) || []).length - (line.match(/\}/g) || []).length;
+    if (/^\s*@keyframes/.test(line)) inKeyframes = true;
+    const hit = inKeyframes ? null : line.match(/^(\s*)([^@\s}/*][^{}]*?)\{/);
+    if (inKeyframes && depth === 0) inKeyframes = false;
+    if (!hit) return line;
+    return hit[1] + hit[2].split(',').map((s) => `${prefix} ${s.trim()}`).join(', ') + line.slice(hit[0].length - 1);
+  }).join('\n');
+}
+
+// JavaScript ของไฟล์ที่ export — ใช้ชุดเดียวกันทั้ง 2 โหมด (แปะในหน้าเดิม/ไฟล์เดียวจบ)
+// root = กรอบ .auth-embed ถ้าเจอ ไม่งั้นใช้ทั้งหน้า → สคริปต์ย้ายที่ก็ยังทำงานได้
+const SCRIPT_JS = `<script>
+// ===== 1) สลับระหว่างหน้า Login และ Register =====
+// root = กรอบฟอร์มของเรา (.auth-embed ในโหมดแปะในหน้าเดิม) ถ้าไม่พบ = ใช้ทั้งหน้า จึงไม่ไปยุ่งกับ Navbar/ฟอร์มอื่น
+var root  = (document.currentScript && document.currentScript.closest('.auth-embed')) || document;
+var tabs  = root.querySelectorAll('.switcher-tab');
+var panes = root.querySelectorAll('.auth-view-pane');
+
+tabs.forEach(function (tab) {
+  tab.addEventListener('click', function () {
+    tabs.forEach(function (t) {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    tab.classList.add('active');
+    tab.setAttribute('aria-selected', 'true');
+
+    panes.forEach(function (pane) {
+      pane.classList.toggle('active', pane.dataset.pane === tab.dataset.view);
+    });
+  });
+});
+
+// ===== 2) ไม่มีหลังบ้าน: กดปุ่มแล้วแสดงข้อความตัวอย่าง =====
+// (ถ้าเว้นช่องที่ required ไว้ เบราว์เซอร์จะเตือนให้กรอกก่อน ตามที่เขียนไว้)
+root.querySelectorAll('.auth-form').forEach(function (form) {
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();   // กันไม่ให้หน้าเว็บรีเฟรช/เปลี่ยนหน้า
+    var which = form.dataset.pane === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+    alert('ตัวอย่างการทำงาน: ฟอร์ม "' + which + '" ส่งข้อมูลได้แล้ว\\n\\nแต่ไฟล์นี้ไม่มีหลังบ้าน จึงยังไม่มีการบันทึกข้อมูลจริง');
+  });
+});
+
+// ===== 3) ปุ่มย้อนกลับ: กลับไปหน้าก่อนหน้าที่มา =====
+// ถ้าเปิดไฟล์นี้เป็นหน้าแรกของแท็บ เบราว์เซอร์จะไม่มีที่ให้ย้อนกลับ ปุ่มจะถูกปิดไว้ (จางลง) ให้เห็นชัด
+var backBtn = root.querySelector('.page-back');
+if (history.length > 1) {
+  backBtn.addEventListener('click', function () { history.back(); });
+} else {
+  backBtn.disabled = true;
+}
+<\/script>`;
+
+function buildStandaloneHTML(mode = 'full') {
+  const embed = mode === 'embed';   // true = ชิ้นส่วนสำหรับแปะในหน้าเดิม
   const c = studioConfig;
   const bgUrl = effectiveBgUrl();
   const grad = c.bgGradient || DEFAULT_CONFIG().bgGradient;
@@ -1843,9 +1905,70 @@ function buildStandaloneHTML() {
 
   const cssVars = varsToCssBlock();
 
-  const cardMarkup = indentBlock(buildAuthMarkup({ scope: '', icons: false }), '    ');
+  const cardMarkup = indentBlock(buildAuthMarkup({ scope: '', icons: false }), embed ? '      ' : '    ');
 
   const swClass = `style-${c.switcherStyle} fx-${c.transitionFx}`;
+  const themeLabel = esc((THEME_PRESETS[c.themePreset] || {}).label || 'กำหนดเอง');
+
+  // ---------- โหมดแปะในหน้าเดิม: ไม่มี <!DOCTYPE>/<html>/<head>/<body> และสไตล์ถูกล็อกในกรอบ .auth-embed ----------
+  if (embed) {
+    return `<!-- ==========================================================================
+     ชิ้นส่วนฟอร์ม Login/Register สำหรับ "แปะในหน้าเดิม" — สร้างจากเครื่องมือออกแบบฟอร์ม
+     วิธีใช้: คัดลอกทั้งหมดนี้ไปวางใน <main> ของหน้าเดิมได้เลย (มี Navbar อยู่แล้วก็ได้ ไม่ทับกัน)
+       - สไตล์ทั้งหมดอยู่ในกรอบ .auth-embed จึงไม่ไปแก้ Navbar หรือส่วนอื่นของหน้าแม่
+       - ถ้าต้องการ HTML ถูกต้องตามมาตรฐาน ให้ย้ายบล็อก <style> ด้านล่างไปไว้ใน <head> (ผลลัพธ์เหมือนกัน)
+       - ข้อจำกัดที่รู้อยู่: ถ้าหน้าแม่มีคลาสชื่อเดียวกัน (.form-row, .form-input ฯลฯ) และตั้งค่าที่การ์ดไม่ได้ตั้งไว้
+         (เช่น background) ค่านั้นจะยังมีผลกับชิ้นนี้ — เลี่ยงได้ด้วยการเปลี่ยนชื่อคลาสในหน้าแม่
+     ลำดับส่วน (ดูแบบละเอียดได้ที่โหมดสอนอ่านโค้ด):  1) พื้นที่ของฟอร์ม  2) ค่าที่เปลี่ยนได้ (CSS Variables)
+       3) สไตล์การ์ด ฟอร์ม ปุ่ม และปุ่มย้อนกลับ  4) จอเล็ก  5) โครงสร้างฟอร์ม (HTML)  6) JavaScript
+     ธีมที่ใช้: ${themeLabel} — อยากเปลี่ยนก็แก้ค่าใน .auth-embed ด้านล่างได้เลย
+     ========================================================================== -->
+
+<style>
+  /* ---------- 1) พื้นที่ของฟอร์มในหน้าเดิม ---------- */
+  /* 64px ที่ลบออก = ความสูง Navbar ของหน้าแม่ — ถ้าไม่เท่านี้ให้แก้ตัวเลข (ไม่มี Navbar ใช้ 100vh) */
+  .auth-embed{
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    ${bgBlock}
+  }
+
+  /* ---------- 2) ค่าที่เปลี่ยนได้ (CSS Variables) แก้ตัวเลขตรงนี้แล้วการ์ดเปลี่ยนทั้งใบ ---------- */
+${varsToCssBlock('    ', '.auth-embed')}
+
+  /* ---------- 3) สไตล์ของการ์ดและฟอร์ม ---------- */
+  /* ล็อกการคำนวณกล่องของทุกชิ้นในกรอบ: หน้าแม่ที่ยังไม่ตั้ง border-box จะได้ไม่ทำช่องกรอกล้นการ์ด */
+  .auth-embed, .auth-embed *, .auth-embed *::before, .auth-embed *::after{ box-sizing: border-box; }
+
+${indentBlock(scopeCss(CARD_CSS.trim(), '.auth-embed'), '  ')}
+  /* ปุ่มย้อนกลับ: โหมดนี้ยึดกับกรอบ .auth-embed (ไม่ลอยไปทับ Navbar ของหน้าแม่) */
+  .auth-embed .page-back{ position: absolute; }
+
+  /* ---------- 4) จอเล็ก ---------- */
+  @media (max-width: 560px){
+    .auth-embed { padding: 12px; }
+    .auth-embed .auth-card-wrapper { padding: 20px; }
+  }
+</style>
+
+  <!-- ---------- 5) โครงสร้างฟอร์ม (HTML): กรอบ .auth-embed + ปุ่มย้อนกลับ + การ์ด Login/Register ---------- -->
+  <div class="auth-embed">
+    ${backButtonMarkup()}
+
+    <div class="auth-card-wrapper ${swClass}">
+${cardMarkup}
+    </div>
+
+${indentBlock(SCRIPT_JS, '    ')}
+  </div>
+`;
+  }
 
   return `<!DOCTYPE html>
 <html lang="th">
@@ -1908,45 +2031,7 @@ ${CARD_CSS.trim()}
 ${cardMarkup}
   </div>
 
-  <script>
-  // ===== 1) สลับระหว่างหน้า Login และ Register =====
-  var tabs  = document.querySelectorAll('.switcher-tab');
-  var panes = document.querySelectorAll('.auth-view-pane');
-
-  tabs.forEach(function (tab) {
-    tab.addEventListener('click', function () {
-      tabs.forEach(function (t) {
-        t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
-      });
-      tab.classList.add('active');
-      tab.setAttribute('aria-selected', 'true');
-
-      panes.forEach(function (pane) {
-        pane.classList.toggle('active', pane.dataset.pane === tab.dataset.view);
-      });
-    });
-  });
-
-  // ===== 2) ไม่มีหลังบ้าน: กดปุ่มแล้วแสดงข้อความตัวอย่าง =====
-  // (ถ้าเว้นช่องที่ required ไว้ เบราว์เซอร์จะเตือนให้กรอกก่อน ตามที่เขียนไว้)
-  document.querySelectorAll('.auth-form').forEach(function (form) {
-    form.addEventListener('submit', function (event) {
-      event.preventDefault();   // กันไม่ให้หน้าเว็บรีเฟรช/เปลี่ยนหน้า
-      var which = form.dataset.pane === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-      alert('ตัวอย่างการทำงาน: ฟอร์ม "' + which + '" ส่งข้อมูลได้แล้ว\\n\\nแต่ไฟล์นี้ไม่มีหลังบ้าน จึงยังไม่มีการบันทึกข้อมูลจริง');
-    });
-  });
-
-  // ===== 3) ปุ่มย้อนกลับ: กลับไปหน้าก่อนหน้าที่มา =====
-  // ถ้าเปิดไฟล์นี้เป็นหน้าแรกของแท็บ เบราว์เซอร์จะไม่มีที่ให้ย้อนกลับ ปุ่มจะถูกปิดไว้ (จางลง) ให้เห็นชัด
-  var backBtn = document.querySelector('.page-back');
-  if (history.length > 1) {
-    backBtn.addEventListener('click', function () { history.back(); });
-  } else {
-    backBtn.disabled = true;
-  }
-  <\/script>
+${indentBlock(SCRIPT_JS, '  ')}
 </body>
 </html>
 `;
@@ -1969,15 +2054,15 @@ const CODE_PART_INFO = {
   script: { label: 'JavaScript — สลับหน้า + ปุ่มย้อนกลับ + บอกว่าไฟล์นี้ไม่มีหลังบ้าน', desc: 'คลิกแท็บแล้วสลับคลาส .active ระหว่าง 2 หน้า, ปุ่มย้อนกลับเรียก history.back() เพื่อกลับไปหน้าก่อนหน้าที่มา (ถ้าเปิดไฟล์เป็นหน้าแรกของแท็บ ปุ่มจะถูกปิดไว้เพราะไม่มีอะไรให้ย้อน) และเมื่อกดปุ่มส่งข้อมูลจะขึ้นข้อความตัวอย่าง เพื่อไม่ให้นักเรียนเข้าใจผิดว่ามีเซิร์ฟเวอร์' }
 };
 
-function buildCodeParts() {
-  const code = buildStandaloneHTML();
+function buildCodeParts(mode = exportMode) {
+  const code = buildStandaloneHTML(mode);
   const marks = [
-    '  /* ---------- 1) พื้นหลังของทั้งหน้า ---------- */',
+    mode === 'embed' ? '  /* ---------- 1) พื้นที่ของฟอร์มในหน้าเดิม ---------- */' : '  /* ---------- 1) พื้นหลังของทั้งหน้า ---------- */',
     '  /* ---------- 2) ค่าที่เปลี่ยนได้ (CSS Variables)',
     '  /* ---------- 3) สไตล์ของการ์ดและฟอร์ม ---------- */',
     '  /* ---------- 4) จอเล็ก ---------- */',
     '  <!-- ---------- 5) โครงสร้างฟอร์ม (HTML):',
-    '  <script>'
+    '<script>'
   ];
   const pos = [];
   let prev = -1;
@@ -1998,12 +2083,22 @@ function buildCodeParts() {
 }
 function codePartKeys(parts) { return CODE_PART_ORDER.filter((k) => (parts || {})[k]); }
 
+// โหมดแปะในหน้าเดิม: 2 ส่วนแรกความหมายต่างจากไฟล์เดียวจบ — อธิบายให้ตรงกับที่เห็นจริง
+const EMBED_PART_INFO = {
+  head: { label: 'คำอธิบายวิธีใช้ + เปิดบล็อก <style>', desc: 'บอกว่าชิ้นส่วนนี้ไปวางที่ไหน (ใน <main> ของหน้าเดิม) และมีอะไรอยู่ในกรอบ .auth-embed บ้าง — โหมดนี้ไม่มี <!DOCTYPE>/<head>/<body> เพราะหน้าแม่มีอยู่แล้ว' },
+  background: { label: 'กรอบ .auth-embed — พื้นหลัง + จัดการ์ดให้อยู่กลางพื้นที่ main', desc: 'กรอบนี้คือ "เขตปลอดภัย" ของฟอร์ม: สไตล์ทั้งหมดอยู่ข้างในนี้ จึงไม่ไปทับ Navbar ของหน้าแม่ · min-height = calc(100vh - 64px) โดย 64px คือความสูง Navbar (แก้ให้ตรงของจริงได้)' }
+};
+
+function partInfo(key) {
+  return (exportMode === 'embed' && EMBED_PART_INFO[key]) || CODE_PART_INFO[key] || { label: key, desc: '' };
+}
+
 function renderTeachCode() {
   const box = document.getElementById('teach-code-parts');
   if (!box) return;
-  const parts = buildCodeParts();
+  const parts = buildCodeParts(exportMode);
   box.innerHTML = codePartKeys(parts).map((k, i) => {
-    const info = CODE_PART_INFO[k] || { label: k, desc: '' };
+    const info = partInfo(k);
     const code = parts[k];
     const shown = code.length > 1500
       ? code.slice(0, 1500) + `\n\n/* … ตัดให้สั้นเพื่ออ่านง่าย — กด “คัดลอกส่วนนี้” จะได้โค้ดเต็ม ${code.length} ตัวอักษร … */`
@@ -2024,8 +2119,8 @@ function renderTeachCode() {
 }
 
 function copyCodePart(key) {
-  const text = (buildCodeParts() || {})[key] || '';
-  const ok = () => toast(`คัดลอก ${CODE_PART_INFO[key] ? '“' + CODE_PART_INFO[key].label.split('—')[0].trim() + '”' : key} แล้ว (${fmtSize(text.length)}) — เอาไปวางในไฟล์ได้เลย`);
+  const text = (buildCodeParts(exportMode) || {})[key] || '';
+  const ok = () => toast(`คัดลอก ${partInfo(key).label ? '“' + partInfo(key).label.split('—')[0].trim() + '”' : key} แล้ว (${fmtSize(text.length)}) — เอาไปวางในไฟล์ได้เลย`);
   const fail = () => toast('คัดลอกอัตโนมัติไม่ได้ — ให้คลิกในกล่องโค้ดด้านบนแล้วกด Ctrl+C (หรือ Cmd+C) เอง');
   if (!text) { fail(); return; }
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -2039,9 +2134,30 @@ function copyCodePart(key) {
   }
 }
 
+// สลับโหมดโค้ดที่ส่งออก: ไฟล์เดียวจบ (ทั้งหน้า) ↔ ชิ้นส่วนสำหรับแปะใน <body><main> ของหน้าเดิม
+function setExportMode(mode) {
+  exportMode = mode === 'embed' ? 'embed' : 'full';
+  const embed = exportMode === 'embed';
+  document.querySelectorAll('.export-mode-btn').forEach((b) => b.classList.toggle('active', b.dataset.mode === exportMode));
+  const note = document.getElementById('export-mode-note');
+  if (note) {
+    note.textContent = embed
+      ? 'วางทั้งหมดนี้ใน <main> ของหน้าเดิมได้เลย — สไตล์ถูกล็อกในกรอบ .auth-embed จึงไม่ทับ Navbar ของหน้าแม่'
+      : 'ไฟล์เดียวจบ: คัดลอกไปวางในไฟล์ index.html แล้วดับเบิลคลิกเปิดได้เลย (เต็มหน้าจอ)';
+  }
+  document.getElementById('copy-standalone-btn').innerHTML = embed
+    ? '<i class="fa-solid fa-copy" aria-hidden="true"></i> คัดลอกชิ้นส่วน (แปะในหน้าเดิม)'
+    : '<i class="fa-solid fa-copy" aria-hidden="true"></i> คัดลอกโค้ดทั้งหน้าเว็บ (Full Page Code)';
+  document.getElementById('download-standalone-btn').innerHTML = embed
+    ? '<i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลดเป็นไฟล์ form-embed.html'
+    : '<i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลดเป็นไฟล์ index.html';
+  regenerateCode();
+  toast(embed ? 'เปลี่ยนเป็นโหมดแปะในหน้าเดิมแล้ว — โค้ดด้านล่างพร้อมวางใน <main>' : 'เปลี่ยนเป็นโหมดไฟล์เดียวจบ (ทั้งหน้า) แล้ว');
+}
+
 function regenerateCode() {
   const box = document.getElementById('standalone-code-output');
-  const code = buildStandaloneHTML();
+  const code = buildStandaloneHTML(exportMode);
   if (box) box.value = code;
   if (isPanelOpen('teach')) renderTeachCode();   // เปิดโหมดสอนอ่านโค้ดอยู่ → อัปเดตส่วนต่าง ๆ ตามด้วย
   const note = document.getElementById('code-size-note');
@@ -2079,10 +2195,14 @@ function copyFullStandaloneHTML() {
   function showCopySuccess() {
     const btn = document.getElementById('copy-standalone-btn');
     const original = btn.innerHTML;
-    btn.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i> คัดลอกโค้ดทั้งหน้าเว็บสำเร็จแล้ว!';
+    btn.innerHTML = exportMode === 'embed'
+      ? '<i class="fa-solid fa-check" aria-hidden="true"></i> คัดลอกชิ้นส่วนสำเร็จแล้ว!'
+      : '<i class="fa-solid fa-check" aria-hidden="true"></i> คัดลอกโค้ดทั้งหน้าเว็บสำเร็จแล้ว!';
     btn.classList.remove('btn-success');
     btn.classList.add('btn-sky');
-    toast('คัดลอกโค้ดแล้ว — เอาไปวางในไฟล์ index.html แล้วดับเบิลคลิกเปิดได้เลย');
+    toast(exportMode === 'embed'
+      ? 'คัดลอกแล้ว — เอาไปวางใน <main> ของหน้าเดิมได้เลย (สไตล์อยู่ในกรอบ .auth-embed ไม่ทับ Navbar)'
+      : 'คัดลอกโค้ดแล้ว — เอาไปวางในไฟล์ index.html แล้วดับเบิลคลิกเปิดได้เลย');
     setTimeout(() => {
       btn.innerHTML = original;
       btn.classList.remove('btn-sky');
@@ -2097,10 +2217,12 @@ function downloadStandaloneHTML() {
   const blob = new Blob([code], { type: 'text/html;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'index.html';
+  a.download = exportMode === 'embed' ? 'form-embed.html' : 'index.html';
   document.body.appendChild(a);
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-  toast('ดาวน์โหลด index.html แล้ว — ดับเบิลคลิกไฟล์เพื่อเปิดบนเบราว์เซอร์ได้เลย (ไม่ต้องต่อเน็ต)');
+  toast(exportMode === 'embed'
+    ? 'ดาวน์โหลด form-embed.html แล้ว — เปิดดูได้เลย แล้วคัดลอกเนื้อหาไปวางใน <main> ของหน้าเดิม'
+    : 'ดาวน์โหลด index.html แล้ว — ดับเบิลคลิกไฟล์เพื่อเปิดบนเบราว์เซอร์ได้เลย (ไม่ต้องต่อเน็ต)');
 }
