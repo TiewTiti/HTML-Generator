@@ -1326,6 +1326,16 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
+  position: relative;   /* ให้ปุ่มย้อนกลับในตัวอย่างยึดมุมกรอบพรีวิว ไม่ใช่ยึดจอ */
+}
+
+/* ปุ่มย้อนกลับในหน้าตัวอย่าง: ไฟล์ที่ export ใช้ position:fixed (ลอยมุมจอ)
+   แต่ในหน้าตัวอย่าง/โมดัลต้องลอยอยู่ในกรอบของตัวเอง จึงเปลี่ยนเป็น absolute */
+#preview-stage-root .page-back,
+#modal-preview-stage .page-back {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* ---- ตรวจความอ่านง่ายของสี (contrast) ในกลุ่มสี/พื้นหลัง ---- */
@@ -1508,6 +1518,7 @@ body {
   align-items: center;
   justify-content: center;
   overflow-y: auto;
+  position: relative;   /* ให้ปุ่มย้อนกลับในตัวอย่างยึดมุมกรอบโมดัล */
 }
 
 /* Toast แจ้งเตือนสั้น ๆ */

@@ -129,6 +129,30 @@ const CARD_CSS = `
 .form-check{ display: flex; align-items: center; gap: 8px; font-size: 13px; }
 .form-divider{ border: 0; border-top: 1px solid var(--card-border, #cbd5e1); margin: 2px 0; }
 
+/* ===== ปุ่มย้อนกลับ (ลอยมุมซ้ายบนของหน้า) ===== */
+.page-back{
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--card-edge, rgba(9,9,11,.12));
+  border-radius: 999px;
+  background-color: var(--card-bg, #fff);
+  color: var(--card-text, #0f172a);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.page-back:hover:not(:disabled){ transform: translateX(-2px); box-shadow: var(--card-shadow, 0 2px 10px rgba(9,9,11,.08)); }
+.page-back:disabled{ opacity: .55; cursor: not-allowed; }   /* ไม่มีหน้าก่อนหน้าให้ย้อนกลับ */
+.page-back:focus-visible{ outline: 2px solid var(--card-accent, #2563eb); outline-offset: 2px; }
+
 /* จอเล็ก: ทุกช่องกลับมาเต็มความกว้าง + ลดขนาดปุ่มสลับให้พอดี */
 @media (max-width: 560px){
   .form-row.col-6, .form-row.col-4{ grid-column: span 12; }
@@ -908,6 +932,11 @@ function commitAll(opts = {}) {
 // ==========================================================================
 // STEP 2: ตัวสร้าง HTML (ใช้ร่วมกันทั้งหน้าตัวอย่าง / modal / ไฟล์ที่ export)
 // ==========================================================================
+// ปุ่มย้อนกลับ — อยู่ในไฟล์ที่ export และในหน้าตัวอย่าง (กดในตัวอย่างจะขึ้นข้อความ ไม่พาออกจากเครื่องมือ)
+function backButtonMarkup() {
+  return `<button type="button" class="page-back" aria-label="ย้อนกลับไปหน้าก่อนหน้า">← กลับ</button>`;
+}
+
 // สร้าง HTML ของ "การ์ด + ปุ่มสลับ + 2 หน้า" (ไม่รวม <div class="auth-card-wrapper"> ด้านนอก)
 //   scope: เติมหน้าชื่อ id เพื่อให้ id ในหน้าโปรแกรมไม่ซ้ำกัน (ไฟล์ที่ export ใช้ '')
 //   icons: ใส่ไอคอน FontAwesome หรือไม่ (ไฟล์ที่ export ไม่ใส่ เพื่อให้ใช้ได้แบบออฟไลน์)
@@ -928,15 +957,19 @@ function buildAuthMarkup(opts = {}) {
 
   const pane = (view, list) => `
       <form class="auth-form auth-view-pane ${previewView === view ? 'active' : ''}" role="tabpanel" data-pane="${view}">
-        <div class="pane-content">${renderFormFields(list, scope)}</div>
+        <div class="pane-content">${renderFormFields(list, scope)}
+        </div>
       </form>`;
 
-  return `${tabs}<div class="auth-views-viewport">${pane('login', loginElements)}${pane('register', registerElements)}</div>`;
+  return `${tabs}
+    <div class="auth-views-viewport">${pane('login', loginElements)}${pane('register', registerElements)}
+    </div>`;
 }
 
 function renderFormFields(list, scope = '') {
   if (!list || list.length === 0) {
-    return `<p class="form-subtitle" style="grid-column: span 12;">ยังไม่มีองค์ประกอบในฟอร์มนี้</p>`;
+    return `
+          <p class="form-subtitle" style="grid-column: span 12;">ยังไม่มีองค์ประกอบในฟอร์มนี้</p>`;
   }
   const fid = (elId) => scope + 'field-' + safeId(elId);
 
@@ -1040,6 +1073,7 @@ function renderStudioPreviewStage() {
   bindCard(card);
 
   stage.innerHTML = '';
+  stage.insertAdjacentHTML('beforeend', backButtonMarkup());   // ปุ่มย้อนกลับของไฟล์ที่ export (ในตัวอย่างกดแล้วไม่ไปไหน)
   stage.appendChild(card);
   updateStageBackground();
 }
@@ -1739,6 +1773,12 @@ function bindModalEvents() {
     }
   });
   modal.addEventListener('click', (e) => { if (e.target === modal) closeModalPreview(); });
+  // ปุ่มย้อนกลับในหน้าตัวอย่าง: กดได้แต่ไม่พาออกจากเครื่องมือ (ไฟล์ที่ export จะย้อนกลับจริง)
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#preview-stage-root .page-back, #modal-preview-stage .page-back')) {
+      toast('ปุ่มนี้อยู่ในหน้าตัวอย่าง — ยังไม่พาไปไหน ส่วนไฟล์ที่ export แล้วจะย้อนกลับไปหน้าก่อนหน้า');
+    }
+  });
 }
 
 function openModalPreview() {
@@ -1751,6 +1791,7 @@ function openModalPreview() {
   bindCard(card);
 
   stage.innerHTML = '';
+  stage.insertAdjacentHTML('beforeend', backButtonMarkup());
   stage.appendChild(card);
   stage.style.backgroundImage = stageBackgroundCss();
 
@@ -1782,6 +1823,15 @@ ${Object.keys(vars).map((k) => `${indent}${k}: ${vars[k]};`).join('\n')}
   }`;
 }
 
+// จัดย่อหน้าโค้ดที่สร้างจาก buildAuthMarkup(): ตัด indent ร่วมออกแล้วเติม base ให้เท่ากันทุกครั้ง
+// (เดิมเติม 6 ช่องเท่ากันทุกบรรทัด → บรรทัดซ้อนในอ่านไม่ออกว่าใครอยู่ใต้ใคร)
+function indentBlock(text, base) {
+  const lines = text.replace(/^\n+|\s+$/g, '').split('\n');
+  const indents = lines.filter((l) => l.trim()).map((l) => l.match(/^ */)[0].length);
+  const min = indents.length ? Math.min(...indents) : 0;
+  return lines.map((l) => (l.trim() ? base + l.slice(min) : '')).join('\n');
+}
+
 function buildStandaloneHTML() {
   const c = studioConfig;
   const bgUrl = effectiveBgUrl();
@@ -1793,8 +1843,7 @@ function buildStandaloneHTML() {
 
   const cssVars = varsToCssBlock();
 
-  const cardMarkup = buildAuthMarkup({ scope: '', icons: false })
-    .split('\n').map((line) => (line.trim() ? '      ' + line.trim() : '')).join('\n');
+  const cardMarkup = indentBlock(buildAuthMarkup({ scope: '', icons: false }), '    ');
 
   const swClass = `style-${c.switcherStyle} fx-${c.transitionFx}`;
 
@@ -1804,14 +1853,25 @@ function buildStandaloneHTML() {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${esc(pageTitle)}</title>
-  <!-- ธีมที่ใช้: ${esc((THEME_PRESETS[c.themePreset] || {}).label || 'กำหนดเอง')} — อยากเปลี่ยนก็แก้ค่าใน :root ด้านล่างได้เลย -->
+
+  <!-- ==========================================================================
+       ไฟล์เดียวจบ สร้างจาก "เครื่องมือออกแบบฟอร์ม" — เปิดได้แบบออฟไลน์ ไม่มีลิงก์ภายนอกเลย
+       อ่านตามลำดับนี้ (โหมดสอนอ่านโค้ดในเครื่องมือแยกให้อ่านทีละส่วนได้)
+         1) พื้นหลังของทั้งหน้า
+         2) ค่าที่เปลี่ยนได้ (CSS Variables)
+         3) สไตล์การ์ด ฟอร์ม ปุ่ม และปุ่มย้อนกลับ
+         4) จอเล็ก (@media)
+         5) โครงสร้างฟอร์ม (HTML): ปุ่มย้อนกลับ + การ์ด Login/Register
+         6) JavaScript: สลับหน้า Login/Register + ปุ่มย้อนกลับ
+       ธีมที่ใช้: ${esc((THEME_PRESETS[c.themePreset] || {}).label || 'กำหนดเอง')} — อยากเปลี่ยนก็แก้ค่าใน :root ด้านล่างได้เลย
+       ========================================================================== -->
 
   <!-- อยากได้ฟอนต์สวย ๆ (Prompt / Kanit / Sarabun)? ให้ลบเครื่องหมายคอมเมนต์บรรทัดล่างออก
        หมายเหตุ: ต้องต่ออินเทอร์เน็ต ถ้าไม่มี เบราว์เซอร์จะใช้ฟอนต์ในเครื่องให้อัตโนมัติ
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap"> -->
 
   <style>
-  /* ---------- พื้นหลังของทั้งหน้า ---------- */
+  /* ---------- 1) พื้นหลังของทั้งหน้า ---------- */
   * { box-sizing: border-box; }
   html { height: 100%; }
   body {
@@ -1824,13 +1884,13 @@ function buildStandaloneHTML() {
     ${bgBlock}
   }
 
-  /* ---------- ค่าที่เปลี่ยนได้ (CSS Variables) แก้ตัวเลขตรงนี้แล้วทั้งหน้าเปลี่ยน ---------- */
+  /* ---------- 2) ค่าที่เปลี่ยนได้ (CSS Variables) แก้ตัวเลขตรงนี้แล้วทั้งหน้าเปลี่ยน ---------- */
 ${cssVars}
 
-  /* ---------- สไตล์ของการ์ดและฟอร์ม ---------- */
+  /* ---------- 3) สไตล์ของการ์ดและฟอร์ม ---------- */
 ${CARD_CSS.trim()}
 
-  /* ---------- จอเล็ก ---------- */
+  /* ---------- 4) จอเล็ก ---------- */
   @media (max-width: 560px){
     body { padding: 12px; }
     .auth-card-wrapper { padding: 20px; }
@@ -1838,6 +1898,10 @@ ${CARD_CSS.trim()}
   </style>
 </head>
 <body>
+
+  <!-- ---------- 5) โครงสร้างฟอร์ม (HTML): ปุ่มย้อนกลับ + การ์ด Login/Register ---------- -->
+  <!-- ปุ่มย้อนกลับ: ลอยมุมซ้ายบน กลับไปหน้าก่อนหน้าที่มา (โค้ด JavaScript อยู่ท้ายไฟล์ ข้อ 3) -->
+  ${backButtonMarkup()}
 
   <!-- การ์ดฟอร์ม: เปลี่ยนคลาส style-... / fx-... เพื่อสลับรูปแบบปุ่มและเอฟเฟกต์ -->
   <div class="auth-card-wrapper ${swClass}">
@@ -1873,6 +1937,15 @@ ${cardMarkup}
       alert('ตัวอย่างการทำงาน: ฟอร์ม "' + which + '" ส่งข้อมูลได้แล้ว\\n\\nแต่ไฟล์นี้ไม่มีหลังบ้าน จึงยังไม่มีการบันทึกข้อมูลจริง');
     });
   });
+
+  // ===== 3) ปุ่มย้อนกลับ: กลับไปหน้าก่อนหน้าที่มา =====
+  // ถ้าเปิดไฟล์นี้เป็นหน้าแรกของแท็บ เบราว์เซอร์จะไม่มีที่ให้ย้อนกลับ ปุ่มจะถูกปิดไว้ (จางลง) ให้เห็นชัด
+  var backBtn = document.querySelector('.page-back');
+  if (history.length > 1) {
+    backBtn.addEventListener('click', function () { history.back(); });
+  } else {
+    backBtn.disabled = true;
+  }
   <\/script>
 </body>
 </html>
@@ -1887,23 +1960,23 @@ ${cardMarkup}
 // --------------------------------------------------------------------------
 const CODE_PART_ORDER = ['head', 'background', 'vars', 'card', 'media', 'form', 'script'];
 const CODE_PART_INFO = {
-  head: { label: 'หัวไฟล์ (head) — บอกเบราว์เซอร์ว่านี่คือ HTML5 ภาษาไทย', desc: 'เริ่มจาก <!DOCTYPE html> แล้วตามด้วย <head> ซึ่งเก็บ<meta> (การเข้ารหัส/ขนาดจอ) และ <title> ที่โชว์บนแท็บ — นักเรียนแก้ชื่อเว็บได้ตรงนี้' },
+  head: { label: 'หัวไฟล์ (head) — บอกเบราว์เซอร์ว่านี่คือ HTML5 ภาษาไทย', desc: 'เริ่มจาก <!DOCTYPE html> แล้วตามด้วย <head> ซึ่งเก็บ<meta> (การเข้ารหัส/ขนาดจอ) และ <title> ที่โชว์บนแท็บ — ด้านบนมีคอมเมนต์เป็นสารบัญบอกว่าทั้งไฟล์มีกี่ส่วน นักเรียนแก้ชื่อเว็บได้ตรงนี้' },
   background: { label: 'พื้นหลังของทั้งหน้า + จัดการ์ดให้อยู่กลางจอ', desc: 'body ใช้ display:flex เพื่อดันการ์ดไปกลางจอ แล้วใส่ background-image เป็นไล่สี (หรือรูปที่ฝังไว้ในไฟล์) — ไม่มีลิงก์จากเน็ตเลย' },
   vars: { label: 'CSS Variables — ค่าที่ปรับได้ทั้งหมด (--card-*)', desc: 'หัวใจของธีม: สี ความมน ความเบลอ ฟอนต์ ถูกเก็บเป็นตัวแปร แก้ตัวเลขตรงนี้ที่เดียวแล้วทั้งหน้าเปลี่ยนตาม' },
   card: { label: 'สไตล์การ์ด ฟอร์ม ปุ่ม และอนิเมชันสลับหน้า', desc: 'สไตล์ของ .auth-card-wrapper / .switcher-tab / .form-input / .form-btn พร้อมเอฟเฟกต์ fx-* ที่ใช้ตอนสลับ Login/Register' },
   media: { label: 'จอเล็ก (@media) — ปรับระยะห่างเมื่อจอแคบกว่า 560px', desc: 'สอนเรื่อง responsive: เมื่อจอเล็กให้ลด padding เพื่อให้การ์ดยังอ่านสบายบนมือถือ' },
-  form: { label: 'โครงสร้างฟอร์ม (HTML) — ฟอร์ม Login/Register จริง', desc: 'ปุ่มสลับหน้า + ฟอร์ม 2 ฟอร์มที่มี <label> คู่กับ <input> และ required — กดส่งแล้วเบราว์เซอร์ตรวจให้เองโดยไม่ต้องมีหลังบ้าน' },
-  script: { label: 'JavaScript — สลับหน้า + บอกว่าไฟล์นี้ไม่มีหลังบ้าน', desc: 'คลิกแท็บแล้วสลับคลาส .active ระหว่าง 2 หน้า และเมื่อกดปุ่มส่งข้อมูลจะขึ้นข้อความตัวอย่าง เพื่อไม่ให้นักเรียนเข้าใจผิดว่ามีเซิร์ฟเวอร์' }
+  form: { label: 'โครงสร้างฟอร์ม (HTML) — ปุ่มย้อนกลับ + ฟอร์ม Login/Register จริง', desc: 'เริ่มจากปุ่มย้อนกลับ (ลอยมุมซ้ายบน) แล้วตามด้วยปุ่มสลับหน้า + ฟอร์ม 2 ฟอร์มที่มี <label> คู่กับ <input> และ required — กดส่งแล้วเบราว์เซอร์ตรวจให้เองโดยไม่ต้องมีหลังบ้าน' },
+  script: { label: 'JavaScript — สลับหน้า + ปุ่มย้อนกลับ + บอกว่าไฟล์นี้ไม่มีหลังบ้าน', desc: 'คลิกแท็บแล้วสลับคลาส .active ระหว่าง 2 หน้า, ปุ่มย้อนกลับเรียก history.back() เพื่อกลับไปหน้าก่อนหน้าที่มา (ถ้าเปิดไฟล์เป็นหน้าแรกของแท็บ ปุ่มจะถูกปิดไว้เพราะไม่มีอะไรให้ย้อน) และเมื่อกดปุ่มส่งข้อมูลจะขึ้นข้อความตัวอย่าง เพื่อไม่ให้นักเรียนเข้าใจผิดว่ามีเซิร์ฟเวอร์' }
 };
 
 function buildCodeParts() {
   const code = buildStandaloneHTML();
   const marks = [
-    '  /* ---------- พื้นหลังของทั้งหน้า ---------- */',
-    '  /* ---------- ค่าที่เปลี่ยนได้ (CSS Variables)',
-    '  /* ---------- สไตล์ของการ์ดและฟอร์ม ---------- */',
-    '  /* ---------- จอเล็ก ---------- */',
-    '  <!-- การ์ดฟอร์ม:',
+    '  /* ---------- 1) พื้นหลังของทั้งหน้า ---------- */',
+    '  /* ---------- 2) ค่าที่เปลี่ยนได้ (CSS Variables)',
+    '  /* ---------- 3) สไตล์ของการ์ดและฟอร์ม ---------- */',
+    '  /* ---------- 4) จอเล็ก ---------- */',
+    '  <!-- ---------- 5) โครงสร้างฟอร์ม (HTML):',
     '  <script>'
   ];
   const pos = [];
