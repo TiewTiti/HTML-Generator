@@ -456,6 +456,19 @@ function applyTeacherGateUi() {
   document.querySelectorAll('.teacher-gated-btn .lock-chip, #theme-lock-chip').forEach((el) => {
     el.hidden = unlocked;
   });
+  document.querySelectorAll('.teacher-gated-btn, .teacher-gated-cta').forEach((btn) => {
+    btn.classList.toggle('is-locked', !unlocked);
+    btn.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
+    const label = btn.querySelector('.gated-cta-label');
+    if (label) {
+      label.textContent = unlocked ? 'ใช้แบบฟอร์มตัวอย่าง' : 'ใช้แบบฟอร์มตัวอย่าง (ล็อก)';
+    }
+    const lockIco = btn.querySelector('.gated-lock-ico');
+    if (lockIco) lockIco.hidden = unlocked;
+  });
+  document.querySelectorAll('.hero-lock-hint, .template-lock-hint').forEach((el) => {
+    el.hidden = unlocked;
+  });
   const banner = document.getElementById('theme-lock-banner');
   if (banner) banner.hidden = unlocked;
   const grid = document.getElementById('theme-presets-grid');
@@ -517,7 +530,7 @@ function submitTeacherOtp() {
     if (activeStep !== 2) switchMainStep(2);
     if (!isGroupOpen('theme')) toggleGroup('theme');
   }
-  tipTiewBot('unlocked', 'ครูทิว: ปลดล็อกแล้ว — ลองกด «ใช้แบบฟอร์มตัวอย่าง» หรือเลือกชุดธีมได้เลย');
+  tipTiewBot('unlocked', 'ครูชิโร่: ปลดล็อกแล้ว — ลองกด «ใช้แบบฟอร์มตัวอย่าง» หรือเลือกชุดธีมได้เลย');
 }
 function bindTeacherOtpInputs() {
   const wrap = document.getElementById('otp-digits');
@@ -563,7 +576,7 @@ function bindTeacherOtpInputs() {
 function requestLoadDefaultForm() {
   if (!isTeacherUnlocked()) {
     openTeacherUnlockModal('template');
-    tipTiewBot('need-unlock', 'ครูทิว: แบบฟอร์มตัวอย่างต้องใส่รหัสครูก่อนนะ');
+    tipTiewBot('need-unlock', 'ครูชิโร่: แบบฟอร์มตัวอย่างต้องใส่รหัสครูก่อนนะ');
     return;
   }
   loadDefaultFormStructure();
@@ -607,7 +620,7 @@ function undoLastDestructive() {
   toast('เลิกทำแล้ว — คืนงานก่อนหน้าแล้ว');
 }
 
-// ---- Bot ครูทิว ----
+// ---- Bot ครูชิโร่ ----
 function prefersReducedMotion() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
 }
@@ -632,7 +645,7 @@ function initTiewBot() {
   root.classList.toggle('is-calm', prefersReducedMotion());
   // คำใบ้เริ่มต้นเมื่อกระดานว่าง
   if (!loginElements.length && !registerElements.length) {
-    tipTiewBot('empty', 'ครูทิว: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
+    tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
   }
 }
 function tipTiewBot(key, message) {
@@ -659,7 +672,7 @@ function toggleTiewBotPanel() {
   panel.hidden = !open;
   root.classList.toggle('is-open', open);
   if (open && !document.getElementById('tiew-bot-msg').textContent) {
-    document.getElementById('tiew-bot-msg').textContent = 'ครูทิว: ถามอะไรก็ได้จากปุ่มรอบ ๆ — หรือกดย่อเมื่อไม่ต้องการ';
+    document.getElementById('tiew-bot-msg').textContent = 'ครูชิโร่: ถามอะไรก็ได้จากปุ่มรอบ ๆ — หรือกดย่อเมื่อไม่ต้องการ';
   }
 }
 function minimizeTiewBot() {
@@ -749,7 +762,7 @@ function resetSavedData() {
   updateTargetChrome();
   commitAll();
   toast('ล้างข้อมูลเดิมแล้ว — กด «เลิกทำ» ถ้าต้องการคืน');
-  tipTiewBot('empty', 'ครูทิว: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
+  tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
 }
 
 // ==========================================================================
@@ -926,7 +939,7 @@ function switchMainStep(step) {
   });
   if (step === 2) {
     renderStudioPreviewStage();
-    tipTiewBot('step2', 'ครูทิว: เลือกสีทีละช่องได้เลย — ชุดธีมสำเร็จรูปใช้ได้เมื่อครูปลดล็อก');
+    tipTiewBot('step2', 'ครูชิโร่: เลือกสีทีละช่องได้เลย — ชุดธีมสำเร็จรูปใช้ได้เมื่อครูปลดล็อก');
   }
   syncDockHighlight();
 }
@@ -956,21 +969,21 @@ function setDockMode(mode) {
   dockMode = mode || 'structure';
   if (mode === 'structure') {
     switchMainStep(1);
-    tipTiewBot('dock-structure', 'ครูทิว: จัดโครงบนกระดาน — กด «เครื่องมือ» เพื่อเพิ่มช่อง');
+    tipTiewBot('dock-structure', 'ครูชิโร่: จัดโครงบนกระดาน — กด «เครื่องมือ» เพื่อเพิ่มช่อง');
   } else if (mode === 'color') {
     switchMainStep(2);
     if (!isPanelOpen('controls')) togglePanel('controls');
     // scroll color panel into view lightly
     const controls = document.querySelector('.studio-controls-sidebar');
     if (controls && controls.scrollIntoView) controls.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    tipTiewBot('dock-color', 'ครูทิว: เลือกสีทีละช่องได้เลย');
+    tipTiewBot('dock-color', 'ครูชิโร่: เลือกสีทีละช่องได้เลย');
   } else if (mode === 'export') {
     switchMainStep(2);
     if (isPanelOpen('controls')) togglePanel('controls');
     const codePanel = document.querySelector('.code-exporter-panel');
     if (codePanel && codePanel.scrollIntoView) codePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (!isPanelOpen('code')) togglePanel('code');
-    tipTiewBot('dock-export', 'ครูทิว: คัดลอกหรือดาวน์โหลดไฟล์ HTML ได้จากด้านล่าง');
+    tipTiewBot('dock-export', 'ครูชิโร่: คัดลอกหรือดาวน์โหลดไฟล์ HTML ได้จากด้านล่าง');
   } else if (mode === 'login') {
     switchMainStep(1);
     setBuilderTarget('login');
@@ -1111,15 +1124,19 @@ function renderCanvas() {
       <p class="empty-canvas-title">ยังไม่มีองค์ประกอบในฟอร์ม${esc(targetName)}</p>
       <p class="empty-canvas-sub">เริ่มจากแบบตัวอย่าง (ครูปลดล็อก) หรือเพิ่มช่องเองทีละอัน</p>
       <div class="empty-canvas-actions">
-        <button type="button" class="btn btn-primary" onclick="requestLoadDefaultForm()">
-          <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> เริ่มจากแบบฟอร์มตัวอย่าง
+        <button type="button" class="btn btn-primary teacher-gated-btn teacher-gated-cta${isTeacherUnlocked() ? '' : ' is-locked'}"
+                onclick="requestLoadDefaultForm()" aria-disabled="${isTeacherUnlocked() ? 'false' : 'true'}">
+          <i class="fa-solid fa-lock gated-lock-ico" aria-hidden="true"${isTeacherUnlocked() ? ' hidden' : ''}></i>
+          <span class="gated-cta-label">${isTeacherUnlocked() ? 'ใช้แบบฟอร์มตัวอย่าง' : 'ใช้แบบฟอร์มตัวอย่าง (ล็อก)'}</span>
+          <span class="lock-chip" aria-hidden="true"${isTeacherUnlocked() ? ' hidden' : ''}><i class="fa-solid fa-lock"></i> ครู</span>
         </button>
         <button type="button" class="btn btn-secondary" onclick="focusToolboxAdd()">
           เพิ่มช่องเอง
         </button>
       </div>
+      <p class="template-lock-hint"${isTeacherUnlocked() ? ' hidden' : ''}>ต้องใส่รหัสครูก่อน</p>
     </div>`;
-    tipTiewBot('empty', 'ครูทิว: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู)');
+    tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู)');
     return;
   }
 
@@ -1280,7 +1297,7 @@ function loadDefaultFormStructure(skipConfirm) {
   selectedElementId = null;
   commitAll();
   toast('โหลดแบบฟอร์มตัวอย่างให้ทั้งสองฝั่งแล้ว');
-  tipTiewBot('loaded', 'ครูทิว: โครงครบแล้ว — แก้ข้อความด้านขวา หรือไปตกแต่งสีได้เมื่อพร้อม');
+  tipTiewBot('loaded', 'ครูชิโร่: โครงครบแล้ว — แก้ข้อความด้านขวา หรือไปตกแต่งสีได้เมื่อพร้อม');
 }
 
 function focusToolboxAdd() {
@@ -1291,7 +1308,7 @@ function focusToolboxAdd() {
     if (first) first.focus();
     else grid.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
   }
-  tipTiewBot('add-self', 'ครูทิว: กดปุ่มองค์ประกอบด้านซ้ายเพื่อเพิ่มช่องทีละอัน');
+  tipTiewBot('add-self', 'ครูชิโร่: กดปุ่มองค์ประกอบด้านซ้ายเพื่อเพิ่มช่องทีละอัน');
 }
 
 function forwardToStep2() {
@@ -1307,7 +1324,7 @@ function commitAll(opts = {}) {
   renderStudioPreviewStage();
   regenerateCode();
   saveState();
-  if (selectedElementId) tipTiewBot('selected', 'ครูทิว: แก้ข้อความด้านขวาได้เลย — เห็นผลบนกระดานทันที');
+  if (selectedElementId) tipTiewBot('selected', 'ครูชิโร่: แก้ข้อความด้านขวาได้เลย — เห็นผลบนกระดานทันที');
 }
 
 // ==========================================================================
@@ -1729,7 +1746,7 @@ function renderThemePresets() {
 function applyThemePreset(presetKey, ev) {
   if (!isTeacherUnlocked()) {
     openTeacherUnlockModal('theme');
-    tipTiewBot('theme-lock', 'ครูทิว: ชุดธีมสำเร็จรูปต้องใส่รหัสครูก่อน — เลือกสีทีละช่องด้านล่างได้เลย');
+    tipTiewBot('theme-lock', 'ครูชิโร่: ชุดธีมสำเร็จรูปต้องใส่รหัสครูก่อน — เลือกสีทีละช่องด้านล่างได้เลย');
     return;
   }
   const p = THEME_PRESETS[presetKey];
@@ -2613,5 +2630,5 @@ function downloadStandaloneHTML() {
   toast(exportMode === 'embed'
     ? 'ดาวน์โหลด form-embed.html แล้ว — เปิดดูได้เลย แล้วคัดลอกเนื้อหาไปวางใน <main> ของหน้าเดิม'
     : 'ดาวน์โหลด index.html แล้ว — ดับเบิลคลิกไฟล์เพื่อเปิดบนเบราว์เซอร์ได้เลย (ไม่ต้องต่อเน็ต)');
-  tipTiewBot('export', 'ครูทิว: บันทึกไฟล์แล้ว ดับเบิลคลิก index.html เพื่อเปิด');
+  tipTiewBot('export', 'ครูชิโร่: บันทึกไฟล์แล้ว ดับเบิลคลิก index.html เพื่อเปิด');
 }

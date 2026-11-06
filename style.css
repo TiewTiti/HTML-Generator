@@ -138,15 +138,13 @@ body {
 .brand-info h1,
 .brand-info p { display: none; }
 
-/* Hero / intro — brand-first (variant B) */
+/* Hero / intro — brand-first (variant B); translucent so ambient cards show through */
 .studio-hero {
   flex: 0 0 auto;
   text-align: center;
   padding: var(--hero-pad-y) 24px 28px;
   border-bottom: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, #e8f1ff 0%, transparent 55%),
-    var(--bg-app);
+  background: transparent;
 }
 
 .studio-hero-eyebrow { display: none; }
@@ -1793,7 +1791,7 @@ body {
 }
 
 /* ==========================================================================
-   Teacher OTP · Bot ครูทิว · Empty state · Lock chips · reduced-motion
+   Teacher OTP · Bot ครูชิโร่ · Empty state · Lock chips · reduced-motion
    ========================================================================== */
 
 .lock-chip {
@@ -1810,6 +1808,46 @@ body {
   vertical-align: middle;
 }
 .lock-chip[hidden] { display: none !important; }
+
+/* Teacher-gated CTAs: soft Apple blue lock (still opens OTP — not a dead gray button) */
+.teacher-gated-cta.is-locked,
+.btn.teacher-gated-btn.is-locked {
+  background: #e8f1ff !important;
+  color: #0058b0 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  opacity: 1;
+}
+.teacher-gated-cta.is-locked:hover,
+.btn.teacher-gated-btn.is-locked:hover {
+  background: #d6e7ff !important;
+  color: #004a99 !important;
+}
+.teacher-gated-cta.is-locked .lock-chip,
+.btn.teacher-gated-btn.is-locked .lock-chip {
+  background: #cfe2ff;
+  color: #0058b0;
+}
+.gated-lock-ico {
+  margin-right: 6px;
+  font-size: 0.9em;
+}
+.gated-lock-ico[hidden] { display: none !important; }
+.hero-lock-hint,
+.template-lock-hint {
+  width: 100%;
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.hero-lock-hint[hidden],
+.template-lock-hint[hidden] { display: none !important; }
+.hero-cta {
+  flex-wrap: wrap;
+}
+.empty-canvas-actions { margin-bottom: 0; }
 
 .teacher-lock-banner {
   display: flex;
@@ -1971,11 +2009,11 @@ body {
 .otp-verify-btn:hover { background: #0077ed; }
 .otp-verify-btn:active { transform: translateY(1px); }
 
-/* ---- Bot ครูทิว ---- */
+/* ---- Bot ครูชิโร่ ---- */
 .tiew-bot {
   position: fixed;
   right: 16px;
-  bottom: 16px;
+  bottom: 96px;
   z-index: 180;
   display: flex;
   flex-direction: column;
@@ -2003,6 +2041,21 @@ body {
   font-size: 13px;
   color: #0f172a;
 }
+.tiew-bot-head-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.tiew-bot-chip-av {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 28%;
+  background: #111;
+  flex-shrink: 0;
+}
 .tiew-bot-actions { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
 .tiew-bot-mini {
   border: 0;
@@ -2026,10 +2079,10 @@ body {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 6px 8px 4px;
+  gap: 4px;
+  padding: 6px 8px 6px;
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 18px;
   background: #fff;
   box-shadow: var(--shadow-md);
   cursor: pointer;
@@ -2039,6 +2092,21 @@ body {
 }
 .tiew-bot-avatar:hover { box-shadow: var(--shadow-lg); }
 .tiew-bot-avatar:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+.tiew-bot-photo-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #111;
+  display: block;
+}
+.tiew-bot-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+  display: block;
+}
 .tiew-bot-name { font-size: 11px; font-weight: 600; }
 
 .tiew-bot.is-wave:not(.is-calm) .tiew-bot-avatar {
@@ -2051,7 +2119,7 @@ body {
 }
 
 @media (max-width: 700px) {
-  .tiew-bot { right: 10px; bottom: 10px; }
+  .tiew-bot { right: 10px; bottom: 88px; }
   .otp-digit { width: 40px; height: 48px; font-size: 20px; gap: 6px; }
   .otp-digits { gap: 6px; }
 }
@@ -2079,13 +2147,172 @@ body {
 }
 
 /* ==========================================================================
+   Ambient template-card backdrop (Apple “ใหม่ล่าสุด” pastel vertical cards)
+   ========================================================================== */
+.template-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  opacity: 0.72;
+}
+.template-backdrop-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(245, 245, 247, 0.55) 0%, rgba(245, 245, 247, 0.22) 38%, rgba(245, 245, 247, 0.7) 100%),
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(232, 241, 255, 0.65), transparent 60%);
+}
+.template-backdrop-track {
+  display: flex;
+  gap: 18px;
+  width: max-content;
+  padding: 0 24px;
+  animation: tplMarquee 72s linear infinite;
+  will-change: transform;
+}
+@keyframes tplMarquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.tpl-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(220px, 42vw);
+  height: min(320px, 58vh);
+  border-radius: 28px;
+  padding: 22px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+}
+.tpl-card-eye {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(29, 29, 31, 0.55);
+}
+.tpl-card-title {
+  margin: 0;
+  font-size: clamp(18px, 2.2vw, 22px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: #1d1d1f;
+}
+.tpl-card-sub {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: rgba(29, 29, 31, 0.55);
+}
+.tpl-card-preview {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-top: 14px;
+  min-height: 0;
+}
+.tpl-mini-form {
+  width: 78%;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  padding: 14px 12px 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tpl-mini-form--light { background: #fff; }
+.tpl-mini-form--reg .tpl-mini-btn { background: #34c759; }
+.tpl-mini-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.02em;
+}
+.tpl-mini-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+.tpl-mini-tabs i {
+  flex: 1;
+  height: 8px;
+  border-radius: 980px;
+  background: #e8f1ff;
+  display: block;
+}
+.tpl-mini-tabs i:first-child { background: #0071e3; }
+.tpl-mini-field {
+  display: block;
+  height: 18px;
+  border-radius: 8px;
+  background: #f2f2f7;
+}
+.tpl-mini-btn {
+  display: block;
+  height: 22px;
+  border-radius: 980px;
+  background: #0071e3;
+  margin-top: 2px;
+}
+.tpl-card-chev {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #6e6e73;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.tpl-card--rose { background: #f8dce8; }
+.tpl-card--sky { background: #d7ebf8; }
+.tpl-card--lilac { background: #e4dff5; }
+.tpl-card--mint { background: #d8f0e4; }
+.tpl-card--peach { background: #f8e0d2; }
+.tpl-card--sand { background: #efe8d8; }
+
+@media (prefers-reduced-motion: reduce) {
+  .template-backdrop-track {
+    animation: none;
+    transform: translate3d(-8%, 0, 0);
+  }
+}
+
+/* ==========================================================================
    LAYOUT B — hero + canvas-dominant + thin bottom dock
    ========================================================================== */
 body.layout-b {
   overflow: auto;
   height: auto;
   min-height: 100vh;
+  position: relative;
+  isolation: isolate;
 }
+body.layout-b > .app-header,
+body.layout-b > .studio-hero,
+body.layout-b > .app-container {
+  position: relative;
+  z-index: 2;
+}
+body.layout-b > .dock-wrap { position: fixed; z-index: 40; }
+body.layout-b > .tiew-bot { position: fixed; z-index: 180; }
+body.layout-b > .modal-backdrop,
+body.layout-b > .otp-backdrop { position: fixed; z-index: 50; }
 
 body.layout-b .app-header {
   height: var(--header-height);
@@ -2093,6 +2320,8 @@ body.layout-b .app-header {
   padding: 0 24px;
   position: sticky;
   top: 0;
+  z-index: 30;
+  background-color: rgba(251, 251, 253, 0.72);
 }
 
 body.layout-b .brand-nav-name {
@@ -2107,6 +2336,13 @@ body.layout-b .app-container {
   padding: 0 20px var(--dock-clearance);
   overflow: visible;
   flex: 1 1 auto;
+  background: transparent;
+}
+body.layout-b {
+  background-color: transparent;
+}
+html:has(body.layout-b) {
+  background-color: var(--bg-app);
 }
 
 body.layout-b .step-panel.active {
