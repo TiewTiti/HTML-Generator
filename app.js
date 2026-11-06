@@ -1119,10 +1119,10 @@ function renderCanvas() {
 
   if (list.length === 0) {
     const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-    canvas.innerHTML = `<div class="empty-canvas-state" style="grid-column: span 12;">
-      <i class="fa-solid fa-plus-circle empty-canvas-icon" aria-hidden="true"></i>
+    canvas.innerHTML = `<div class="empty-canvas-state">
+      <span class="empty-canvas-icon" aria-hidden="true">+</span>
       <p class="empty-canvas-title">ยังไม่มีองค์ประกอบในฟอร์ม${esc(targetName)}</p>
-      <p class="empty-canvas-sub">เริ่มจากแบบตัวอย่าง (ครูปลดล็อก) หรือเพิ่มช่องเองทีละอัน</p>
+      <p class="empty-canvas-sub">เริ่มจากแบบตัวอย่าง หรือเพิ่มช่องเอง</p>
       <div class="empty-canvas-actions">
         <button type="button" class="btn btn-primary teacher-gated-btn teacher-gated-cta${isTeacherUnlocked() ? '' : ' is-locked'}"
                 onclick="requestLoadDefaultForm()" aria-disabled="${isTeacherUnlocked() ? 'false' : 'true'}">
@@ -1140,6 +1140,15 @@ function renderCanvas() {
     tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู)');
     return;
   }
+
+  /* Figma Variant B: form sits as a centered preview card on the board grid */
+  const preview = document.createElement('div');
+  preview.className = 'canvas-preview-card';
+  const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+  preview.innerHTML = `
+    <h3 class="canvas-preview-title">${esc(targetName)}</h3>
+    <p class="canvas-preview-hint">พรีวิวบนกระดาน — ยังแก้โครงได้อยู่</p>
+  `;
 
   list.forEach((item, idx) => {
     const isFirst = idx === 0;
@@ -1216,8 +1225,9 @@ function renderCanvas() {
       </div>
       ${contentHTML}
     `;
-    canvas.appendChild(itemCard);
+    preview.appendChild(itemCard);
   });
+  canvas.appendChild(preview);
 }
 
 function renderInspector() {
