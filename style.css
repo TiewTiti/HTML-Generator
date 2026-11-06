@@ -2287,6 +2287,7 @@ body.layout-b .hero-cta .btn-ghost {
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
+.dock-btn[data-dock="login"] { min-width: 78px; }
 .dock-btn:hover { background: rgba(0, 0, 0, 0.05); }
 .dock-btn.on {
   background: #e8f1ff;
