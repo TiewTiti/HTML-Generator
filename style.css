@@ -392,6 +392,17 @@ body {
   align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
+  /* Sticky panel chrome — usable while body scrolls (mobile sheets) */
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  padding: 10px 4px 8px;
+  margin: 0 -4px 8px;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.06);
 }
 
 .sidebar-heading { min-width: 0; }
@@ -402,7 +413,10 @@ body {
   flex-direction: column;
   gap: 14px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding-right: 4px;
+  min-height: 0;
 }
 
 /* ปุ่มเปิด/ปิดแถบ อยู่ใน "แถบหัวเรื่องของพื้นที่ทำงาน" → ตำแหน่งคงที่ทั้งตอนแถบเปิดและปิด
@@ -704,6 +718,134 @@ body {
   gap: 12px;
   align-content: start;
   min-height: 500px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Zoom stage — scales preview without restyling craft tokens */
+.canvas-zoom-stage {
+  --canvas-zoom: 1;
+  transform: scale(var(--canvas-zoom));
+  transform-origin: top center;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 12px;
+  align-content: start;
+  transition: transform 0.18s var(--ease-apple, cubic-bezier(0.25, 0.1, 0.25, 1));
+  will-change: transform;
+}
+body.layout-b .canvas-zoom-stage {
+  display: grid;
+  place-items: center;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+/* Canvas chrome: zoom + view mode (functional controls only) */
+.canvas-chrome {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 2px;
+}
+.canvas-zoom {
+  display: inline-flex;
+  align-items: stretch;
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+.zoom-btn,
+.view-mode-btn {
+  min-width: 36px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--text-main);
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  line-height: 1;
+}
+.zoom-btn + .zoom-btn { border-left: 0.5px solid rgba(0, 0, 0, 0.1); }
+.zoom-btn:hover:not(:disabled),
+.view-mode-btn:hover { background: rgba(0, 0, 0, 0.04); }
+.zoom-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.zoom-btn-label { min-width: 52px; font-variant-numeric: tabular-nums; font-weight: 500; }
+.view-mode-btn {
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 980px;
+  background: #fff;
+  font-weight: 500;
+  font-size: 12px;
+  padding: 0 12px;
+}
+.view-mode-btn[aria-pressed="true"] {
+  background: #e8f1ff;
+  color: #0058b0;
+  border-color: transparent;
+}
+.zoom-btn:focus-visible,
+.view-mode-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -2px;
+}
+
+/* Light WYSIWYG field chrome (preview only — page craft unchanged) */
+#builder-canvas[data-view="wysiwyg"] .canvas-item {
+  border-color: transparent;
+  box-shadow: none;
+  background: transparent;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+#builder-canvas[data-view="wysiwyg"] .canvas-item:hover,
+#builder-canvas[data-view="wysiwyg"] .canvas-item.selected {
+  border-color: rgba(0, 113, 227, 0.35);
+  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.12);
+  border-radius: 12px;
+}
+#builder-canvas[data-view="wysiwyg"] .item-order-hint { display: none; }
+#builder-canvas[data-view="wysiwyg"] .item-controls {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+#builder-canvas[data-view="wysiwyg"] .canvas-item:hover .item-controls,
+#builder-canvas[data-view="wysiwyg"] .canvas-item.selected .item-controls,
+#builder-canvas[data-view="wysiwyg"] .canvas-item:focus-within .item-controls {
+  opacity: 1;
+}
+.wys-heading { margin: 0 0 4px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+.wys-sub { margin: 0 0 12px; font-size: 14px; color: var(--text-muted); }
+.wys-label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+.wys-req { color: #dc2626; }
+.wys-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 0.5px solid rgba(0, 0, 0, 0.16);
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fff;
+}
+.wys-check { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.wys-submit {
+  width: 100%;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 980px;
+  background: var(--accent-primary, #0071e3);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: inherit;
 }
 
 /* Canvas Item Card */
@@ -712,9 +854,8 @@ body {
   background-color: var(--surface-panel);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  /* เผื่อที่ด้านบน 18px ให้แถวควบคุม (ปุ่มขึ้น/ลง/ลบ + ป้ายลำดับ) ที่เกาะขอบบน
-     → ปุ่มไม่ทับหัวข้อ/ช่องกรอก/ปุ่มข้างใน (บั๊กที่ผู้ใช้เจอ) */
-  padding: 18px 12px 12px;
+  /* เผื่อที่ด้านบนให้แถวควบคุม (ปุ่มขึ้น/ลง/ลบ เป้าแตะใหญ่ขึ้น) ไม่ทับเนื้อหา */
+  padding: 28px 12px 12px;
   position: relative;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -757,17 +898,20 @@ body {
 }
 
 .canvas-item .ctrl-btn {
-  width: 22px;
-  height: 22px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   border: 0;
   border-radius: 0;
   background: transparent;
   color: var(--text-muted);
-  font-size: 10px;
+  font-size: 13px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  touch-action: manipulation;
 }
 
 /* รวมปุ่มลูกศร/ลบเป็นกล่องเดียว เกาะขอบการ์ด (ไม่ลอยทับเนื้อหา) */
@@ -830,13 +974,16 @@ body {
   background: var(--surface-panel);
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  padding: 0 8px;
-  font-size: 10px;
+  padding: 0 10px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--text-muted);
-  line-height: 20px;
+  line-height: 34px;
+  min-height: 36px;
   white-space: nowrap;
   box-shadow: var(--shadow-sm);
+  display: inline-flex;
+  align-items: center;
 }
 
 .canvas-item.selected .item-order-hint {
@@ -845,12 +992,27 @@ body {
   background: var(--accent-light);
 }
 
-/* จอสัมผัส: ปุ่ม 22px เล็กเกินไปกดยาก → ขยายเป็น 30px เผื่อที่ด้านบนการ์ดเพิ่มให้พ้นเนื้อหา */
+/* จอสัมผัส: เป้าแตะ ≥44px สำหรับลูกศร/ลบ */
 @media (hover: none), (pointer: coarse) {
-  .canvas-item .ctrl-btn { width: 30px; height: 30px; font-size: 12px; }
-  .canvas-item { padding-top: 26px; }
-  .canvas-item .item-controls { top: -14px; }
-  .canvas-item .item-order-hint { line-height: 28px; }
+  .canvas-item .ctrl-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 15px;
+  }
+  .canvas-item { padding-top: 36px; }
+  .canvas-item .item-controls { top: -18px; }
+  .canvas-item .item-order-hint {
+    line-height: 42px;
+    min-height: 44px;
+    font-size: 12px;
+  }
+  .zoom-btn,
+  .view-mode-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
 }
 
 /* Inspector Form Controls */

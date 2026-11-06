@@ -780,6 +780,65 @@ const DEFAULT_PANELS = { toolbox: false, inspector: false, controls: false, code
 const UI_STATE_VERSION = 4;            // v4: layout B defaults (drawers closed)
 let dockMode = 'structure';
 
+/* Canvas chrome (behavior-only prototype — does not restyle locked Apple craft) */
+const CANVAS_ZOOM_STEPS = [0.75, 1, 1.25, 1.5];
+const CANVAS_CHROME_KEY = 'lr-studio-canvas-chrome-v1';
+let canvasZoom = 1;
+let canvasViewMode = 'structure'; // structure | wysiwyg
+
+function loadCanvasChrome() {
+  try {
+    const raw = localStorage.getItem(CANVAS_CHROME_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (s && typeof s.zoom === 'number' && CANVAS_ZOOM_STEPS.includes(s.zoom)) canvasZoom = s.zoom;
+    if (s && (s.view === 'structure' || s.view === 'wysiwyg')) canvasViewMode = s.view;
+  } catch (e) { /* ignore */ }
+}
+function saveCanvasChrome() {
+  try { localStorage.setItem(CANVAS_CHROME_KEY, JSON.stringify({ zoom: canvasZoom, view: canvasViewMode })); } catch (e) {}
+}
+function applyCanvasChrome() {
+  const drop = document.getElementById('builder-canvas');
+  const stage = document.getElementById('canvas-zoom-stage');
+  const label = document.getElementById('canvas-zoom-label');
+  const modeBtn = document.getElementById('canvas-view-mode');
+  const outBtn = document.getElementById('canvas-zoom-out');
+  const inBtn = document.getElementById('canvas-zoom-in');
+  if (drop) drop.setAttribute('data-view', canvasViewMode);
+  if (stage) {
+    stage.style.setProperty('--canvas-zoom', String(canvasZoom));
+    stage.style.transform = `scale(${canvasZoom})`;
+  }
+  if (label) label.textContent = Math.round(canvasZoom * 100) + '%';
+  if (outBtn) outBtn.disabled = canvasZoom <= CANVAS_ZOOM_STEPS[0];
+  if (inBtn) inBtn.disabled = canvasZoom >= CANVAS_ZOOM_STEPS[CANVAS_ZOOM_STEPS.length - 1];
+  if (modeBtn) {
+    const wysiwyg = canvasViewMode === 'wysiwyg';
+    modeBtn.textContent = wysiwyg ? 'หน้าตาจริง' : 'โครง';
+    modeBtn.setAttribute('aria-pressed', wysiwyg ? 'true' : 'false');
+    modeBtn.title = wysiwyg ? 'สลับกลับโหมดโครง' : 'สลับโหมดหน้าตาจริง (พรีวิวใกล้ของจริง)';
+  }
+}
+function nudgeCanvasZoom(dir) {
+  const idx = CANVAS_ZOOM_STEPS.indexOf(canvasZoom);
+  const next = CANVAS_ZOOM_STEPS[Math.max(0, Math.min(CANVAS_ZOOM_STEPS.length - 1, (idx < 0 ? 1 : idx) + dir))];
+  canvasZoom = next;
+  saveCanvasChrome();
+  applyCanvasChrome();
+}
+function resetCanvasZoom() {
+  canvasZoom = 1;
+  saveCanvasChrome();
+  applyCanvasChrome();
+}
+function toggleCanvasViewMode() {
+  canvasViewMode = canvasViewMode === 'wysiwyg' ? 'structure' : 'wysiwyg';
+  saveCanvasChrome();
+  applyCanvasChrome();
+  renderCanvas();
+}
+
 function defaultUiState() {
   // groups = {} → กลุ่มย่อยทุกกลุ่ม "พับปิด" (เห็นแค่หัวข้อใหญ่) ตามค่าเริ่มต้นของ isGroupOpen()
   return { groups: {}, panels: Object.assign({}, DEFAULT_PANELS) };
@@ -940,6 +999,7 @@ document.addEventListener('DOMContentLoaded', () => {
   teacherUnlocked = isTeacherUnlocked();
   const restored = loadState();
   loadUiState();
+  loadCanvasChrome();
   renderComponentButtons();
   renderThemePresets();
   renderGradientPresets();
@@ -949,6 +1009,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyTeacherGateUi();
   updateTargetChrome();
   renderCanvas();
+  applyCanvasChrome();
   renderInspector();
   renderStudioPreviewStage();
   updateStudioStyles();
@@ -1163,13 +1224,14 @@ function selectElement(id) {
 }
 
 function renderCanvas() {
-  const canvas = document.getElementById('builder-canvas');
+  const stage = document.getElementById('canvas-zoom-stage') || document.getElementById('builder-canvas');
   const list = getActiveList();
-  canvas.innerHTML = '';
+  stage.innerHTML = '';
+  applyCanvasChrome();
 
   if (list.length === 0) {
     const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-    canvas.innerHTML = `<div class="empty-canvas-state">
+    stage.innerHTML = `<div class="empty-canvas-state">
       <span class="empty-canvas-icon" aria-hidden="true">+</span>
       <p class="empty-canvas-title">ยังไม่มีองค์ประกอบในฟอร์ม${esc(targetName)}</p>
       <p class="empty-canvas-sub">เริ่มจากแบบตัวอย่าง หรือเพิ่มช่องเอง</p>
@@ -1195,9 +1257,12 @@ function renderCanvas() {
   const preview = document.createElement('div');
   preview.className = 'canvas-preview-card';
   const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+  const hint = canvasViewMode === 'wysiwyg'
+    ? 'หน้าตาใกล้ของจริง — แตะชิ้นเพื่อแก้'
+    : 'พรีวิวบนกระดาน — ยังแก้โครงได้อยู่';
   preview.innerHTML = `
     <h3 class="canvas-preview-title">${esc(targetName)}</h3>
-    <p class="canvas-preview-hint">พรีวิวบนกระดาน — ยังแก้โครงได้อยู่</p>
+    <p class="canvas-preview-hint">${hint}</p>
   `;
 
   list.forEach((item, idx) => {
@@ -1250,16 +1315,26 @@ function renderCanvas() {
       reorderElement(sourceId, item.id, placeBefore);
     });
 
+    const wysiwyg = canvasViewMode === 'wysiwyg';
     let contentHTML = '';
     if (item.type === 'heading') {
-      contentHTML = `<h3 style="font-size: 16px; font-weight: 700;">${esc(item.label)}</h3><p style="font-size: 12px; color: var(--text-muted);">${esc(item.subtitle || '')}</p>`;
+      contentHTML = wysiwyg
+        ? `<h3 class="wys-heading">${esc(item.label)}</h3><p class="wys-sub">${esc(item.subtitle || '')}</p>`
+        : `<h3 style="font-size: 16px; font-weight: 700;">${esc(item.label)}</h3><p style="font-size: 12px; color: var(--text-muted);">${esc(item.subtitle || '')}</p>`;
     } else if (['text', 'password', 'email'].includes(item.type)) {
-      contentHTML = `<label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">${esc(item.label)} ${item.required ? '<span style="color:red">*</span>' : ''}</label>
+      contentHTML = wysiwyg
+        ? `<label class="wys-label">${esc(item.label)} ${item.required ? '<span class="wys-req">*</span>' : ''}</label>
+           <input class="wys-input" type="${item.type}" placeholder="${esc(item.placeholder)}" disabled>`
+        : `<label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">${esc(item.label)} ${item.required ? '<span style="color:red">*</span>' : ''}</label>
                      <input type="${item.type}" placeholder="${esc(item.placeholder)}" disabled style="width:100%; padding: 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">`;
     } else if (item.type === 'checkbox') {
-      contentHTML = `<label style="font-size: 12px; display: flex; align-items: center; gap: 6px;"><input type="checkbox" disabled> ${esc(item.label)}</label>`;
+      contentHTML = wysiwyg
+        ? `<label class="wys-check"><input type="checkbox" disabled> ${esc(item.label)}</label>`
+        : `<label style="font-size: 12px; display: flex; align-items: center; gap: 6px;"><input type="checkbox" disabled> ${esc(item.label)}</label>`;
     } else if (item.type === 'button') {
-      contentHTML = `<button disabled style="width: 100%; padding: 8px; background: var(--accent-primary); color: #fff; border: none; border-radius: 4px; font-size: 12px;">${esc(item.label)}</button>`;
+      contentHTML = wysiwyg
+        ? `<button class="wys-submit" disabled>${esc(item.label)}</button>`
+        : `<button disabled style="width: 100%; padding: 8px; background: var(--accent-primary); color: #fff; border: none; border-radius: 4px; font-size: 12px;">${esc(item.label)}</button>`;
     } else if (item.type === 'divider') {
       contentHTML = `<hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 8px 0;">`;
     }
@@ -1277,7 +1352,7 @@ function renderCanvas() {
     `;
     preview.appendChild(itemCard);
   });
-  canvas.appendChild(preview);
+  stage.appendChild(preview);
 }
 
 function renderInspector() {

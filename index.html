@@ -375,6 +375,14 @@
               <span id="active-target-badge" class="badge badge-sky">เข้าสู่ระบบ · 0 ช่อง</span>
             </div>
             <div class="header-actions">
+              <div class="canvas-chrome" role="toolbar" aria-label="ซูมและมุมมองกระดาน">
+                <div class="canvas-zoom" role="group" aria-label="ซูม">
+                  <button type="button" class="zoom-btn" id="canvas-zoom-out" onclick="nudgeCanvasZoom(-1)" aria-label="ซูมออก" title="ซูมออก">−</button>
+                  <button type="button" class="zoom-btn zoom-btn-label" id="canvas-zoom-label" onclick="resetCanvasZoom()" aria-label="รีเซ็ตซูม 100%" title="แตะเพื่อกลับ 100%">100%</button>
+                  <button type="button" class="zoom-btn" id="canvas-zoom-in" onclick="nudgeCanvasZoom(1)" aria-label="ซูมเข้า" title="ซูมเข้า">+</button>
+                </div>
+                <button type="button" class="view-mode-btn" id="canvas-view-mode" onclick="toggleCanvasViewMode()" aria-pressed="false" title="สลับโครง / หน้าตาจริง">โครง</button>
+              </div>
               <button type="button" id="panel-toolbox-toggle" class="btn btn-secondary btn-sm panel-open-btn" data-label="เครื่องมือ"
                       aria-expanded="false" aria-controls="panel-toolbox-body"
                       onclick="togglePanel('toolbox', event)">เครื่องมือ</button>
@@ -385,8 +393,10 @@
             </div>
           </div>
 
-          <div class="canvas-dropzone" id="builder-canvas">
-            <!-- Dynamic elements generated here -->
+          <div class="canvas-dropzone" id="builder-canvas" data-view="structure">
+            <div class="canvas-zoom-stage" id="canvas-zoom-stage">
+              <!-- Dynamic elements generated here -->
+            </div>
           </div>
         </div>
 
