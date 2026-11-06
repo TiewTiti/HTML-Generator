@@ -685,13 +685,14 @@ function updateTargetChrome() {
   const badge = document.getElementById('active-target-badge');
   if (badge) {
     const cur = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-    const otherN = builderTarget === 'login' ? regCount : loginCount;
-    badge.textContent = `กำลังแก้: ${cur} · อีกฝั่งมี ${otherN} ช่อง`;
+    const n = builderTarget === 'login' ? loginCount : regCount;
+    badge.textContent = `${cur} · ${n} ช่อง`;
   }
   const loginBtn = document.getElementById('target-login-btn');
   const regBtn = document.getElementById('target-register-btn');
   if (loginBtn) loginBtn.classList.toggle('active', builderTarget === 'login');
   if (regBtn) regBtn.classList.toggle('active', builderTarget === 'register');
+  syncDockHighlight();
 }
 
 // ==========================================================================
@@ -761,10 +762,10 @@ const GROUP_KEYS = ['page', 'theme', 'appearance', 'switcher', 'typography'];
 const PANEL_KEYS = ['toolbox', 'inspector', 'controls', 'code', 'teach'];
 const PANEL_LAYOUT = { toolbox: '.builder-layout', inspector: '.builder-layout', controls: '.studio-layout', code: '', teach: '' };
 
-// ค่าเริ่มต้นของ "แถบด้านข้าง": เปิดทุกแถบ (เห็นงาน + เครื่องมือพร้อมกันตั้งแต่แรก)
-// ยกเว้น "โหมดสอนอ่านโค้ด" ที่ปิดไว้เพราะเป็นโหมดเสริม (กดเปิดเองเมื่อต้องสอนอ่านโค้ด)
-const DEFAULT_PANELS = { toolbox: true, inspector: true, controls: true, code: true, teach: false };
-const UI_STATE_VERSION = 3;            // เก็บไว้เป็นร่องรอยของรูปแบบเซฟ (ดูหมายเหตุใน loadUiState)
+// Layout B: canvas-first — side drawers closed by default; dock drives steps
+const DEFAULT_PANELS = { toolbox: false, inspector: false, controls: false, code: true, teach: false };
+const UI_STATE_VERSION = 4;            // v4: layout B defaults (drawers closed)
+let dockMode = 'structure';
 
 function defaultUiState() {
   // groups = {} → กลุ่มย่อยทุกกลุ่ม "พับปิด" (เห็นแค่หัวข้อใหญ่) ตามค่าเริ่มต้นของ isGroupOpen()
@@ -778,11 +779,13 @@ function loadUiState() {
     if (!raw) return;
     const s = JSON.parse(raw);
     if (s && typeof s === 'object') {
-      // เซฟเก็บเฉพาะ "สิ่งที่ผู้ใช้เลือกเอง" — ค่าที่ไม่มีในเซฟ = ใช้ค่าเริ่มต้นปัจจุบัน (แถบเปิด / กลุ่มพับปิด)
-      // จึงอ่านของเก่าได้ทุกเวอร์ชันโดยไม่ต้องย้ายค่า
+      // v4+ = layout B canvas-first defaults; older saves keep groups but reset panel openness once
+      const migratePanels = !(s.v >= 4);
       uiState = {
         groups: Object.assign({}, s.groups || {}),
-        panels: Object.assign({}, DEFAULT_PANELS, s.panels || {}),
+        panels: migratePanels
+          ? Object.assign({}, DEFAULT_PANELS)
+          : Object.assign({}, DEFAULT_PANELS, s.panels || {}),
       };
     }
   } catch (e) { uiState = defaultUiState(); }
@@ -898,6 +901,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindBackgroundEvents();
   bindTeacherOtpInputs();
   initTiewBot();
+  syncDockHighlight();
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       const otp = document.getElementById('teacher-otp-modal');
@@ -922,8 +926,61 @@ function switchMainStep(step) {
   });
   if (step === 2) {
     renderStudioPreviewStage();
-    tipTiewBot('step2', 'ครูทิว: เลือกสีทีละช่องด้านซ้ายได้เลย — ชุดธีมสำเร็จรูปใช้ได้เมื่อครูปลดล็อก');
+    tipTiewBot('step2', 'ครูทิว: เลือกสีทีละช่องได้เลย — ชุดธีมสำเร็จรูปใช้ได้เมื่อครูปลดล็อก');
   }
+  syncDockHighlight();
+}
+
+function syncDockHighlight() {
+  const onStructure = activeStep === 1 && (dockMode === 'structure' || dockMode === 'login' || dockMode === 'register' || dockMode === 'teacher');
+  const map = {
+    structure: onStructure || dockMode === 'structure',
+    color: dockMode === 'color',
+    export: dockMode === 'export',
+    login: builderTarget === 'login' && activeStep === 1,
+    register: builderTarget === 'register' && activeStep === 1,
+    teacher: false
+  };
+  if (dockMode === 'color') { map.structure = false; map.export = false; }
+  if (dockMode === 'export') { map.structure = false; map.color = false; }
+
+  document.querySelectorAll('.dock-btn[data-dock]').forEach((btn) => {
+    const key = btn.getAttribute('data-dock');
+    const on = !!map[key];
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+
+function setDockMode(mode) {
+  dockMode = mode || 'structure';
+  if (mode === 'structure') {
+    switchMainStep(1);
+    tipTiewBot('dock-structure', 'ครูทิว: จัดโครงบนกระดาน — กด «เครื่องมือ» เพื่อเพิ่มช่อง');
+  } else if (mode === 'color') {
+    switchMainStep(2);
+    if (!isPanelOpen('controls')) togglePanel('controls');
+    // scroll color panel into view lightly
+    const controls = document.querySelector('.studio-controls-sidebar');
+    if (controls && controls.scrollIntoView) controls.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    tipTiewBot('dock-color', 'ครูทิว: เลือกสีทีละช่องได้เลย');
+  } else if (mode === 'export') {
+    switchMainStep(2);
+    if (isPanelOpen('controls')) togglePanel('controls');
+    const codePanel = document.querySelector('.code-exporter-panel');
+    if (codePanel && codePanel.scrollIntoView) codePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!isPanelOpen('code')) togglePanel('code');
+    tipTiewBot('dock-export', 'ครูทิว: คัดลอกหรือดาวน์โหลดไฟล์ HTML ได้จากด้านล่าง');
+  } else if (mode === 'login') {
+    switchMainStep(1);
+    setBuilderTarget('login');
+  } else if (mode === 'register') {
+    switchMainStep(1);
+    setBuilderTarget('register');
+  } else if (mode === 'teacher') {
+    openTeacherUnlockModal();
+  }
+  syncDockHighlight();
 }
 
 function setBuilderTarget(target) {
@@ -1238,9 +1295,8 @@ function focusToolboxAdd() {
 }
 
 function forwardToStep2() {
-  switchMainStep(2);
-  toast('ไปตกแต่งสีและส่งออกแล้ว');
-  tipTiewBot('forward', 'ครูทิว: โครงครบแล้ว ไปตกแต่งสีได้เมื่อพร้อม');
+  setDockMode('color');
+  toast('ไปเลือกสีแล้ว');
 }
 
 // เรียกหลังแก้ข้อมูลทุกครั้ง: วาดใหม่ + สร้างโค้ดใหม่ + บันทึก
