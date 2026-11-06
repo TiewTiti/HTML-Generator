@@ -1,40 +1,40 @@
 /* ==========================================================================
-   ENTERPRISE SLATE LIGHT THEME & CORE UTILITIES
-   (สไตล์ของ "ตัวเครื่องมือ" — ส่วนสไตล์ของ "การ์ดฟอร์ม" ที่นักเรียนสร้าง
-    อยู่ใน CARD_CSS ในไฟล์ app.js เพราะต้องใช้ชุดเดียวกันกับไฟล์ที่ export)
+   STUDIO CHROME — Apple Store–inspired calm layout
+   (แรงบันดาลใจด้าน whitespace / typography / soft surfaces — ไม่ใช่การโคลนแบรนด์)
+   สไตล์การ์ดฟอร์มที่ export ยังอยู่ใน CARD_CSS ใน app.js
    ========================================================================== */
 :root {
-  --bg-app: #f8fafc;
+  --bg-app: #f5f5f7;
+  --bg-hero: #ffffff;
   --surface-panel: #ffffff;
-  --surface-subtle: #f1f5f9;
-  --border-color: #e2e8f0;
-  --border-hover: #cbd5e1;
+  --surface-subtle: #fbfbfd;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.16);
 
-  --text-main: #0f172a;
-  --text-muted: #475569;
+  --text-main: #1d1d1f;
+  --text-muted: #6e6e73;
   --text-inverse: #ffffff;
 
-  --accent-primary: #2563eb;
-  --accent-hover: #1d4ed8;
-  --accent-light: #eff6ff;
+  --accent-primary: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-light: rgba(0, 113, 227, 0.08);
 
-  --success-color: #047857;
-  --sky-color: #0369a1;
+  --success-color: #248a3d;
+  --sky-color: #0071e3;
 
-  --font-main: 'Prompt', 'Inter', sans-serif;
+  --font-main: 'Prompt', 'Sarabun', sans-serif;
+  --font-display: 'Prompt', 'Sarabun', sans-serif;
+  --radius-panel: 18px;
+  --radius-control: 12px;
 
-  /* ความสูงจริงของหัวเว็บ (ตราโรงเรียน 56px + padding บน/ล่าง 12px×2 + เส้นขอบล่าง 1px)
-     ใช้คำนวณความสูงของกระดาน/แถบด้านข้างให้ "พอดีกับจอ" พอดี
-     เดิมใช้เลข 65px (ค่าตกค้างจากหัวเว็บเวอร์ชันก่อน) → แถบด้านข้างยื่นเลยขอบล่างจอ 16px
-     ทำให้การ์ด "ส่งไปยังขั้นตอนที่ 2" ติดขอบล่างจอและแถบขาวด้านล่างถูกตัดทิ้ง */
-  --header-height: 81px;
+  /* หัวเว็บบาง + hero — ความสูงจริงปรับด้วย flex; ค่านี้เป็น fallback เก่า */
+  --header-height: 52px;
+  --hero-pad-y: 28px;
 
-  /* ความกว้าง "รางเปิดแถบ" ที่กันไว้ด้านข้างตอนกดปิดแถบ (จอใหญ่)
-     แคบพอให้เนื้อหา (กระดาน/หน้าตัวอย่าง) ได้พื้นที่คืนเกือบเต็ม แต่ยังมีปุ่มเปิดแถบโผล่อยู่ */
   --rail-width: 44px;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -48,14 +48,22 @@
     ทำให้กดปิดแล้วค่า hidden=true แต่ยังเห็นอยู่ — เจอบั๊กนี้ที่ "โหมดสอนอ่านโค้ด" ปิดไม่ได้) */
 [hidden] { display: none !important; }
 
+html, body {
+  height: 100%;
+}
+
 body {
   font-family: var(--font-main);
   background-color: var(--bg-app);
   color: var(--text-main);
-  line-height: 1.5;
+  line-height: 1.47;
+  letter-spacing: -0.01em;
   min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ช่วยเรื่องการเข้าถึง: ซ่อนข้อความไว้ให้ screen reader อ่าน */
@@ -71,42 +79,38 @@ body {
   border: 0;
 }
 
-/* Header Navbar */
+/* Header — slim quiet chrome */
 .app-header {
-  background-color: var(--surface-panel);
+  flex: 0 0 auto;
+  background-color: rgba(251, 251, 253, 0.82);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
   border-bottom: 1px solid var(--border-color);
-  padding: 12px 24px;
+  padding: 8px 28px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  box-shadow: var(--shadow-sm);
-  z-index: 10;
+  gap: 16px;
+  z-index: 20;
 }
 
 .header-branding {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  min-width: 0;
 }
 
 .brand-icon {
   flex: 0 0 auto;
-  /* ตราโรงเรียนเป็นทรงสูง (สัดส่วน ~0.69) → ทำกรอบทรงสูงตาม (ไม่ใช่จัตุรัส)
-     เพื่อให้ตราเต็มกรอบจริง ๆ ไม่เหลือที่ว่างข้าง ๆ มากเกินไป */
-  width: 38px;
-  height: 56px;
-  /* ตราโรงเรียนไฟล์ใหม่เป็น PNG โปร่งใส (ไม่มีพื้นขาวของตัวเองแล้ว)
-     → ไม่ต้องมีกรอบขาว/เส้นขอบอีก ตราจึงกลมกลืนกับพื้นหัวเว็บโดยตรง */
+  width: 28px;
+  height: 40px;
   background-color: transparent;
   border: 0;
-  /* ไม่ใส่ padding: ให้ตราเต็มกรอบเลย */
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  color: #fff;
   overflow: hidden;
 }
 
@@ -114,64 +118,104 @@ body {
   display: block;
   width: 100%;
   height: 100%;
-  /* ตราโรงเรียนเป็นรูปทรงสูง → ใช้ contain เพื่อไม่ให้ยอดแหลม/วงข้อความถูกตัด */
   object-fit: contain;
 }
 
-.brand-info h1 {
-  font-size: 18px;
-  font-weight: 700;
+.brand-info { min-width: 0; }
+
+.brand-nav-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--text-main);
-  line-height: 1.2;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.brand-info p {
+.brand-info h1,
+.brand-info p { display: none; }
+
+/* Hero / intro — brand-first before tools */
+.studio-hero {
+  flex: 0 0 auto;
+  background: var(--bg-hero);
+  text-align: center;
+  padding: var(--hero-pad-y) 24px 22px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.studio-hero-eyebrow {
+  margin: 0 0 8px;
   font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--text-muted);
+}
+
+.studio-hero-title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--text-main);
+}
+
+.studio-hero-sub {
+  margin: 0 auto;
+  max-width: 36rem;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-muted);
+  line-height: 1.5;
 }
 
 .step-navigator {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background-color: var(--surface-subtle);
-  padding: 4px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  gap: 4px;
+  background-color: rgba(0, 0, 0, 0.04);
+  padding: 3px;
+  border-radius: 980px;
+  border: 0;
 }
 
 .step-tab-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 7px 14px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: 980px;
   cursor: pointer;
   font-family: var(--font-main);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-muted);
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .step-tab-btn .step-number {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background-color: #cbd5e1;
+  background-color: rgba(0, 0, 0, 0.08);
   color: var(--text-main);
-  font-size: 12px;
+  font-size: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .step-tab-btn.active {
   background-color: var(--surface-panel);
-  color: var(--accent-primary);
+  color: var(--text-main);
   box-shadow: var(--shadow-sm);
   font-weight: 600;
 }
@@ -181,25 +225,35 @@ body {
   color: #fff;
 }
 
+.step-tab-btn:hover:not(.active) {
+  color: var(--text-main);
+}
+
 .step-label {
   white-space: nowrap;
 }
 
 .step-divider {
-  color: #cbd5e1;
-  font-size: 12px;
+  width: 1px;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.12);
+  font-size: 0;
 }
 
 /* App Container Layout */
 .app-container {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .step-panel {
   display: none;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .step-panel.active {
@@ -209,31 +263,34 @@ body {
 /* Step 1 Layout Grid */
 .builder-layout {
   display: grid;
-  /* ค่าเริ่มต้น = แถบเครื่องมือ + แถบคุณสมบัติ "เปิด" ทั้งคู่ (เครื่องมือ 280px · กระดาน · คุณสมบัติ 320px)
-     กรณีที่ผู้ใช้กดซ่อนแถบใด ตัวเลขคอลัมน์จะถูกกำหนดใหม่ในบล็อกด้านล่าง (แถบที่ซ่อน = display:none) */
-  grid-template-columns: 280px 1fr 320px;
+  grid-template-columns: 268px 1fr 300px;
   width: 100%;
-  min-height: calc(100vh - var(--header-height));
+  min-height: 0;
+  height: 100%;
+  gap: 0;
+  padding: 12px 12px 12px;
+  background: var(--bg-app);
 }
 
-/* Sidebars Base — โครง: หัวแถบ (มีปุ่มย่อ/ขยาย) + เนื้อหาที่เลื่อนได้ */
+/* Sidebars — soft panels, quieter chrome */
 .toolbox-sidebar,
 .inspector-sidebar,
 .studio-controls-sidebar {
   background-color: var(--surface-panel);
-  border-right: 1px solid var(--border-color);
-  padding: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-panel);
+  padding: 18px 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  overflow: hidden;               /* ตัวเลื่อนอยู่ใน .sidebar-body */
-  max-height: calc(100vh - var(--header-height));
+  gap: 12px;
+  overflow: hidden;
+  max-height: 100%;
+  box-shadow: var(--shadow-sm);
 }
 
-.inspector-sidebar {
-  border-right: none;
-  border-left: 1px solid var(--border-color);
-}
+.toolbox-sidebar { margin-right: 8px; }
+.inspector-sidebar { margin-left: 8px; border-right: none; border-left: 1px solid var(--border-color); }
+.studio-controls-sidebar { margin-right: 8px; }
 
 .sidebar-header {
   display: flex;
@@ -353,8 +410,9 @@ body {
 }
 
 .sidebar-header h2 {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--text-main);
   display: flex;
   align-items: center;
@@ -364,7 +422,8 @@ body {
 .sidebar-header p {
   font-size: 12px;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 4px;
+  font-weight: 400;
 }
 
 .sidebar-note {
@@ -462,10 +521,10 @@ body {
 
 .category-title {
   font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 500;
+  text-transform: none;
   color: var(--text-muted);
-  letter-spacing: 0.5px;
+  letter-spacing: -0.01em;
 }
 
 .component-grid {
@@ -478,20 +537,20 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  background-color: var(--surface-panel);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  padding: 11px 14px;
+  background-color: var(--surface-subtle);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
   font-family: var(--font-main);
   font-size: 13px;
   color: var(--text-main);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
   text-align: left;
 }
 
 .comp-btn:hover {
-  border-color: var(--accent-primary);
+  border-color: transparent;
   background-color: var(--accent-light);
   color: var(--accent-primary);
 }
@@ -505,14 +564,15 @@ body {
   border-top: 1px solid var(--border-color);
 }
 
-/* Canvas Viewport */
+/* Canvas Viewport — calm center */
 .canvas-viewport {
-  background-color: var(--bg-app);
-  padding: 24px;
+  background-color: transparent;
+  padding: 8px 4px 4px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .canvas-header {
@@ -521,6 +581,7 @@ body {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+  padding: 4px 6px;
 }
 
 .canvas-title-group {
@@ -531,15 +592,17 @@ body {
 }
 
 .canvas-title-group h2 {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .canvas-dropzone {
   flex: 1;
   background-color: var(--surface-panel);
-  border: 2px dashed var(--border-hover);
-  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-sm);
   padding: 24px;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -742,13 +805,13 @@ body {
   line-height: 1.4;
 }
 
-/* Forward Action Card (ขั้นตอนที่ 1 → 2) */
+/* Forward Action (ขั้นตอนที่ 1 → 2) — soft surface, not a loud card */
 .forward-action-card {
   margin-top: auto;
-  padding: 16px;
-  background-color: var(--accent-light);
-  border: 1px solid #bfdbfe;
-  border-radius: 10px;
+  padding: 18px 16px;
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-panel);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -769,7 +832,7 @@ body {
 /* Buttons System */
 .btn {
   padding: 8px 14px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   font-family: var(--font-main);
   font-size: 13px;
   font-weight: 500;
@@ -779,7 +842,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
 
 .btn:disabled {
@@ -787,64 +850,76 @@ body {
   cursor: not-allowed;
 }
 
-.btn-primary { background-color: var(--accent-primary); color: #fff; }
+.btn-primary { background-color: var(--accent-primary); color: #fff; border-color: transparent; border-radius: 980px; }
 .btn-primary:hover { background-color: var(--accent-hover); }
 
-.btn-sky { background-color: var(--sky-color); color: #fff; }
-.btn-sky:hover { background-color: #075985; }
+.btn-sky { background-color: var(--accent-primary); color: #fff; border-color: transparent; border-radius: 980px; }
+.btn-sky:hover { background-color: var(--accent-hover); }
 
-.btn-success { background-color: var(--success-color); color: #fff; }
-.btn-success:hover { background-color: #065f46; }
+.btn-success { background-color: var(--success-color); color: #fff; border-color: transparent; border-radius: 980px; }
+.btn-success:hover { background-color: #1f7a36; }
 
-.btn-secondary { background-color: var(--surface-subtle); border-color: var(--border-color); color: var(--text-main); }
-.btn-secondary:hover { background-color: var(--border-hover); }
+.btn-secondary {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: transparent;
+  color: var(--text-main);
+  border-radius: 980px;
+}
+.btn-secondary:hover { background-color: rgba(0, 0, 0, 0.08); }
 
-.btn-outline-full { width: 100%; border-color: var(--border-color); background: transparent; color: var(--text-main); }
+.btn-outline-full {
+  width: 100%;
+  border-color: var(--border-color);
+  background: transparent;
+  color: var(--text-main);
+  border-radius: var(--radius-control);
+}
 .btn-outline-full:hover { background-color: var(--surface-subtle); }
 
-/* ปุ่มโทนสีในกล่อง "โครงสร้างฟอร์มมาตรฐาน / ล้างข้อมูล" — ฟ้า = โหลด, แดง = ล้าง (อันตราย) */
 .btn-outline-full.btn-tone-info {
-  border-color: #93c5fd;
-  background-color: #eff6ff;
-  color: #1d4ed8;
+  border-color: transparent;
+  background-color: var(--accent-light);
+  color: var(--accent-primary);
 }
 .btn-outline-full.btn-tone-info:hover {
-  background-color: #dbeafe;
-  border-color: #60a5fa;
-  color: #1e40af;
+  background-color: rgba(0, 113, 227, 0.14);
+  border-color: transparent;
+  color: var(--accent-hover);
 }
 
 .btn-outline-full.btn-tone-danger {
-  border-color: #fca5a5;
-  background-color: #fef2f2;
-  color: #b91c1c;
+  border-color: transparent;
+  background-color: rgba(255, 59, 48, 0.08);
+  color: #d70015;
 }
 .btn-outline-full.btn-tone-danger:hover {
-  background-color: #fee2e2;
-  border-color: #f87171;
-  color: #991b1b;
+  background-color: rgba(255, 59, 48, 0.14);
+  border-color: transparent;
+  color: #b80012;
 }
 
-.btn-sm { padding: 6px 10px; font-size: 12px; }
-.btn-md { padding: 10px 16px; font-size: 13px; }
-.btn-lg { padding: 12px 20px; font-size: 14px; font-weight: 600; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-md { padding: 10px 18px; font-size: 13px; }
+.btn-lg { padding: 12px 22px; font-size: 14px; font-weight: 600; }
 .btn-full { width: 100%; }
 
 .badge {
-  padding: 2px 8px;
-  border-radius: 12px;
+  padding: 4px 10px;
+  border-radius: 980px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
 }
-.badge-sky { background-color: #e0f2fe; color: #0369a1; }
+.badge-sky { background-color: var(--accent-light); color: var(--accent-primary); }
 
 /* Step 2 Layout Grid */
 .studio-layout {
   display: grid;
-  /* ค่าเริ่มต้น = แถบตกแต่ง "เปิด" (360px · หน้าตัวอย่าง) — ถ้ากดซ่อนจะเหลือคอลัมน์เดียว */
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: 340px 1fr;
   width: 100%;
-  min-height: calc(100vh - var(--header-height));
+  min-height: 0;
+  height: 100%;
+  padding: 12px;
+  background: var(--bg-app);
 }
 
 .control-scroll-body {
@@ -1284,25 +1359,23 @@ body {
 
 /* (รอบที่ 11) ปุ่ม "ประมวลผลและสร้างโค้ด" ถูกลบ — โค้ดอัปเดตอัตโนมัติอยู่แล้ว จึงไม่ต้องมี .compute-action-card */
 
-/* Studio Preview Viewport */
+/* Studio Preview Viewport — soft stage, not heavy slate slab */
 .studio-preview-viewport {
-  background-color: #0f172a;
-  padding: 24px;
+  background-color: #1d1d1f;
+  border-radius: var(--radius-panel);
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  /* รอบที่ 14: ให้คอลัมน์นี้ "เลื่อนในตัวเอง" เหมือนแถบตกแต่ง (aside)
-     เดิมไม่จำกัดความสูง → คอลัมน์ยืดยาวตามเนื้อหา ทำให้ทั้งหน้าเลื่อน และฝั่งซ้าย (แถบตกแต่ง) เลื่อนหลุดจอ
-     ตอนนี้ทั้ง 2 ฝั่งมีความสูงเท่าจอและเลื่อนแยกกันคนละฝั่ง เหมือนกัน */
-  max-height: calc(100vh - var(--header-height));
+  gap: 16px;
+  max-height: 100%;
+  min-height: 0;
   overflow-y: auto;
-  /* ให้เห็นว่าคอลัมน์นี้เลื่อนได้ (macOS ซ่อน scrollbar จนกว่าจะเลื่อน) */
   scrollbar-width: thin;
-  scrollbar-color: #475569 #0f172a;
+  scrollbar-color: #6e6e73 #1d1d1f;
 }
-.studio-preview-viewport::-webkit-scrollbar { width: 10px; }
-.studio-preview-viewport::-webkit-scrollbar-track { background-color: #0f172a; }
-.studio-preview-viewport::-webkit-scrollbar-thumb { background-color: #475569; border-radius: 8px; border: 2px solid #0f172a; }
+.studio-preview-viewport::-webkit-scrollbar { width: 8px; }
+.studio-preview-viewport::-webkit-scrollbar-track { background-color: transparent; }
+.studio-preview-viewport::-webkit-scrollbar-thumb { background-color: #6e6e73; border-radius: 8px; }
 
 .preview-toolbar {
   display: flex;
@@ -1310,12 +1383,13 @@ body {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  color: #fff;
+  color: #f5f5f7;
 }
 
 .toolbar-left h2 {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .toolbar-right {
@@ -1570,10 +1644,23 @@ body {
    (สลับลำดับด้วย order) ส่วนเครื่องมือ/คุณสมบัติไปอยู่ด้านล่างเป็นกลุ่มที่ย่อได้
    ========================================================================== */
 @media (max-width: 1100px) {
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+  .app-container,
+  .step-panel.active {
+    overflow: visible;
+    min-height: auto;
+  }
+
   .builder-layout,
   .studio-layout {
     grid-template-columns: 1fr;
     min-height: auto;
+    height: auto;
+    padding: 10px;
   }
 
   /* สลับลำดับ: กระดาน/หน้าตัวอย่างขึ้นก่อน เสมอ */
@@ -1587,20 +1674,15 @@ body {
   .toolbox-sidebar,
   .inspector-sidebar,
   .studio-controls-sidebar {
-    border-right: none;
-    border-left: none;
-    border-bottom: 1px solid var(--border-color);
+    margin: 0 0 10px;
     max-height: none;
     overflow: visible;
   }
 
   .sidebar-body { overflow: visible; padding-right: 0; }
 
-  /* รอบที่ 14: จอเล็กเรียงเป็นคอลัมน์เดียว → ยกเลิกการเลื่อนในคอลัมน์ ให้ทั้งหน้าเลื่อนปกติ (เหมือนแถบตกแต่ง) */
   .studio-preview-viewport { max-height: none; }
 
-  /* บนจอเล็กทุกอย่างเรียงเป็นคอลัมน์เดียวเสมอ (ต้องเขียน selector ให้ specificity สูงกว่า
-     กฎคอลัมน์ด้านบน ไม่งั้นแถบที่เปิดอยู่จะถูกจัดเป็นคอลัมน์แคบ ๆ แล้วล้นแนวนอน) */
   .builder-layout,
   .builder-layout.inspector-hidden:not(.toolbox-hidden),
   .builder-layout.toolbox-hidden:not(.inspector-hidden),
@@ -1608,19 +1690,14 @@ body {
   .studio-layout,
   .studio-layout.controls-hidden { grid-template-columns: 1fr; }
 
-  /* ปุ่มเปิดแถบบนจอสัมผัส/จอเล็ก: เป้าแตะ ≥ 44px */
   .panel-open-btn { min-height: 44px; padding: 10px 14px; font-size: 13px; }
 
-  /* แถบ "เพิ่มเร็ว" — หยิบองค์ประกอบได้ทันทีโดยไม่ต้องเลื่อนลงไปหากล่องเครื่องมือ */
   .quickbar { display: flex; flex-direction: column; gap: 4px; }
 
-  /* หัวเว็บแบบกะทัดรัดบนแท็บเล็ต/มือถือ → กระดานออกแบบเลื่อนขึ้นมาใกล้ขอบบนมากขึ้น */
-  .app-header { padding: 12px 16px; }
-  .brand-info p { display: none; }
-  .brand-info h1 { font-size: 17px; }
+  .app-header { padding: 10px 16px; }
+  .studio-hero { padding: 20px 16px 16px; }
+  .studio-hero-title { font-size: clamp(24px, 6vw, 32px); }
   .step-navigator { padding: 3px; }
-
-  .inspector-sidebar { border-top: 1px solid var(--border-color); }
 
   .canvas-dropzone { min-height: 320px; }
 
@@ -1635,11 +1712,10 @@ body {
     padding: 10px 12px;
   }
 
-  /* ย่อหัวเว็บให้เล็กลง → เห็นกระดานออกแบบเร็วขึ้นบนจอมือถือ */
-  .brand-icon { width: 30px; height: 44px; border-radius: 7px; }
-  .brand-info { align-items: center; }
-  .brand-info h1 { font-size: 17px; }
-  .brand-info p { display: none; }
+  .brand-icon { width: 24px; height: 34px; }
+  .brand-nav-name { font-size: 12px; }
+  .studio-hero { padding: 16px 14px 14px; }
+  .studio-hero-sub { font-size: 14px; }
 
   .step-navigator { width: 100%; gap: 4px; padding: 3px; }
 
@@ -1798,10 +1874,10 @@ body {
 .otp-close:hover { background: #f1f5f9; color: #0f172a; }
 .otp-title {
   margin: 0 0 6px;
-  font-size: 22px;
-  font-weight: 700;
-  color: #0f172a;
-  letter-spacing: 0.02em;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.02em;
 }
 .otp-hint {
   margin: 0 0 22px;
@@ -1847,8 +1923,8 @@ body {
   width: 100%;
   padding: 14px 16px;
   border: 0;
-  border-radius: 10px;
-  background: #1e3a5f;
+  border-radius: 980px;
+  background: #0071e3;
   color: #fff;
   font-family: inherit;
   font-size: 15px;
@@ -1857,7 +1933,7 @@ body {
   cursor: pointer;
   transition: background-color 0.15s ease, transform 0.15s ease;
 }
-.otp-verify-btn:hover { background: #152a45; }
+.otp-verify-btn:hover { background: #0077ed; }
 .otp-verify-btn:active { transform: translateY(1px); }
 
 /* ---- Bot ครูทิว ---- */
