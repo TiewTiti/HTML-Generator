@@ -896,6 +896,13 @@ function applyUiState() {
 // ==========================================================================
 document.addEventListener('DOMContentLoaded', () => {
   injectCardCss();
+  /* Preload Noto Sans Thai weights so Thai UI never paints with a synthetic/wrong face */
+  if (document.fonts && document.fonts.load) {
+    [400, 500, 600, 700].forEach((w) => {
+      document.fonts.load(`${w} 16px "Noto Sans Thai"`).catch(() => {});
+      document.fonts.load(`${w} 16px "SF Pro TH"`).catch(() => {});
+    });
+  }
   teacherUnlocked = isTeacherUnlocked();
   const restored = loadState();
   loadUiState();

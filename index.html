@@ -5,15 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login &amp; Register Studio · ม.5</title>
 
-  <!-- FontAwesome ไอคอนเครื่องมือ · Google Fonts เฉพาะตัวเลือกฟอนต์ในฟอร์มที่ export (chrome ใช้ SF stack) -->
+  <!-- FontAwesome ไอคอน · Google Fonts: Noto Sans Thai = SF fallback · Prompt/Sarabun/Kanit/Inter = ตัวเลือกในฟอร์มที่ export -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;600;700&family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;600;700&family=Kanit:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Warm Noto Thai weights so 500/600 UI never synthesizes a broken face -->
+  <style>
+    .font-warmup {
+      position: absolute; width: 0; height: 0; overflow: hidden; clip: rect(0,0,0,0);
+      font-family: "Noto Sans Thai", sans-serif; speak: never; pointer-events: none;
+    }
+  </style>
 
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="layout-b">
+  <div class="font-warmup" aria-hidden="true">
+    <span style="font-weight:400">อ่า</span>
+    <span style="font-weight:500">อ่า</span>
+    <span style="font-weight:600">อ่า</span>
+    <span style="font-weight:700">อ่า</span>
+  </div>
 
   <!-- Ambient Apple-style template cards (real form screenshots; decorative) -->
   <div class="template-backdrop" aria-hidden="true">
@@ -730,29 +743,41 @@
   <div class="dock-wrap" id="studio-dock-wrap">
     <nav class="dock" id="studio-dock" aria-label="แถบเครื่องมือ">
       <button type="button" class="dock-btn on" data-dock="structure" onclick="setDockMode('structure')" aria-pressed="true">
-        <span class="dock-ico" aria-hidden="true">▢</span>
+        <span class="dock-ico" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.7"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.7"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.7"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.7"/></svg>
+        </span>
         <span class="dock-label">โครง</span>
       </button>
       <button type="button" class="dock-btn" data-dock="color" onclick="setDockMode('color')" aria-pressed="false">
-        <span class="dock-ico" aria-hidden="true">◐</span>
+        <span class="dock-ico" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7"/><path d="M12 3.8v16.4M3.8 12h16.4" stroke="currentColor" stroke-width="1.5" opacity=".35"/><path d="M12 12l5.8-5.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </span>
         <span class="dock-label">สี</span>
       </button>
       <button type="button" class="dock-btn" data-dock="export" onclick="setDockMode('export')" aria-pressed="false">
-        <span class="dock-ico" aria-hidden="true">↓</span>
+        <span class="dock-ico" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 4v11.5M12 15.5l-4-4M12 15.5l4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19.5h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </span>
         <span class="dock-label">ส่งออก</span>
       </button>
       <span class="dock-sep" aria-hidden="true"></span>
       <button type="button" class="dock-btn" data-dock="login" onclick="setDockMode('login')" aria-pressed="false">
-        <span class="dock-ico" aria-hidden="true">⌂</span>
+        <span class="dock-ico" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 4H7.5A2.5 2.5 0 0 0 5 6.5v11A2.5 2.5 0 0 0 7.5 20H10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M10 12h9M15.5 8.5 19 12l-3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
         <span class="dock-label">Login</span>
       </button>
       <button type="button" class="dock-btn" data-dock="register" onclick="setDockMode('register')" aria-pressed="false">
-        <span class="dock-ico" aria-hidden="true">+</span>
+        <span class="dock-ico" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 19c1.3-3 3.5-4.5 6.5-4.5s5.2 1.5 6.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M18.5 7.5v4M16.5 9.5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </span>
         <span class="dock-label">สมัคร</span>
       </button>
       <span class="dock-sep" aria-hidden="true"></span>
       <button type="button" class="dock-btn" data-dock="teacher" onclick="setDockMode('teacher')" aria-pressed="false">
-        <span class="dock-ico" aria-hidden="true">🔑</span>
+        <span class="dock-ico" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="8" cy="14" r="3.2" stroke="currentColor" stroke-width="1.7"/><path d="M10.8 11.8 18 4.6M15.2 4.6h2.8v2.8M14.4 8.2l2 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
         <span class="dock-label">รหัสครู</span>
       </button>
     </nav>
