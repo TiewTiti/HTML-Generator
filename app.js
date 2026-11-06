@@ -461,7 +461,7 @@ function applyTeacherGateUi() {
     btn.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
     const label = btn.querySelector('.gated-cta-label');
     if (label) {
-      label.textContent = unlocked ? 'ใช้แบบฟอร์มตัวอย่าง' : 'ใช้แบบฟอร์มตัวอย่าง (ล็อก)';
+      label.textContent = unlocked ? 'ใช้แบบฟอร์มตัวอย่าง' : 'ใช้แบบฟอร์มตัวอย่าง · ล็อก';
     }
     const lockIco = btn.querySelector('.gated-lock-ico');
     if (lockIco) lockIco.hidden = unlocked;
@@ -1126,9 +1126,10 @@ function renderCanvas() {
       <div class="empty-canvas-actions">
         <button type="button" class="btn btn-primary teacher-gated-btn teacher-gated-cta${isTeacherUnlocked() ? '' : ' is-locked'}"
                 onclick="requestLoadDefaultForm()" aria-disabled="${isTeacherUnlocked() ? 'false' : 'true'}">
-          <i class="fa-solid fa-lock gated-lock-ico" aria-hidden="true"${isTeacherUnlocked() ? ' hidden' : ''}></i>
-          <span class="gated-cta-label">${isTeacherUnlocked() ? 'ใช้แบบฟอร์มตัวอย่าง' : 'ใช้แบบฟอร์มตัวอย่าง (ล็อก)'}</span>
-          <span class="lock-chip" aria-hidden="true"${isTeacherUnlocked() ? ' hidden' : ''}><i class="fa-solid fa-lock"></i> ครู</span>
+          <svg class="gated-lock-ico" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false"${isTeacherUnlocked() ? ' hidden' : ''}>
+            <path fill="currentColor" d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2Zm-7-2a2 2 0 0 1 4 0v2h-4V7Zm7 12H7v-8h10v8Zm-5-3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
+          </svg>
+          <span class="gated-cta-label">${isTeacherUnlocked() ? 'ใช้แบบฟอร์มตัวอย่าง' : 'ใช้แบบฟอร์มตัวอย่าง · ล็อก'}</span>
         </button>
         <button type="button" class="btn btn-secondary" onclick="focusToolboxAdd()">
           เพิ่มช่องเอง
@@ -1275,8 +1276,7 @@ function updateItemProp(id, prop, val) {
 }
 
 function clearCanvas() {
-  const which = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-  if (!confirm(`ล้างองค์ประกอบทั้งหมดของฟอร์ม${which} ใช่หรือไม่? (มีปุ่มเลิกทำ 1 ครั้ง)`)) return;
+  if (!confirm('ต้องการลบจริงหรือไม่?')) return;
   captureUndo('ล้างกระดาน');
   if (builderTarget === 'login') loginElements = [];
   else registerElements = [];

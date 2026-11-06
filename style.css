@@ -1809,31 +1809,51 @@ body {
 }
 .lock-chip[hidden] { display: none !important; }
 
-/* Teacher-gated CTAs: soft Apple blue lock (still opens OTP — not a dead gray button) */
+/* Teacher-gated CTAs: one soft-blue family (fill + text + SVG lock) — opens OTP */
 .teacher-gated-cta.is-locked,
 .btn.teacher-gated-btn.is-locked {
   background: #e8f1ff !important;
-  color: #0058b0 !important;
-  border-color: transparent !important;
+  color: #0071e3 !important;
+  border: 1px solid #cfe2ff !important;
   box-shadow: none !important;
   cursor: pointer;
   opacity: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 .teacher-gated-cta.is-locked:hover,
 .btn.teacher-gated-btn.is-locked:hover {
-  background: #d6e7ff !important;
-  color: #004a99 !important;
-}
-.teacher-gated-cta.is-locked .lock-chip,
-.btn.teacher-gated-btn.is-locked .lock-chip {
-  background: #cfe2ff;
-  color: #0058b0;
+  background: #dcedff !important;
+  color: #0071e3 !important;
+  border-color: #b6d6ff !important;
 }
 .gated-lock-ico {
-  margin-right: 6px;
-  font-size: 0.9em;
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  vertical-align: -2px;
+  color: inherit;
 }
 .gated-lock-ico[hidden] { display: none !important; }
+.teacher-gated-cta.is-locked .gated-lock-ico,
+.btn.teacher-gated-btn.is-locked .gated-lock-ico {
+  color: #0071e3;
+}
+
+/* Destructive clear */
+.btn-clear-danger {
+  background: #fff5f5 !important;
+  color: #d70015 !important;
+  border: 1px solid #ffd4d8 !important;
+  border-radius: 980px;
+  font-weight: 500;
+}
+.btn-clear-danger:hover {
+  background: #ffe8ea !important;
+  color: #b80012 !important;
+}
 .hero-lock-hint,
 .template-lock-hint {
   width: 100%;
@@ -2048,8 +2068,8 @@ body {
   min-width: 0;
 }
 .tiew-bot-chip-av {
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   object-fit: cover;
   object-position: center 35%;
@@ -2093,8 +2113,8 @@ body {
 .tiew-bot-avatar:hover { box-shadow: var(--shadow-lg); }
 .tiew-bot-avatar:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
 .tiew-bot-photo-wrap {
-  width: 56px;
-  height: 56px;
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
   overflow: hidden;
   background: transparent;
@@ -2107,7 +2127,14 @@ body {
   object-position: center 35%;
   display: block;
 }
-.tiew-bot-name { font-size: 11px; font-weight: 600; }
+.tiew-bot-name { font-size: 12px; font-weight: 600; }
+@media (max-width: 1100px) {
+  .tiew-bot-photo-wrap { width: 68px; height: 68px; }
+}
+@media (max-width: 700px) {
+  .tiew-bot-photo-wrap { width: 64px; height: 64px; }
+  .tiew-bot-name { font-size: 11px; }
+}
 
 .tiew-bot.is-wave:not(.is-calm) .tiew-bot-avatar {
   animation: tiewWave 0.7s ease 1;

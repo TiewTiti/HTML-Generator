@@ -276,9 +276,10 @@
     <div class="hero-cta">
       <button type="button" id="hero-load-default-btn" class="btn btn-primary teacher-gated-btn teacher-gated-cta"
               onclick="requestLoadDefaultForm()" aria-describedby="hero-template-lock-hint">
-        <i class="fa-solid fa-lock gated-lock-ico" aria-hidden="true"></i>
-        <span class="gated-cta-label">ใช้แบบฟอร์มตัวอย่าง</span>
-        <span class="lock-chip" aria-hidden="true"><i class="fa-solid fa-lock"></i> ครู</span>
+        <svg class="gated-lock-ico" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2Zm-7-2a2 2 0 0 1 4 0v2h-4V7Zm7 12H7v-8h10v8Zm-5-3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
+        </svg>
+        <span class="gated-cta-label">ใช้แบบฟอร์มตัวอย่าง · ล็อก</span>
       </button>
       <button type="button" class="btn btn-ghost" onclick="focusToolboxAdd()">เพิ่มช่องเอง</button>
       <p id="hero-template-lock-hint" class="hero-lock-hint">ต้องใส่รหัสครูก่อน</p>
@@ -367,7 +368,7 @@
               <button type="button" id="panel-inspector-toggle" class="btn btn-secondary btn-sm panel-open-btn" data-label="คุณสมบัติ"
                       aria-expanded="false" aria-controls="panel-inspector-body"
                       onclick="togglePanel('inspector', event)">คุณสมบัติ</button>
-              <button class="btn btn-secondary btn-sm" onclick="clearCanvas()">ล้าง</button>
+              <button type="button" class="btn btn-sm btn-clear-danger" onclick="clearCanvas()">ล้าง</button>
             </div>
           </div>
 
@@ -807,7 +808,7 @@
     </div>
     <button type="button" class="tiew-bot-avatar" id="tiew-bot-avatar" aria-label="เปิดคำใบ้จากครูชิโร่" onclick="toggleTiewBotPanel()">
       <span class="tiew-bot-photo-wrap" aria-hidden="true">
-        <img class="tiew-bot-photo" src="assets/bot-kru-shiro.png" alt="" width="64" height="64" decoding="async">
+        <img class="tiew-bot-photo" src="assets/bot-kru-shiro.png" alt="" width="76" height="76" decoding="async">
       </span>
       <span class="tiew-bot-name">ครูชิโร่</span>
     </button>
