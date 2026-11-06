@@ -2052,8 +2052,8 @@ body {
   height: 28px;
   border-radius: 50%;
   object-fit: cover;
-  object-position: center 28%;
-  background: #111;
+  object-position: center 35%;
+  background: transparent;
   flex-shrink: 0;
 }
 .tiew-bot-actions { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
@@ -2097,14 +2097,14 @@ body {
   height: 56px;
   border-radius: 50%;
   overflow: hidden;
-  background: #111;
+  background: transparent;
   display: block;
 }
 .tiew-bot-photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 28%;
+  object-position: center 35%;
   display: block;
 }
 .tiew-bot-name { font-size: 11px; font-weight: 600; }
@@ -2147,7 +2147,7 @@ body {
 }
 
 /* ==========================================================================
-   Ambient template-card backdrop (Apple “ใหม่ล่าสุด” pastel vertical cards)
+   Ambient template-card backdrop — real form screenshots in Apple squircles
    ========================================================================== */
 .template-backdrop {
   position: fixed;
@@ -2156,41 +2156,60 @@ body {
   pointer-events: none;
   overflow: hidden;
   display: flex;
-  align-items: center;
-  opacity: 0.72;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+  opacity: 0.88;
 }
 .template-backdrop-fade {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   background:
-    linear-gradient(180deg, rgba(245, 245, 247, 0.55) 0%, rgba(245, 245, 247, 0.22) 38%, rgba(245, 245, 247, 0.7) 100%),
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(232, 241, 255, 0.65), transparent 60%);
+    linear-gradient(180deg, rgba(245, 245, 247, 0.72) 0%, rgba(245, 245, 247, 0.28) 36%, rgba(245, 245, 247, 0.78) 100%),
+    radial-gradient(ellipse 80% 55% at 50% -10%, rgba(232, 241, 255, 0.7), transparent 58%);
 }
+.template-backdrop-rail {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+}
+.template-backdrop-rail--a { transform: rotate(-2.5deg) scale(1.04); }
+.template-backdrop-rail--b { transform: rotate(2deg) scale(1.02); margin-top: -6px; }
 .template-backdrop-track {
   display: flex;
-  gap: 18px;
+  gap: 20px;
   width: max-content;
-  padding: 0 24px;
-  animation: tplMarquee 72s linear infinite;
+  padding: 8px 28px;
+  animation: tplMarquee 80s linear infinite;
   will-change: transform;
+}
+.template-backdrop-track--reverse {
+  animation-name: tplMarqueeReverse;
+  animation-duration: 96s;
 }
 @keyframes tplMarquee {
   from { transform: translate3d(0, 0, 0); }
   to { transform: translate3d(-50%, 0, 0); }
 }
+@keyframes tplMarqueeReverse {
+  from { transform: translate3d(-50%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
 
 .tpl-card {
   position: relative;
   flex: 0 0 auto;
-  width: min(220px, 42vw);
-  height: min(320px, 58vh);
-  border-radius: 28px;
-  padding: 22px 20px 18px;
+  width: min(248px, 46vw);
+  height: min(340px, 52vh);
+  border-radius: 30px;
+  padding: 22px 18px 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 18px 40px rgba(0, 0, 0, 0.08);
 }
 .tpl-card-eye {
   margin: 0 0 6px;
@@ -2200,7 +2219,7 @@ body {
 }
 .tpl-card-title {
   margin: 0;
-  font-size: clamp(18px, 2.2vw, 22px);
+  font-size: clamp(17px, 2vw, 21px);
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.15;
@@ -2208,7 +2227,7 @@ body {
 }
 .tpl-card-sub {
   margin: 6px 0 0;
-  font-size: 13px;
+  font-size: 12px;
   color: rgba(29, 29, 31, 0.55);
 }
 .tpl-card-preview {
@@ -2216,81 +2235,58 @@ body {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  margin-top: 14px;
+  margin-top: 12px;
   min-height: 0;
+  position: relative;
 }
-.tpl-mini-form {
-  width: 78%;
-  background: rgba(255, 255, 255, 0.92);
-  border-radius: 16px;
-  padding: 14px 12px 12px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.tpl-mini-form--light { background: #fff; }
-.tpl-mini-form--reg .tpl-mini-btn { background: #34c759; }
-.tpl-mini-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #1d1d1f;
-  letter-spacing: -0.02em;
-}
-.tpl-mini-tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 2px;
-}
-.tpl-mini-tabs i {
-  flex: 1;
-  height: 8px;
-  border-radius: 980px;
-  background: #e8f1ff;
+.tpl-card-shot {
   display: block;
-}
-.tpl-mini-tabs i:first-child { background: #0071e3; }
-.tpl-mini-field {
-  display: block;
-  height: 18px;
-  border-radius: 8px;
-  background: #f2f2f7;
-}
-.tpl-mini-btn {
-  display: block;
-  height: 22px;
-  border-radius: 980px;
-  background: #0071e3;
-  margin-top: 2px;
+  width: 92%;
+  height: auto;
+  max-height: 72%;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.12);
+  transform: translateY(10%);
 }
 .tpl-card-chev {
   position: absolute;
   right: 14px;
   bottom: 14px;
-  width: 28px;
-  height: 28px;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   color: #6e6e73;
   display: grid;
   place-items: center;
   font-size: 18px;
   line-height: 1;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.tpl-card--rose { background: #f8dce8; }
-.tpl-card--sky { background: #d7ebf8; }
-.tpl-card--lilac { background: #e4dff5; }
-.tpl-card--mint { background: #d8f0e4; }
-.tpl-card--peach { background: #f8e0d2; }
-.tpl-card--sand { background: #efe8d8; }
+.tpl-card--rose { background: #f7d6e4; }
+.tpl-card--sky { background: #d5eaf8; }
+.tpl-card--lilac { background: #e3ddf6; }
+.tpl-card--mint { background: #d5efe4; }
+.tpl-card--peach { background: #f7dfd0; }
+.tpl-card--sand { background: #efe6d6; }
 
 @media (prefers-reduced-motion: reduce) {
-  .template-backdrop-track {
+  .template-backdrop-track,
+  .template-backdrop-track--reverse {
     animation: none;
-    transform: translate3d(-8%, 0, 0);
   }
+  .template-backdrop-track { transform: translate3d(-12%, 0, 0); }
+  .template-backdrop-track--reverse { transform: translate3d(-28%, 0, 0); }
+}
+@media (max-width: 700px) {
+  .template-backdrop { gap: 14px; opacity: 0.8; }
+  .template-backdrop-rail--a,
+  .template-backdrop-rail--b { transform: none; }
+  .tpl-card { width: min(190px, 58vw); height: min(270px, 46vh); border-radius: 24px; }
 }
 
 /* ==========================================================================
