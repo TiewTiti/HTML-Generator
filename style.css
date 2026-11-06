@@ -129,9 +129,12 @@ body {
 .brand-icon {
   flex: 0 0 auto;
   width: 28px;
-  height: 40px;
-  background-color: transparent;
-  border: 0;
+  height: 28px;
+  border-radius: 50%;
+  background:
+    linear-gradient(145deg, #f6d56a 0%, #e8b84a 45%, #1d4f91 46%, #2a6bb8 100%);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.35);
   padding: 0;
   display: flex;
   align-items: center;
@@ -141,9 +144,10 @@ body {
 
 .brand-icon img {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: 118%;
+  height: 118%;
+  object-fit: cover;
+  object-position: center 42%;
 }
 
 .brand-info { min-width: 0; }
@@ -1325,39 +1329,53 @@ body {
 .grad-chip.active { outline: 2px solid var(--accent-primary); outline-offset: 1px; }
 .grad-chip:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
 
-/* ----- แถบ "เพิ่มเร็ว" (จอเล็ก): หยิบองค์ประกอบได้ทันทีโดยไม่ต้องเปิดกล่องเครื่องมือ ----- */
+/* ----- Mobile quickbar (Figma: card above canvas) ----- */
 .quickbar { display: none; }
 
-.quickbar-label { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+.quickbar-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
 
 .quickbar-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   gap: 6px;
-  overflow-x: auto;
-  padding-bottom: 4px;
   min-width: 0;
 }
 
 .quick-tile {
-  flex: 0 0 auto;
-  min-width: 64px;
+  min-width: 0;
   min-height: 54px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 6px 8px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background-color: var(--surface-panel);
+  padding: 8px 4px;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background-color: #fff;
   font-family: var(--font-main);
-  font-size: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
   color: var(--text-main);
   cursor: pointer;
+  transition: background-color 0.2s var(--ease-apple);
 }
 
-.quick-tile i { font-size: 15px; color: var(--accent-primary); }
+.quick-tile-glyph {
+  color: var(--accent-primary);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+}
+.quick-tile-label { line-height: 1.2; text-align: center; }
 .quick-tile:active { background-color: var(--accent-light); }
 .quick-tile:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
 
@@ -1787,8 +1805,6 @@ body {
 
   .panel-open-btn { min-height: 44px; padding: 10px 14px; font-size: 13px; }
 
-  .quickbar { display: flex; flex-direction: column; gap: 4px; }
-
   .app-header { padding: 10px 16px; }
   .studio-hero { padding: 20px 16px 16px; }
   .studio-hero-title { font-size: clamp(24px, 6vw, 32px); }
@@ -1807,7 +1823,7 @@ body {
     padding: 10px 12px;
   }
 
-  .brand-icon { width: 24px; height: 34px; }
+  .brand-icon { width: 24px; height: 24px; }
   .brand-nav-name { font-size: 12px; }
   .studio-hero { padding: 16px 14px 14px; }
   .studio-hero-sub { font-size: 14px; }
@@ -2246,7 +2262,11 @@ body {
   .target-btn,
   .step-tab-btn,
   .ctrl-btn,
-  .dock-btn {
+  .dock-btn,
+  .drawer-scrim,
+  body.layout-b .builder-layout > .toolbox-sidebar,
+  body.layout-b .builder-layout > .inspector-sidebar,
+  body.layout-b .studio-layout > .studio-controls-sidebar {
     transition: none !important;
     animation: none !important;
   }
@@ -2467,11 +2487,31 @@ body.layout-b .app-header {
   border-bottom: 0.5px solid rgba(0, 0, 0, 0.16);
 }
 
+body.layout-b .brand-icon {
+  width: 22px;
+  height: 22px;
+}
 body.layout-b .brand-nav-name {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--text-main);
+}
+
+/* Mobile quickbar — Figma card between hero and stage */
+body.layout-b > .quickbar {
+  display: none;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto 12px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  z-index: 2;
 }
 
 body.layout-b .app-container {
@@ -2535,28 +2575,72 @@ body.layout-b .builder-layout > .canvas-viewport {
 
 body.layout-b .builder-layout > .toolbox-sidebar,
 body.layout-b .builder-layout > .inspector-sidebar {
+  display: flex !important; /* override legacy display:none while animating off-canvas */
+  flex-direction: column;
   position: absolute;
   top: 0;
   bottom: 0;
-  z-index: 12;
+  z-index: 24;
   width: min(300px, 86vw);
   max-width: 300px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-  background: #fff;
+  margin: 0;
+  box-shadow: var(--shadow-lg);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 0;
+  transition: transform 0.32s var(--ease-apple), opacity 0.24s var(--ease-apple);
+  will-change: transform;
 }
 
 body.layout-b .builder-layout > .toolbox-sidebar {
   left: 0;
-  border-right: 1px solid var(--border-color);
+  border-right: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0 18px 18px 0;
+  transform: translateX(0);
 }
 body.layout-b .builder-layout > .inspector-sidebar {
   right: 0;
-  border-left: 1px solid var(--border-color);
+  border-left: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px 0 0 18px;
+  transform: translateX(0);
 }
 
-body.layout-b .builder-layout.toolbox-hidden > .toolbox-sidebar,
+body.layout-b .builder-layout.toolbox-hidden > .toolbox-sidebar {
+  transform: translateX(-104%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
 body.layout-b .builder-layout.inspector-hidden > .inspector-sidebar {
-  display: none;
+  transform: translateX(104%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Drawer scrim — tap outside to close */
+.drawer-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 22;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: rgba(29, 29, 31, 0.18);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.28s var(--ease-apple);
+}
+.drawer-scrim[hidden] { display: none !important; }
+body.layout-b.drawer-open .builder-layout,
+body.layout-b.drawer-open .studio-layout {
+  /* Raise shell above scrim (22) so absolute drawers stay tappable; dock stays at 40 */
+  isolation: isolate;
+  z-index: 23;
+  position: relative;
 }
 
 body.layout-b .rail-btn { display: none !important; }
@@ -2572,18 +2656,29 @@ body.layout-b .studio-layout > .studio-preview-viewport {
   min-height: 420px;
 }
 body.layout-b .studio-layout > .studio-controls-sidebar {
+  display: flex !important;
+  flex-direction: column;
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
-  z-index: 12;
+  z-index: 24;
   width: min(320px, 90vw);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-  background: #fff;
-  border-right: 1px solid var(--border-color);
+  margin: 0;
+  box-shadow: var(--shadow-lg);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-right: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0 18px 18px 0;
+  transition: transform 0.32s var(--ease-apple), opacity 0.24s var(--ease-apple);
+  transform: translateX(0);
 }
 body.layout-b .studio-layout.controls-hidden > .studio-controls-sidebar {
-  display: none;
+  transform: translateX(-104%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 body.layout-b .canvas-header,
@@ -2743,11 +2838,7 @@ body.layout-b .canvas-header .btn-clear-danger {
   padding: 5px 12px;
 }
 
-body.layout-b .quickbar {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.9);
-  padding: 10px 12px;
-}
+/* (quickbar styles live on body.layout-b > .quickbar) */
 
 body.layout-b .forward-action-card {
   border: 0;
@@ -2864,6 +2955,39 @@ body.layout-b .tiew-bot {
   body.layout-b .studio-hero-title { font-size: clamp(30px, 8.5vw, 40px); letter-spacing: -0.01em; }
   body.layout-b .studio-hero-sub { font-size: 16px; max-width: 22em; letter-spacing: 0; }
   body.layout-b .header-meta { display: none; }
+  body.layout-b .app-header {
+    flex-direction: row;
+    align-items: center;
+    height: var(--header-height);
+    min-height: var(--header-height);
+    padding: 0 14px;
+  }
+  body.layout-b > .quickbar {
+    display: block;
+    width: calc(100% - 24px);
+    margin: 0 12px 12px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+  /* Mobile drawers: full-height sheets under nav (Figma handoff overlay behavior) */
+  body.layout-b .builder-layout > .toolbox-sidebar,
+  body.layout-b .builder-layout > .inspector-sidebar,
+  body.layout-b .studio-layout > .studio-controls-sidebar {
+    position: fixed;
+    top: var(--header-height, 44px);
+    bottom: 0;
+    max-height: none;
+    z-index: 34; /* above scrim (22) and shell; under dock (40) */
+  }
+  body.layout-b .builder-layout > .toolbox-sidebar,
+  body.layout-b .studio-layout > .studio-controls-sidebar {
+    left: 0;
+    right: auto;
+  }
+  body.layout-b .builder-layout > .inspector-sidebar {
+    right: 0;
+    left: auto;
+  }
   body.layout-b .app-container { padding: 0 12px var(--dock-clearance); }
   body.layout-b .builder-layout,
   body.layout-b .studio-layout {

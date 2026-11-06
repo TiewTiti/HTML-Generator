@@ -837,27 +837,56 @@ function setAllGroups(open) {
   toast(open ? 'ขยายทุกกลุ่มแล้ว' : 'ย่อทุกกลุ่มแล้ว — กดหัวข้อกลุ่มเพื่อเปิดทีละกลุ่มได้');
 }
 
-// ย่อ/ขยายแถบด้านข้าง (และกล่องโค้ด) — จำเป็นบนจอเล็กที่พื้นที่จำกัด
+// ย่อ/ขยายแถบด้านข้าง (และกล่องโค้ด) — layout B: one drawer at a time + scrim
 function togglePanel(panel, e) {
-  // Ensure only one side panel (toolbox or inspector) is open at a time in step1
-  // (Removed exclusive logic to allow both panels open simultaneously for layout test)
   const wasOpen = isPanelOpen(panel);
   uiState.panels[panel] = !wasOpen;
-  // No mutual exclusivity enforced here
+  /* Figma Variant B drawers: exclusive toolbox ↔ inspector on the builder board */
+  if (!wasOpen && (panel === 'toolbox' || panel === 'inspector')) {
+    const other = panel === 'toolbox' ? 'inspector' : 'toolbox';
+    if (isPanelOpen(other)) {
+      uiState.panels[other] = false;
+      applyPanelState(other);
+    }
+  }
   saveUiState();
   applyPanelState(panel);
+  syncDrawerScrim();
   const fromRail = e && e.currentTarget && e.currentTarget.classList && e.currentTarget.classList.contains('rail-btn');
   if (fromRail && !wasOpen) {
     const headerBtn = document.getElementById('panel-' + panel + '-toggle');
     if (headerBtn && headerBtn.focus) headerBtn.focus({ preventScroll: true });
   }
-  if (isPanelOpen(panel) && window.matchMedia('(max-width: 1100px)').matches) {
-    const sel = { toolbox: '.toolbox-sidebar', inspector: '.inspector-sidebar', controls: '.studio-controls-sidebar' }[panel];
-    const el = sel ? document.querySelector(sel) : null;
-    if (el && el.getBoundingClientRect().top > window.innerHeight - 80 && el.scrollIntoView) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeDrawerPanels() {
+  let changed = false;
+  ['toolbox', 'inspector', 'controls'].forEach((k) => {
+    if (isPanelOpen(k)) {
+      uiState.panels[k] = false;
+      applyPanelState(k);
+      changed = true;
     }
+  });
+  if (changed) saveUiState();
+  syncDrawerScrim();
+}
+
+function syncDrawerScrim() {
+  const open = isPanelOpen('toolbox') || isPanelOpen('inspector') || isPanelOpen('controls');
+  document.body.classList.toggle('drawer-open', !!open);
+  let scrim = document.getElementById('drawer-scrim');
+  if (!scrim) {
+    scrim = document.createElement('button');
+    scrim.type = 'button';
+    scrim.id = 'drawer-scrim';
+    scrim.className = 'drawer-scrim';
+    scrim.setAttribute('aria-label', 'ปิดแถบด้านข้าง');
+    scrim.addEventListener('click', () => { closeDrawerPanels(); });
+    document.body.appendChild(scrim);
   }
+  scrim.hidden = !open;
+  scrim.setAttribute('aria-hidden', open ? 'false' : 'true');
 }
 
 function applyPanelState(key) {
@@ -876,6 +905,11 @@ function applyPanelState(key) {
   const layoutSel = PANEL_LAYOUT[key];
   const layout = layoutSel ? document.querySelector(layoutSel) : null;
   if (layout) layout.classList.toggle(key + '-hidden', !open);
+  /* Keep drawer open class in sync when panels change from applyUiState */
+  if (key === 'toolbox' || key === 'inspector' || key === 'controls') {
+    const anyOpen = isPanelOpen('toolbox') || isPanelOpen('inspector') || isPanelOpen('controls');
+    document.body.classList.toggle('drawer-open', !!anyOpen);
+  }
   // ปุ่มในรางเปิดแถบ (จอใหญ่): บอกสถานะให้ถูก — ตอนนี้แถบปิดอยู่ กดแล้วจะเปิด
   const rail = document.getElementById('panel-' + key + '-rail');
   if (rail) {
@@ -910,6 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderThemePresets();
   renderGradientPresets();
   applyUiState();
+  syncDrawerScrim();
   applyConfigToControls();
   applyTeacherGateUi();
   updateTargetChrome();
@@ -926,6 +961,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') {
       const otp = document.getElementById('teacher-otp-modal');
       if (otp && !otp.hidden) { closeTeacherUnlockModal(); return; }
+      if (document.body.classList.contains('drawer-open')) { closeDrawerPanels(); return; }
       minimizeTiewBot();
     }
   });
@@ -1052,10 +1088,17 @@ function renderComponentButtons() {
   }
   const bar = document.getElementById('quickbar-grid');
   if (bar) {
-    bar.innerHTML = COMPONENTS.map((c) => `
-        <button class="quick-tile" type="button" onclick="addCanvasElement('${c.type}')" aria-label="เพิ่ม ${esc(c.label)}">
-          <i class="fa-solid ${c.icon}" aria-hidden="true"></i><span>${esc(c.short)}</span>
-        </button>`).join('');
+    /* Figma mobile quickbar shows the five primary field types */
+    const quickTypes = ['heading', 'text', 'password', 'email', 'checkbox'];
+    const glyphs = { heading: 'H', text: 'A', password: '●', email: '✉', checkbox: '☑' };
+    bar.innerHTML = quickTypes.map((type) => {
+      const c = COMPONENT_BY_TYPE[type];
+      if (!c) return '';
+      return `<button class="quick-tile" type="button" onclick="addCanvasElement('${c.type}')" aria-label="เพิ่ม ${esc(c.label)}">
+          <span class="quick-tile-glyph" aria-hidden="true">${glyphs[type] || ''}</span>
+          <span class="quick-tile-label">${esc(c.short)}</span>
+        </button>`;
+    }).join('');
   }
 }
 
