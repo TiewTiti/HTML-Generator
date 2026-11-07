@@ -2716,7 +2716,7 @@ body.layout-b .canvas-dropzone {
 }
 
 @media (max-width: 700px) {
-  .tiew-bot { right: 10px; bottom: 124px; }
+  .tiew-bot { right: 10px; bottom: 188px; }
   .otp-digit { width: 40px; height: 48px; font-size: 20px; gap: 6px; }
   .otp-digits { gap: 6px; }
 }
@@ -3487,7 +3487,7 @@ body.layout-b .tiew-bot {
   /* Chip + bubble sit fully above the dock, including the drop shadow */
   body.layout-b .tiew-bot {
     right: 10px;
-    bottom: 124px;
+    bottom: 188px;
   }
   body.layout-b .dock-wrap { bottom: 10px; }
   body.layout-b .studio-hero { padding: 28px 14px 18px; }
@@ -3595,7 +3595,7 @@ body.layout-b .tiew-bot {
     flex: 1 1 auto;
   }
   .dock-sep { margin: 0 1px; flex: 0 0 auto; }
-  body.layout-b .tiew-bot { bottom: 124px; right: 10px; }
+  body.layout-b .tiew-bot { bottom: 188px; right: 10px; }
 }
 
 /* Tablet — Variant B (Figma 834) */
