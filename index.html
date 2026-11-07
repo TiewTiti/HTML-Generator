@@ -302,14 +302,14 @@
         <aside class="toolbox-sidebar">
           <div class="sidebar-header">
             <div class="sidebar-heading">
-              <h2>เพิ่มช่อง</h2>
-              <p>คลิกเพื่อวางบนกระดาน</p>
+              <h2>โครง</h2>
+              <p>เลือกฟอร์ม แล้วเพิ่มช่อง</p>
             </div>
           </div>
 
           <div class="sidebar-body" id="panel-toolbox-body">
             <div class="view-target-selector">
-              <span id="target-label" class="selector-label tool-section-label">กำลังแก้ฟอร์ม</span>
+              <span id="target-label" class="selector-label tool-section-label">ฟอร์ม</span>
               <div class="target-btn-group" role="group" aria-labelledby="target-label">
                 <button id="target-login-btn" class="target-btn target-btn-login active" onclick="setBuilderTarget('login')" title="แก้ไขฟอร์มเข้าสู่ระบบ">
                   <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> เข้าสู่ระบบ <span class="target-count" id="target-login-count">(0)</span>
@@ -321,7 +321,7 @@
             </div>
 
             <div class="component-category">
-              <span class="category-title tool-section-label">คลิกเพื่อเพิ่ม</span>
+              <span class="category-title tool-section-label">เพิ่มช่อง</span>
               <!-- สร้างจาก COMPONENTS ใน app.js (ที่เดียวกับแถบ "เพิ่มเร็ว" บนจอมือถือ) -->
               <div class="component-grid" id="component-grid"></div>
             </div>
@@ -442,15 +442,15 @@
         <aside class="studio-controls-sidebar">
           <div class="sidebar-header">
             <div class="sidebar-heading">
-              <h2>สีและสไตล์</h2>
-              <p>เปลี่ยนแล้วเห็นทันทีในตัวอย่าง</p>
+              <h2>ชุดสี</h2>
+              <p>เห็นในตัวอย่างทันที</p>
             </div>
           </div>
 
           <div class="sidebar-body" id="panel-controls-body">
 
             <div class="group-tools">
-              <span class="group-tools-label tool-section-label">กดหัวข้อเพื่อเปิด</span>
+              <span class="group-tools-label tool-section-label">ส่วน</span>
               <div class="group-tools-btns">
                 <button type="button" class="btn btn-secondary btn-sm" onclick="setAllGroups(false)">ย่อทั้งหมด</button>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="setAllGroups(true)">ขยายทั้งหมด</button>
@@ -462,7 +462,7 @@
               <button type="button" class="group-header" id="group-page-header" aria-expanded="false" aria-controls="group-page-body"
                       data-open-label="กลุ่มชื่อหน้าเว็บ" onclick="toggleGroup('page', event)">
                 <span class="group-index">1</span>
-                <span class="group-name"><i class="fa-solid fa-heading" aria-hidden="true"></i> ชื่อหน้าเว็บ (แท็ก &lt;title&gt;)</span>
+                <span class="group-name"><i class="fa-solid fa-heading" aria-hidden="true"></i> ชื่อหน้าเว็บ</span>
                 <i class="fa-solid fa-chevron-down group-chevron" aria-hidden="true"></i>
               </button>
               <div class="group-body" id="group-page-body" role="group" aria-labelledby="group-page-header" hidden>
@@ -483,12 +483,12 @@
               </button>
               <div class="group-body" id="group-theme-body" role="group" aria-labelledby="group-theme-header" hidden>
                 <div id="theme-lock-banner" class="teacher-lock-banner" hidden>
-                  <p>ชุดสีใช้ได้เมื่อครูปลดล็อก — กดการ์ดชุดสีเพื่อใส่รหัส หรือเลือกสีทีละช่องด้านล่างได้ตามปกติ</p>
+                  <p>ชุดสียังล็อก ใส่รหัสครู หรือเลือกสีทีละช่องด้านล่าง</p>
                   <button type="button" class="btn btn-secondary btn-sm" onclick="openTeacherUnlockModal('theme')">
                     <i class="fa-solid fa-key" aria-hidden="true"></i> ใส่รหัสครู
                   </button>
                 </div>
-                <p class="control-hint">เลือกชุดสีแล้วเปลี่ยนสี ฟอนต์ และพื้นหลังพร้อมกัน — ชื่อชุดเป็นภาษาไทย</p>
+                <p class="control-hint">เลือกแล้ว สี ฟอนต์ และพื้นหลังเปลี่ยนพร้อมกัน</p>
                 <div class="theme-presets-grid" id="theme-presets-grid" role="group" aria-label="ชุดสีสำเร็จรูป"></div>
               </div>
             </div>
@@ -498,11 +498,11 @@
               <button type="button" class="group-header" id="group-appearance-header" aria-expanded="false" aria-controls="group-appearance-body"
                       data-open-label="กลุ่มสี พื้นหลัง และความโปร่งแสง/เบลอ" onclick="toggleGroup('appearance', event)">
                 <span class="group-index">3</span>
-                <span class="group-name"><i class="fa-solid fa-palette" aria-hidden="true"></i> ตกแต่งสี • พื้นหลัง </span>
+                <span class="group-name"><i class="fa-solid fa-palette" aria-hidden="true"></i> สีทีละช่อง</span>
                 <i class="fa-solid fa-chevron-down group-chevron" aria-hidden="true"></i>
               </button>
               <div class="group-body" id="group-appearance-body" role="group" aria-labelledby="group-appearance-header" hidden>
-                <p class="control-hint">เลือกสีทีละช่องบนการ์ด — รูปพื้นหลัง ความโปร่งแสง และความเบลอ</p>
+                <p class="control-hint">ปุ่ม พื้นหลังการ์ด ข้อความ และขอบ</p>
 
                 <div class="color-picker-grid">
                   <div class="picker-item">
