@@ -808,7 +808,18 @@ function applyCanvasChrome() {
   if (drop) drop.setAttribute('data-view', canvasViewMode);
   if (stage) {
     stage.style.setProperty('--canvas-zoom', String(canvasZoom));
-    stage.style.transform = `scale(${canvasZoom})`;
+    /* Prefer layout-aware `zoom` (Chrome/Safari) so scrollports match visual size.
+       Clear transform when zoom works; keep transform fallback for engines without zoom. */
+    const supportsZoom = typeof CSS !== 'undefined' && CSS.supports && CSS.supports('zoom', '1');
+    if (supportsZoom) {
+      stage.style.zoom = String(canvasZoom);
+      stage.style.transform = '';
+      stage.dataset.zoomMode = 'zoom';
+    } else {
+      stage.style.zoom = '';
+      stage.style.transform = canvasZoom === 1 ? '' : `scale(${canvasZoom})`;
+      stage.dataset.zoomMode = 'transform';
+    }
   }
   if (label) label.textContent = Math.round(canvasZoom * 100) + '%';
   if (outBtn) outBtn.disabled = canvasZoom <= CANVAS_ZOOM_STEPS[0];

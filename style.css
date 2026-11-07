@@ -722,24 +722,39 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Zoom stage — scales preview without restyling craft tokens */
+/* Zoom stage — layout-aware zoom (avoids transform overflow/clip bugs) */
 .canvas-zoom-stage {
   --canvas-zoom: 1;
-  transform: scale(var(--canvas-zoom));
-  transform-origin: top center;
+  zoom: var(--canvas-zoom);
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 12px;
   align-content: start;
-  transition: transform 0.18s var(--ease-apple, cubic-bezier(0.25, 0.1, 0.25, 1));
-  will-change: transform;
+  transform-origin: top center;
+}
+/* Fallback when CSS zoom unsupported: shrink layout width then scale back up */
+@supports not (zoom: 1) {
+  .canvas-zoom-stage {
+    zoom: unset;
+    width: calc(100% / var(--canvas-zoom));
+    max-width: none;
+    transform: scale(var(--canvas-zoom));
+    margin-bottom: calc((var(--canvas-zoom) - 1) * 100% / var(--canvas-zoom)); /* rough; JS sets height via zoom when available */
+  }
 }
 body.layout-b .canvas-zoom-stage {
   display: grid;
   place-items: center;
   grid-template-columns: 1fr;
   gap: 0;
+}
+body.layout-b .canvas-dropzone {
+  /* Keep zoomed stage inside the board; allow pan/scroll instead of clipping shell */
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 /* Canvas chrome: zoom + view mode (functional controls only) */
@@ -992,7 +1007,7 @@ body.layout-b .canvas-zoom-stage {
   background: var(--accent-light);
 }
 
-/* จอสัมผัส: เป้าแตะ ≥44px สำหรับลูกศร/ลบ */
+/* จอสัมผัส: เป้าแตะ ≥44px — เก็บแถบควบคุมไว้ใน padding การ์ด (ไม่ลอยทับชิ้นก่อนหน้า) */
 @media (hover: none), (pointer: coarse) {
   .canvas-item .ctrl-btn {
     width: 44px;
@@ -1001,12 +1016,23 @@ body.layout-b .canvas-zoom-stage {
     min-height: 44px;
     font-size: 15px;
   }
-  .canvas-item { padding-top: 36px; }
-  .canvas-item .item-controls { top: -18px; }
+  .canvas-item { padding-top: 52px; }
+  .canvas-item .item-controls {
+    top: 6px;
+    left: 8px;
+    right: 8px;
+  }
   .canvas-item .item-order-hint {
     line-height: 42px;
     min-height: 44px;
     font-size: 12px;
+  }
+  /* โชว์ปุ่มลูกศรเฉพาะชิ้นที่เลือก — กันซ้อนทับบนจอแคบ */
+  .canvas-item:not(.selected) .item-controls {
+    visibility: hidden;
+  }
+  .canvas-item.selected .item-controls {
+    visibility: visible;
   }
   .zoom-btn,
   .view-mode-btn {
@@ -2905,6 +2931,7 @@ body.layout-b .canvas-preview-card {
   flex-direction: column;
   gap: 12px;
   border: 0.5px solid rgba(0, 0, 0, 0.06);
+  overflow: visible; /* item controls sit in card padding — don't clip */
 }
 
 body.layout-b .canvas-preview-title {
@@ -3140,6 +3167,19 @@ body.layout-b .tiew-bot {
     bottom: 0;
     max-height: none;
     z-index: 34; /* above scrim (22) and shell; under dock (40) */
+    /* Override ≤1100px overflow:visible so sticky header + body scroll work */
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column;
+  }
+  body.layout-b .builder-layout > .toolbox-sidebar .sidebar-body,
+  body.layout-b .builder-layout > .inspector-sidebar .sidebar-body,
+  body.layout-b .studio-layout > .studio-controls-sidebar .sidebar-body {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    min-height: 0;
+    flex: 1 1 auto;
   }
   body.layout-b .builder-layout > .toolbox-sidebar,
   body.layout-b .studio-layout > .studio-controls-sidebar {
@@ -3158,7 +3198,21 @@ body.layout-b .tiew-bot {
   }
   body.layout-b .builder-layout > .canvas-viewport { min-height: 380px; }
   body.layout-b .canvas-header,
-  body.layout-b .preview-toolbar { padding: 10px 12px; }
+  body.layout-b .preview-toolbar {
+    padding: 10px 12px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  body.layout-b .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+  body.layout-b .canvas-chrome {
+    width: 100%;
+    justify-content: space-between;
+    margin: 0 0 4px;
+  }
   body.layout-b .canvas-dropzone {
     min-height: 220px;
     padding: 20px 12px 100px;
