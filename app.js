@@ -1042,8 +1042,11 @@ document.addEventListener('DOMContentLoaded', () => {
   bindTeacherOtpInputs();
   initTiewBot();
   syncDockHighlight();
+  initTutorial();
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+      const tut = document.getElementById('tutorial');
+      if (tut && !tut.hidden) { skipTutorial(); return; }
       const otp = document.getElementById('teacher-otp-modal');
       if (otp && !otp.hidden) { closeTeacherUnlockModal(); return; }
       if (document.body.classList.contains('drawer-open')) { closeDrawerPanels(); return; }
@@ -1101,10 +1104,15 @@ function setDockMode(mode) {
   } else if (mode === 'color') {
     switchMainStep(2);
     if (!isPanelOpen('controls')) togglePanel('controls');
-    // scroll color panel into view lightly
-    const controls = document.querySelector('.studio-controls-sidebar');
-    if (controls && controls.scrollIntoView) controls.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    tipTiewBot('dock-color', 'ครูชิโร่: เลือกสีทีละช่องได้');
+    /* Dock «สี» should land with ชุดสี and color slots open, not collapsed */
+    uiState.groups.theme = true;
+    uiState.groups.appearance = true;
+    saveUiState();
+    applyGroupState('theme');
+    applyGroupState('appearance');
+    const themeHead = document.getElementById('group-theme-header');
+    if (themeHead && themeHead.scrollIntoView) themeHead.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    tipTiewBot('dock-color', 'ครูชิโร่: เลือกชุดสี หรือปรับสีทีละช่องได้');
   } else if (mode === 'export') {
     switchMainStep(2);
     if (isPanelOpen('controls')) togglePanel('controls');
@@ -1921,16 +1929,49 @@ function onColorInput() {
   showColorConfirmBar();
 }
 
+function thaiColorName(hex) {
+  const raw = String(hex || '').replace('#', '').trim();
+  if (!/^[0-9a-fA-F]{6}$/.test(raw)) return 'สีใหม่';
+  const r = parseInt(raw.slice(0, 2), 16);
+  const g = parseInt(raw.slice(2, 4), 16);
+  const b = parseInt(raw.slice(4, 6), 16);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const light = (max + min) / 2 / 255;
+  if (max - min < 22) {
+    if (light > 0.92) return 'ขาว';
+    if (light > 0.72) return 'เทาอ่อน';
+    if (light > 0.38) return 'เทา';
+    if (light > 0.16) return 'เทาเข้ม';
+    return 'ดำ';
+  }
+  let hue = 0;
+  const d = max - min;
+  if (max === r) hue = ((g - b) / d) % 6;
+  else if (max === g) hue = (b - r) / d + 2;
+  else hue = (r - g) / d + 4;
+  hue *= 60;
+  if (hue < 0) hue += 360;
+  if (hue < 18 || hue >= 345) return 'แดง';
+  if (hue < 42) return 'ส้ม';
+  if (hue < 70) return 'เหลือง';
+  if (hue < 165) return 'เขียว';
+  if (hue < 200) return 'ฟ้า';
+  if (hue < 255) return 'น้ำเงิน';
+  if (hue < 290) return 'ม่วง';
+  return 'ชมพู';
+}
+
 function showColorConfirmBar() {
   const bar = document.getElementById('picker-confirm-bar');
   const note = document.getElementById('picker-confirm-note');
   if (!bar) return;
   const changed = COLOR_FIELDS.filter((f) => studioConfig[f.key] !== pendingColors[f.key])
-    .map((f) => `${f.label} ${pendingColors[f.key]} → ${studioConfig[f.key]}`);
+    .map((f) => `${f.label} เป็นสี${thaiColorName(studioConfig[f.key])}`);
   if (note) {
     note.textContent = changed.length
       ? `ยังไม่บันทึก — ${changed.join(' · ')}`
-      : 'ยังไม่บันทึก — เลือกสีใหม่แล้วกด "ตกลง" เพื่อใช้ หรือ "ยกเลิก" เพื่อคืนค่าเดิม';
+      : 'ยังไม่บันทึก — กดตกลงเพื่อใช้สีนี้ หรือยกเลิกเพื่อคืนค่าเดิม';
   }
   bar.hidden = false;
 }
@@ -2929,7 +2970,7 @@ function setExportMode(mode) {
   const note = document.getElementById('export-mode-note');
   if (note) {
     note.textContent = embed
-      ? 'วางทั้งหมดนี้ใน <main> ของหน้าเดิม — สไตล์ถูกล็อกในกรอบ .auth-embed จึงไม่ทับ Navbar'
+      ? 'วางโค้ดนี้ในหน้าเว็บที่มีอยู่แล้ว — สไตล์อยู่ในการ์ด ไม่ทับเมนูด้านบน'
       : 'ไฟล์เดียวจบ: วางใน index.html แล้วดับเบิลคลิกเปิดได้ (เต็มจอ)';
   }
   document.getElementById('copy-standalone-btn').innerHTML = embed
@@ -2939,7 +2980,7 @@ function setExportMode(mode) {
     ? '<i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลด form-embed.html'
     : '<i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลดไฟล์';
   regenerateCode();
-  toast(embed ? 'โหมดแปะในหน้าเดิม — โค้ดด้านล่างวางใน <main> ได้' : 'โหมดไฟล์เดียวจบ (ทั้งหน้า)');
+  toast(embed ? 'โหมดแปะในหน้าที่มีอยู่แล้ว' : 'โหมดไฟล์เดียวจบ (ทั้งหน้า)');
 }
 
 function regenerateCode() {
@@ -2988,7 +3029,7 @@ function copyFullStandaloneHTML() {
     btn.classList.remove('btn-success');
     btn.classList.add('btn-sky');
     toast(exportMode === 'embed'
-      ? 'คัดลอกแล้ว — วางใน <main> ของหน้าเดิมได้ (สไตล์อยู่ใน .auth-embed ไม่ทับ Navbar)'
+      ? 'คัดลอกแล้ว — วางในหน้าเว็บที่มีอยู่แล้ว สไตล์อยู่ในการ์ด ไม่ทับเมนู'
       : 'คัดลอกแล้ว — วางใน index.html แล้วดับเบิลคลิกเปิดได้');
     setTimeout(() => {
       btn.innerHTML = original;
@@ -3010,7 +3051,90 @@ function downloadStandaloneHTML() {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   toast(exportMode === 'embed'
-    ? 'ดาวน์โหลด form-embed.html แล้ว — เปิดดู แล้วคัดลอกไปวางใน <main> ของหน้าเดิม'
+    ? 'ดาวน์โหลดแล้ว — เอาไปวางในหน้าเว็บที่มีอยู่แล้ว'
     : 'ดาวน์โหลด index.html แล้ว — ดับเบิลคลิกเพื่อเปิดบนเบราว์เซอร์ (ไม่ต้องต่อเน็ต)');
   tipTiewBot('export', 'ครูชิโร่: บันทึกแล้ว — ดับเบิลคลิก index.html เพื่อเปิด');
+}
+
+// ==========================================================================
+// In-app tutorial — one step at a time, reopen from «แนะนำ»
+// ==========================================================================
+const TUTORIAL_SEEN_KEY = 'html-generate-studio-tutorial-seen';
+const TUTORIAL_STEPS = [
+  {
+    title: 'ใส่รหัสครู',
+    body: 'กด «รหัสครู» ที่แถบล่าง แล้วใส่รหัส 6 หลัก เพื่อใช้แบบตัวอย่างและชุดสี',
+    dock: 'teacher'
+  },
+  {
+    title: 'ใช้แบบฟอร์มตัวอย่าง',
+    body: 'กด «ใช้แบบฟอร์มตัวอย่าง» จะได้ช่องเข้าสู่ระบบและสมัครสมาชิกบนกระดาน',
+    dock: 'structure'
+  },
+  {
+    title: 'จัดช่องบนกระดาน',
+    body: 'แตะช่องแล้วพิมพ์ชื่อ เลือกประเภท มุมชิ้นมีปุ่มความกว้าง: กว้าง 1/3 แถว ครึ่งแถว หรือเต็มแถว',
+    dock: 'structure'
+  },
+  {
+    title: 'เลือกชุดสี',
+    body: 'กด «สี» ที่แถบล่าง เลือกชุดสี หรือปรับสีทีละช่อง (ปุ่ม พื้นหลังการ์ด ข้อความ ขอบ)',
+    dock: 'color'
+  },
+  {
+    title: 'ส่งออก',
+    body: 'กด «ส่งออก» แล้วคัดลอกหรือดาวน์โหลดไฟล์ เอาไปเปิดหรือวางในหน้าเว็บได้',
+    dock: 'export'
+  }
+];
+let tutorialIndex = 0;
+
+function tutorialSeen() {
+  try { return sessionStorage.getItem(TUTORIAL_SEEN_KEY) === '1'; } catch (e) { return false; }
+}
+function markTutorialSeen() {
+  try { sessionStorage.setItem(TUTORIAL_SEEN_KEY, '1'); } catch (e) {}
+}
+function openTutorial(step) {
+  tutorialIndex = Math.max(0, Math.min(TUTORIAL_STEPS.length - 1, step || 0));
+  const root = document.getElementById('tutorial');
+  if (!root) return;
+  root.hidden = false;
+  renderTutorialStep();
+}
+function closeTutorial(markSeen) {
+  const root = document.getElementById('tutorial');
+  if (root) root.hidden = true;
+  document.querySelectorAll('.dock-btn.is-tutorial').forEach((b) => b.classList.remove('is-tutorial'));
+  if (markSeen) markTutorialSeen();
+}
+function skipTutorial() { closeTutorial(true); }
+function tutorialGo(delta) {
+  const next = tutorialIndex + delta;
+  if (next < 0) return;
+  if (next >= TUTORIAL_STEPS.length) { closeTutorial(true); return; }
+  tutorialIndex = next;
+  renderTutorialStep();
+}
+function renderTutorialStep() {
+  const step = TUTORIAL_STEPS[tutorialIndex];
+  const label = document.getElementById('tutorial-step-label');
+  const title = document.getElementById('tutorial-title');
+  const body = document.getElementById('tutorial-body');
+  const back = document.getElementById('tutorial-back');
+  const next = document.getElementById('tutorial-next');
+  if (label) label.textContent = `ขั้นที่ ${tutorialIndex + 1} จาก ${TUTORIAL_STEPS.length}`;
+  if (title) title.textContent = step.title;
+  if (body) body.textContent = step.body;
+  if (back) back.disabled = tutorialIndex === 0;
+  if (next) next.textContent = tutorialIndex === TUTORIAL_STEPS.length - 1 ? 'เสร็จ' : 'ถัดไป';
+  document.querySelectorAll('.dock-btn[data-dock]').forEach((btn) => {
+    btn.classList.toggle('is-tutorial', btn.getAttribute('data-dock') === step.dock);
+  });
+  if (step.dock === 'color') setDockMode('color');
+  else if (step.dock === 'export') setDockMode('export');
+  else if (step.dock === 'structure' && activeStep !== 1) setDockMode('structure');
+}
+function initTutorial() {
+  if (!tutorialSeen()) openTutorial(0);
 }

@@ -268,6 +268,7 @@
       </div>
     </div>
 
+    <button type="button" class="btn btn-secondary header-help-btn" id="tutorial-open-btn" onclick="openTutorial(0)">แนะนำ</button>
     <span class="header-meta">ชั้น ม.5 · HTML / CSS / JS</span>
 
     <!-- Step tabs kept for a11y/JS; visually replaced by bottom dock in layout B -->
@@ -589,14 +590,14 @@
 
                 <div class="slider-field-unit">
                   <div class="slider-info">
-                    <label for="slider-card-opacity">ความโปร่งแสงการ์ด (Opacity):</label>
+                    <label for="slider-card-opacity">ความโปร่งแสงของการ์ด</label>
                     <span id="val-card-opacity">95%</span>
                   </div>
                   <input type="range" id="slider-card-opacity" min="40" max="100" value="95" oninput="updateStudioStyles()">
                 </div>
                 <div class="slider-field-unit">
                   <div class="slider-info">
-                    <label for="slider-card-blur">ความเบลอพื้นหลังการ์ด (Blur):</label>
+                    <label for="slider-card-blur">ความเบลอหลังการ์ด</label>
                     <span id="val-card-blur">16px</span>
                   </div>
                   <input type="range" id="slider-card-blur" min="0" max="40" value="16" oninput="updateStudioStyles()">
@@ -725,7 +726,7 @@
                 <button type="button" class="export-mode-btn active" data-mode="full" onclick="setExportMode('full')"
                         title="ไฟล์ HTML เดียวจบ เปิดเดี่ยว ๆ ได้เต็มหน้าจอ">ไฟล์เดียวจบ (ทั้งหน้า)</button>
                 <button type="button" class="export-mode-btn" data-mode="embed" onclick="setExportMode('embed')"
-                        title="ชิ้นส่วนสำหรับแปะใน main ของหน้าเว็บเดิมที่มี Navbar อยู่แล้ว (สไตล์ไม่ทับกัน)">แปะในหน้าเดิม (body &gt; main)</button>
+                        title="โค้ดชิ้นนี้เอาไปวางในหน้าเว็บที่มีอยู่แล้ว">แปะในหน้าที่มีอยู่แล้ว</button>
               </div>
               <p class="export-mode-note" id="export-mode-note">ไฟล์เดียวจบ: วางใน index.html แล้วดับเบิลคลิกเปิดได้ (เต็มจอ)</p>
             </div>
@@ -777,7 +778,7 @@
         <span class="dock-ico" aria-hidden="true">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10 4H7.5A2.5 2.5 0 0 0 5 6.5v11A2.5 2.5 0 0 0 7.5 20H10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M10 12h9M15.5 8.5 19 12l-3.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
-        <span class="dock-label">Login</span>
+        <span class="dock-label">เข้าสู่ระบบ</span>
       </button>
       <button type="button" class="dock-btn" data-dock="register" onclick="setDockMode('register')" aria-pressed="false">
         <span class="dock-ico" aria-hidden="true">
@@ -849,6 +850,22 @@
       </span>
       <span class="tiew-bot-name">ครูชิโร่</span>
     </button>
+  </div>
+
+  <div id="tutorial" class="tutorial" hidden role="dialog" aria-modal="false" aria-labelledby="tutorial-title">
+    <div class="tutorial-card">
+      <p class="tutorial-kicker" id="tutorial-kicker">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span id="tutorial-step-label">ขั้นที่ 1 จาก 5</span>
+      </p>
+      <h2 class="tutorial-title" id="tutorial-title">รหัสครู</h2>
+      <p class="tutorial-body" id="tutorial-body"></p>
+      <div class="tutorial-actions">
+        <button type="button" class="btn btn-secondary" id="tutorial-back" onclick="tutorialGo(-1)">ย้อน</button>
+        <button type="button" class="btn btn-ghost" id="tutorial-skip" onclick="skipTutorial()">ข้าม</button>
+        <button type="button" class="btn btn-primary" id="tutorial-next" onclick="tutorialGo(1)">ถัดไป</button>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
