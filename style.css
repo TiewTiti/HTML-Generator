@@ -877,18 +877,18 @@ body.layout-b .canvas-dropzone {
   font-family: inherit;
 }
 
-/* Canvas Item Card */
+/* Canvas Item Card — freer grid cell */
 .canvas-item {
   grid-column: span 12;
   background-color: var(--surface-panel);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  /* เผื่อที่ด้านบนให้แถวควบคุม (ปุ่มขึ้น/ลง/ลบ เป้าแตะใหญ่ขึ้น) ไม่ทับเนื้อหา */
-  padding: 28px 12px 12px;
+  border-radius: 12px;
+  padding: 14px 14px 12px;
   position: relative;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  cursor: grab;
+  transition: border-color 0.15s var(--ease-apple), box-shadow 0.15s var(--ease-apple);
   box-shadow: var(--shadow-sm);
+  min-width: 0;
 }
 
 .canvas-item.col-12 { grid-column: span 12; }
@@ -898,7 +898,7 @@ body.layout-b .canvas-dropzone {
 .canvas-item:hover,
 .canvas-item.selected {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 0 0 2px var(--accent-spark-soft);
 }
 
 .canvas-item:focus-visible {
@@ -906,114 +906,122 @@ body.layout-b .canvas-dropzone {
   outline-offset: 2px;
 }
 
-.canvas-item .item-controls {
-  position: absolute;
-  /* เกาะขอบบนของการ์ด (ครึ่งใน ครึ่งนอก) → ไม่ทับเนื้อหาข้างในเลย
-     การ์ดเผื่อ padding-top 18px ไว้ให้แล้ว (ดู .canvas-item) */
-  top: -14px;
-  left: 10px;
-  right: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  z-index: 3;
-  /* ปล่อยให้ช่องว่างตรงกลางคลิกทะลุได้ ให้เฉพาะป้าย/ปุ่มที่กดได้จริง */
-  pointer-events: none;
+.canvas-item.is-resizing {
+  cursor: ew-resize;
+  user-select: none;
 }
 
-.canvas-item .item-controls > * {
+/* Quiet student chrome — width chip + delete only (no heavy up/down) */
+.canvas-item .item-controls {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s var(--ease-apple);
+}
+
+.canvas-item:hover .item-controls,
+.canvas-item.selected .item-controls,
+.canvas-item:focus-within .item-controls {
+  opacity: 1;
   pointer-events: auto;
 }
 
 .canvas-item .ctrl-btn {
-  width: 34px;
-  height: 34px;
-  min-width: 34px;
-  min-height: 34px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--text-main);
-  font-size: 12px;
+  height: 28px;
+  min-width: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: 980px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   touch-action: manipulation;
-  transition: background-color 0.15s var(--ease-apple), color 0.15s var(--ease-apple);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+  transition: background-color 0.15s var(--ease-apple), color 0.15s var(--ease-apple), border-color 0.15s var(--ease-apple);
 }
 
 .canvas-item .ctrl-btn i {
   display: block;
   line-height: 1;
-  font-size: 12px;
+  font-size: 11px;
 }
 
-/* รวมปุ่มลูกศร/ลบเป็นกล่องเดียว — finished segmented control */
-.canvas-item .item-btn-group {
-  display: flex;
-  align-items: stretch;
-  background: #fff;
-  border: 1px solid var(--border-soft);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(15, 23, 42, 0.02);
-}
-
-.canvas-item .ctrl-btn + .ctrl-btn {
-  border-left: 1px solid var(--border-soft);
-}
-
-.canvas-item:hover .item-btn-group {
-  border-color: #cbd5e1;
-}
-
-.canvas-item.selected .item-btn-group {
-  border-color: var(--accent-primary);
-  box-shadow:
-    0 2px 10px rgba(37, 99, 235, 0.14),
-    0 0 0 1px var(--accent-spark-soft);
-}
-
-/* ปุ่มเลื่อนตำแหน่ง (ขึ้น/ลง) — soft blue */
-.canvas-item .ctrl-btn.ctrl-move {
+.canvas-item .ctrl-btn.ctrl-width {
   color: var(--accent-deep);
+  border-color: var(--accent-soft);
   background: var(--accent-tint);
 }
-.canvas-item .ctrl-btn.ctrl-move:hover:not(:disabled) {
-  background-color: var(--accent-soft);
+
+.canvas-item .ctrl-btn.ctrl-width:hover {
+  background: var(--accent-soft);
   color: var(--accent-hover);
 }
-.canvas-item.selected .ctrl-btn.ctrl-move:not(:disabled) {
-  background: var(--accent-primary);
-  color: #fff;
-}
-.canvas-item.selected .ctrl-btn.ctrl-move:hover:not(:disabled) {
-  background: var(--accent-hover);
-  color: #fff;
-}
 
-/* ปุ่มลบ — โทนแดง (อันตราย) */
 .canvas-item .ctrl-btn.ctrl-delete {
+  width: 28px;
+  padding: 0;
   color: #b91c1c;
   background: #fff;
 }
+
 .canvas-item .ctrl-btn.ctrl-delete:hover {
   background-color: #fee2e2;
   color: #dc2626;
 }
 
-.canvas-item .ctrl-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  filter: grayscale(0.2);
-}
-
 .canvas-item .ctrl-btn:focus-visible {
   outline: 2px solid var(--accent-primary);
-  outline-offset: -2px;
-  z-index: 1;
+  outline-offset: 1px;
+}
+
+/* Edge resize — soft blue rail when selected */
+.canvas-item .resize-handle {
+  position: absolute;
+  top: 10px;
+  right: -5px;
+  bottom: 10px;
+  width: 10px;
+  border-radius: 980px;
+  cursor: ew-resize;
+  touch-action: none;
+  z-index: 4;
+  opacity: 0;
+  background: transparent;
+  transition: opacity 0.15s var(--ease-apple), background-color 0.15s var(--ease-apple);
+}
+
+.canvas-item .resize-handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 28px;
+  border-radius: 980px;
+  transform: translate(-50%, -50%);
+  background: var(--accent-soft);
+}
+
+.canvas-item:hover .resize-handle,
+.canvas-item.selected .resize-handle {
+  opacity: 1;
+}
+
+.canvas-item.selected .resize-handle::after,
+.canvas-item.is-resizing .resize-handle::after {
+  background: var(--accent-primary);
 }
 
 /* ลากการ์ดเพื่อสลับตำแหน่ง (นอกจากกดปุ่มลูกศร) */
@@ -1024,61 +1032,31 @@ body.layout-b .canvas-dropzone {
 
 .canvas-item.drop-before { box-shadow: 0 -3px 0 0 var(--sky-color), var(--shadow-sm); }
 .canvas-item.drop-after { box-shadow: 0 3px 0 0 var(--sky-color), var(--shadow-sm); }
+.canvas-item.drop-side-left { box-shadow: inset 3px 0 0 0 var(--accent-primary), var(--shadow-sm); }
+.canvas-item.drop-side-right { box-shadow: inset -3px 0 0 0 var(--accent-primary), var(--shadow-sm); }
 
-/* ป้ายลำดับ — อยู่ในแถวควบคุมบนขอบการ์ด (ไม่กินพื้นที่เนื้อหาข้างใน) */
-.canvas-item .item-order-hint {
-  background: #fff;
-  border: 1px solid var(--border-soft);
-  border-radius: 12px;
-  padding: 0 12px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--text-muted);
-  line-height: 32px;
-  min-height: 34px;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
-  display: inline-flex;
-  align-items: center;
-}
-
-.canvas-item.selected .item-order-hint {
-  color: var(--accent-deep);
-  border-color: var(--accent-primary);
-  background: var(--accent-tint);
-  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.12);
-}
-
-/* จอสัมผัส: เป้าแตะ ≥44px — เก็บแถบควบคุมไว้ใน padding การ์ด (ไม่ลอยทับชิ้นก่อนหน้า) */
+/* จอสัมผัส: เป้าแตะใหญ่ขึ้น — โชว์ควบคุมเฉพาะชิ้นที่เลือก */
 @media (hover: none), (pointer: coarse) {
   .canvas-item .ctrl-btn {
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-    min-height: 44px;
-    font-size: 14px;
+    min-width: 40px;
+    min-height: 40px;
+    height: 40px;
+    font-size: 13px;
   }
-  .canvas-item .ctrl-btn i { font-size: 14px; }
-  .canvas-item .item-btn-group { border-radius: 14px; }
-  .canvas-item { padding-top: 52px; }
-  .canvas-item .item-controls {
-    top: 6px;
-    left: 8px;
-    right: 8px;
+  .canvas-item .ctrl-btn i { font-size: 13px; }
+  .canvas-item .resize-handle {
+    width: 16px;
+    right: -8px;
+    opacity: 1;
   }
-  .canvas-item .item-order-hint {
-    line-height: 42px;
-    min-height: 44px;
-    font-size: 12px;
-    border-radius: 14px;
-  }
-  /* โชว์ปุ่มลูกศรเฉพาะชิ้นที่เลือก — กันซ้อนทับบนจอแคบ */
   .canvas-item:not(.selected) .item-controls {
     visibility: hidden;
+    opacity: 0;
   }
   .canvas-item.selected .item-controls {
     visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
   }
   .zoom-btn,
   .view-mode-btn {
@@ -2978,22 +2956,23 @@ body.layout-b .canvas-dropzone {
 }
 
 body.layout-b .canvas-preview-card {
-  width: min(340px, 88%);
+  width: min(520px, 94%);
   background: #fff;
   border-radius: 22px;
-  padding: 30px 26px;
+  padding: 28px 22px 24px;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.8) inset,
     0 2px 6px rgba(0, 0, 0, 0.03),
     0 14px 40px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  border: 0.5px solid rgba(0, 0, 0, 0.06);
-  overflow: visible; /* item controls sit in card padding — don't clip */
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 12px 10px;
+  border: 1px solid var(--border-soft);
+  overflow: visible; /* resize handle / quiet chips can sit on edges */
 }
 
 body.layout-b .canvas-preview-title {
+  grid-column: 1 / -1;
   margin: 0;
   font-family: var(--font-display);
   font-size: 22px;
@@ -3004,7 +2983,8 @@ body.layout-b .canvas-preview-title {
 }
 
 body.layout-b .canvas-preview-hint {
-  margin: -4px 0 6px;
+  grid-column: 1 / -1;
+  margin: -6px 0 4px;
   font-size: 13px;
   font-weight: 400;
   letter-spacing: 0;
@@ -3013,8 +2993,7 @@ body.layout-b .canvas-preview-hint {
 }
 
 body.layout-b .canvas-preview-card .canvas-item {
-  grid-column: auto;
-  width: 100%;
+  width: auto;
   border-radius: 12px;
   border-color: rgba(0, 0, 0, 0.06);
   box-shadow: none;

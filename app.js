@@ -180,14 +180,14 @@ let exportMode = 'full';          // 'full' = ไฟล์เดียวจบ�
 
 const DEFAULT_LOGIN = () => ([
   { id: 'el-1', type: 'heading',  label: 'เข้าสู่ระบบ', subtitle: 'กรอกบัญชีผู้ใช้เพื่อเข้าสู่ระบบ', colSpan: 12 },
-  { id: 'el-2', type: 'text',     label: 'ชื่อผู้ใช้ หรือ อีเมล', placeholder: 'username / email', required: true, colSpan: 12 },
-  { id: 'el-3', type: 'password', label: 'รหัสผ่าน', placeholder: '••••••••', required: true, colSpan: 12 },
+  { id: 'el-2', type: 'text',     label: 'ชื่อผู้ใช้ หรือ อีเมล', placeholder: 'username / email', required: true, colSpan: 6 },
+  { id: 'el-3', type: 'password', label: 'รหัสผ่าน', placeholder: '••••••••', required: true, colSpan: 6 },
   { id: 'el-4', type: 'button',   label: 'เข้าสู่ระบบ', colSpan: 12 }
 ]);
 const DEFAULT_REGISTER = () => ([
   { id: 'el-5', type: 'heading',  label: 'สมัครสมาชิก', subtitle: 'สร้างบัญชีผู้ใช้ใหม่สำหรับชั้น ม.5', colSpan: 12 },
-  { id: 'el-6', type: 'text',     label: 'ชื่อ-นามสกุล', placeholder: 'นายสมชาย ใจดี', required: true, colSpan: 12 },
-  { id: 'el-7', type: 'email',    label: 'อีเมล', placeholder: 'student@school.ac.th', required: true, colSpan: 12 },
+  { id: 'el-6', type: 'text',     label: 'ชื่อ-นามสกุล', placeholder: 'นายสมชาย ใจดี', required: true, colSpan: 6 },
+  { id: 'el-7', type: 'email',    label: 'อีเมล', placeholder: 'student@school.ac.th', required: true, colSpan: 6 },
   { id: 'el-8', type: 'password', label: 'ตั้งรหัสผ่าน', placeholder: '••••••••', required: true, colSpan: 12 },
   { id: 'el-9', type: 'button',   label: 'ยืนยันการสมัครสมาชิก', colSpan: 12 }
 ]);
@@ -1194,22 +1194,51 @@ function removeElement(id) {
 }
 
 // --------------------------------------------------------------------------
-// ย้ายตำแหน่งองค์ประกอบในฟอร์ม (สลับลำดับ) — ไม่ต้องลบแล้วสร้างใหม่ให้เสียเวลา
-// ลำดับในอาร์เรย์ = ลำดับที่แสดงบนกระดาน และลำดับที่ออกมาในโค้ด HTML
+// จัดตำแหน่งบนกระดานแบบอิสระขึ้น — ลากเรียง + ความกว้าง (colSpan) คู่ขนานได้
+// ลำดับในอาร์เรย์ = ลำดับใน HTML; colSpan 4/6/12 = กว้างบนกริด 12 คอลัมน์
 // --------------------------------------------------------------------------
+const WIDTH_SNAPS = [4, 6, 12];
+
+function normalizeColSpan(n) {
+  const v = Number(n) || 12;
+  if (v <= 4) return 4;
+  if (v <= 6) return 6;
+  return 12;
+}
+
+function cycleElementWidth(id) {
+  const list = getActiveList();
+  const item = list.find((el) => el.id === id);
+  if (!item) return;
+  const cur = normalizeColSpan(item.colSpan);
+  const i = WIDTH_SNAPS.indexOf(cur);
+  item.colSpan = WIDTH_SNAPS[(i + 1) % WIDTH_SNAPS.length];
+  selectedElementId = item.id;
+  commitAll();
+}
+
+function setElementWidth(id, span) {
+  const list = getActiveList();
+  const item = list.find((el) => el.id === id);
+  if (!item) return;
+  item.colSpan = normalizeColSpan(span);
+  selectedElementId = item.id;
+  commitAll({ keepInspector: true });
+}
+
 function moveElement(id, dir) {
   const list = getActiveList();
   const from = list.findIndex((el) => el.id === id);
   if (from < 0) return;
   const to = from + dir;
-  if (to < 0 || to >= list.length) return;   // อยู่บนสุด/ล่างสุดแล้ว ไม่ต้องทำอะไร
+  if (to < 0 || to >= list.length) return;
   const [moved] = list.splice(from, 1);
   list.splice(to, 0, moved);
   selectedElementId = moved.id;
   commitAll();
 }
 
-// ย้าย id ไปไว้ "ก่อน/หลัง" เป้าหมาย (ใช้ตอนลากการ์ดวางทับ)
+// ย้าย id ไปไว้ "ก่อน/หลัง" เป้าหมาย (ลากวางแนวตั้ง)
 function reorderElement(sourceId, targetId, placeBefore) {
   const list = getActiveList();
   const from = list.findIndex((el) => el.id === sourceId);
@@ -1223,9 +1252,69 @@ function reorderElement(sourceId, targetId, placeBefore) {
   commitAll();
 }
 
+// วางข้าง ๆ เป้าหมาย (แนวนอน) — จัดคู่ครึ่งความกว้างให้อยู่แถวเดียวกัน
+function placeBeside(sourceId, targetId, placeLeft) {
+  const list = getActiveList();
+  const from = list.findIndex((el) => el.id === sourceId);
+  const target = list.find((el) => el.id === targetId);
+  if (from < 0 || !target || sourceId === targetId) return;
+  const [moved] = list.splice(from, 1);
+  let to = list.findIndex((el) => el.id === targetId);
+  if (!placeLeft) to += 1;
+  list.splice(to, 0, moved);
+  moved.colSpan = 6;
+  target.colSpan = 6;
+  selectedElementId = moved.id;
+  commitAll();
+  tipTiewBot('beside', 'ครูชิโร่: วางคู่กันแล้ว — ลากขอบขวาเพื่อปรับความกว้างได้');
+}
+
 function clearDropMarkers() {
-  document.querySelectorAll('#builder-canvas .canvas-item.drop-before, #builder-canvas .canvas-item.drop-after')
-    .forEach((el) => el.classList.remove('drop-before', 'drop-after'));
+  document.querySelectorAll('#builder-canvas .canvas-item.drop-before, #builder-canvas .canvas-item.drop-after, #builder-canvas .canvas-item.drop-side-left, #builder-canvas .canvas-item.drop-side-right')
+    .forEach((el) => el.classList.remove('drop-before', 'drop-after', 'drop-side-left', 'drop-side-right'));
+}
+
+function attachResizeHandle(itemCard, item) {
+  const handle = itemCard.querySelector('.resize-handle');
+  if (!handle) return;
+  let startX = 0;
+  let startSpan = 12;
+  let cardWidth = 1;
+  const onMove = (e) => {
+    const x = (e.touches ? e.touches[0].clientX : e.clientX);
+    const dx = x - startX;
+    const ratio = (startSpan / 12) + dx / cardWidth;
+    const snapped = ratio < 0.42 ? 4 : ratio < 0.75 ? 6 : 12;
+    itemCard.classList.remove('col-4', 'col-6', 'col-12');
+    itemCard.classList.add(`col-${snapped}`);
+    itemCard.dataset.pendingSpan = String(snapped);
+  };
+  const onUp = (e) => {
+    document.removeEventListener('pointermove', onMove);
+    document.removeEventListener('pointerup', onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onUp);
+    itemCard.classList.remove('is-resizing');
+    const pending = Number(itemCard.dataset.pendingSpan || startSpan);
+    delete itemCard.dataset.pendingSpan;
+    if (pending !== startSpan) setElementWidth(item.id, pending);
+  };
+  const onDown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    selectElement(item.id);
+    startX = (e.touches ? e.touches[0].clientX : e.clientX);
+    startSpan = normalizeColSpan(item.colSpan);
+    const preview = itemCard.closest('.canvas-preview-card') || itemCard.parentElement;
+    cardWidth = Math.max(1, (preview || itemCard).getBoundingClientRect().width);
+    itemCard.classList.add('is-resizing');
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onUp);
+  };
+  handle.addEventListener('pointerdown', onDown);
+  handle.addEventListener('touchstart', onDown, { passive: false });
 }
 
 function selectElement(id) {
@@ -1277,26 +1366,33 @@ function renderCanvas() {
   `;
 
   list.forEach((item, idx) => {
-    const isFirst = idx === 0;
-    const isLast = idx === list.length - 1;
+    const span = normalizeColSpan(item.colSpan);
+    const widthLabel = span === 12 ? 'เต็ม' : span === 6 ? 'ครึ่ง' : '⅓';
     const itemCard = document.createElement('div');
-    itemCard.className = `canvas-item col-${item.colSpan || 12} ${selectedElementId === item.id ? 'selected' : ''}`;
+    itemCard.className = `canvas-item col-${span} ${selectedElementId === item.id ? 'selected' : ''}`;
     itemCard.tabIndex = 0;
     itemCard.dataset.elementId = item.id;
-    itemCard.setAttribute('aria-label', `องค์ประกอบ ${item.type} : ${item.label || ''} — ลำดับที่ ${idx + 1} จาก ${list.length}`);
-    itemCard.title = 'ลากการ์ดนี้เพื่อสลับตำแหน่งได้เลย';
+    itemCard.setAttribute('aria-label', `องค์ประกอบ ${item.type} : ${item.label || ''} — ความกว้าง ${widthLabel} — ลำดับที่ ${idx + 1} จาก ${list.length}`);
+    itemCard.title = 'ลากเพื่อย้าย — วางข้าง ๆ เพื่อจัดคู่ — ลากขอบขวาเพื่อปรับความกว้าง';
     itemCard.onclick = (e) => { e.stopPropagation(); selectElement(item.id); };
     itemCard.onkeydown = (e) => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectElement(item.id); }
       if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); removeElement(item.id); }
-      // ย้ายตำแหน่งด้วยคีย์บอร์ด: Alt + ลูกศรขึ้น/ลง
       if (e.altKey && e.key === 'ArrowUp') { e.preventDefault(); moveElement(item.id, -1); }
       if (e.altKey && e.key === 'ArrowDown') { e.preventDefault(); moveElement(item.id, 1); }
+      if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        e.preventDefault();
+        cycleElementWidth(item.id);
+      }
     };
 
-    // ----- ลากการ์ดเพื่อสลับตำแหน่ง (ทางเลือกเสริมจากปุ่มลูกศร) -----
+    // ลากจัดตำแหน่ง — บน/ล่าง = เรียงแนวตั้ง, ซ้าย/ขวา = วางคู่
     itemCard.draggable = true;
     itemCard.addEventListener('dragstart', (e) => {
+      if (e.target.closest('.resize-handle, .item-controls, .ctrl-btn')) {
+        e.preventDefault();
+        return;
+      }
       dragSourceId = item.id;
       itemCard.classList.add('dragging');
       try { e.dataTransfer.setData('text/plain', item.id); e.dataTransfer.effectAllowed = 'move'; } catch (err) {}
@@ -1311,19 +1407,25 @@ function renderCanvas() {
       e.preventDefault();
       try { e.dataTransfer.dropEffect = 'move'; } catch (err) {}
       const rect = itemCard.getBoundingClientRect();
-      const placeBefore = (e.clientY - rect.top) < rect.height / 2;
+      const xRatio = (e.clientX - rect.left) / Math.max(1, rect.width);
+      const yRatio = (e.clientY - rect.top) / Math.max(1, rect.height);
       clearDropMarkers();
-      itemCard.classList.add(placeBefore ? 'drop-before' : 'drop-after');
+      if (xRatio < 0.28) itemCard.classList.add('drop-side-left');
+      else if (xRatio > 0.72) itemCard.classList.add('drop-side-right');
+      else itemCard.classList.add(yRatio < 0.5 ? 'drop-before' : 'drop-after');
     });
     itemCard.addEventListener('drop', (e) => {
       if (!dragSourceId || dragSourceId === item.id) return;
       e.preventDefault();
       const rect = itemCard.getBoundingClientRect();
-      const placeBefore = (e.clientY - rect.top) < rect.height / 2;
+      const xRatio = (e.clientX - rect.left) / Math.max(1, rect.width);
+      const yRatio = (e.clientY - rect.top) / Math.max(1, rect.height);
       const sourceId = dragSourceId;
       dragSourceId = null;
       clearDropMarkers();
-      reorderElement(sourceId, item.id, placeBefore);
+      if (xRatio < 0.28) placeBeside(sourceId, item.id, true);
+      else if (xRatio > 0.72) placeBeside(sourceId, item.id, false);
+      else reorderElement(sourceId, item.id, yRatio < 0.5);
     });
 
     const wysiwyg = canvasViewMode === 'wysiwyg';
@@ -1350,17 +1452,16 @@ function renderCanvas() {
       contentHTML = `<hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 8px 0;">`;
     }
 
+    /* Quiet student chrome: width chip + delete only (no heavy up/down) */
     itemCard.innerHTML = `
       <div class="item-controls">
-        <span class="item-order-hint" aria-hidden="true">ลำดับ ${idx + 1}</span>
-        <span class="item-btn-group">
-          <button type="button" class="ctrl-btn ctrl-move" data-dir="up"${isFirst ? ' disabled' : ''} title="ย้ายขึ้น (ไปลำดับก่อนหน้า)" aria-label="ย้ายองค์ประกอบนี้ขึ้นหนึ่งลำดับ" onclick="event.stopPropagation(); moveElement('${safeId(item.id)}', -1)"><i class="fa-solid fa-chevron-up" aria-hidden="true"></i></button>
-          <button type="button" class="ctrl-btn ctrl-move" data-dir="down"${isLast ? ' disabled' : ''} title="ย้ายลง (ไปลำดับถัดไป)" aria-label="ย้ายองค์ประกอบนี้ลงหนึ่งลำดับ" onclick="event.stopPropagation(); moveElement('${safeId(item.id)}', 1)"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
-          <button type="button" class="ctrl-btn ctrl-delete" title="ลบองค์ประกอบนี้" aria-label="ลบองค์ประกอบนี้" onclick="event.stopPropagation(); removeElement('${safeId(item.id)}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
-        </span>
+        <button type="button" class="ctrl-btn ctrl-width" title="สลับความกว้าง (เต็ม / ครึ่ง / ⅓)" aria-label="สลับความกว้างองค์ประกอบ" onclick="event.stopPropagation(); cycleElementWidth('${safeId(item.id)}')">${widthLabel}</button>
+        <button type="button" class="ctrl-btn ctrl-delete" title="ลบองค์ประกอบนี้" aria-label="ลบองค์ประกอบนี้" onclick="event.stopPropagation(); removeElement('${safeId(item.id)}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
+      <span class="resize-handle" role="slider" aria-label="ปรับความกว้าง" aria-valuetext="${widthLabel}" title="ลากเพื่อปรับความกว้าง"></span>
       ${contentHTML}
     `;
+    attachResizeHandle(itemCard, item);
     preview.appendChild(itemCard);
   });
   stage.appendChild(preview);
@@ -1401,14 +1502,14 @@ function renderInspector() {
       </div>
     ` : ''}
     <div class="inspector-field">
-      <label for="insp-colspan">ความกว้าง (Column Width):</label>
+      <label for="insp-colspan">ความกว้างบนกระดาน:</label>
       <select id="insp-colspan" onchange="updateItemProp('${id}', 'colSpan', parseInt(this.value))">
-        <option value="12" ${item.colSpan === 12 ? 'selected' : ''}>เต็มความกว้าง (100%)</option>
-        <option value="6" ${item.colSpan === 6 ? 'selected' : ''}>ครึ่งหนึ่ง (50%)</option>
-        <option value="4" ${item.colSpan === 4 ? 'selected' : ''}>หนึ่งในสาม (33%)</option>
+        <option value="12" ${normalizeColSpan(item.colSpan) === 12 ? 'selected' : ''}>เต็มแถว</option>
+        <option value="6" ${normalizeColSpan(item.colSpan) === 6 ? 'selected' : ''}>ครึ่งแถว (คู่กันได้)</option>
+        <option value="4" ${normalizeColSpan(item.colSpan) === 4 ? 'selected' : ''}>หนึ่งในสาม</option>
       </select>
     </div>
-    <p class="inspector-hint">แก้ข้อความแล้วหน้าตัวอย่าง/โค้ดด้านล่างจะเปลี่ยนตามทันที — ย้ายลำดับขององค์ประกอบได้โดยกดปุ่มลูกศรขึ้น/ลงบนการ์ด หรือลากการ์ดไปวางในตำแหน่งที่ต้องการ</p>
+    <p class="inspector-hint">ลากชิ้นเพื่อย้าย — วางข้าง ๆ เพื่อจัดคู่ — ลากขอบขวาหรือกดชิปความกว้างเพื่อย่อ/ขยาย</p>
   `;
 }
 
@@ -1416,7 +1517,7 @@ function updateItemProp(id, prop, val) {
   const list = getActiveList();
   const item = list.find((el) => el.id === id);
   if (item) {
-    item[prop] = val;
+    item[prop] = prop === 'colSpan' ? normalizeColSpan(val) : val;
     commitAll({ keepInspector: true });
   }
 }
