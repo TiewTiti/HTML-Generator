@@ -1319,8 +1319,54 @@ function attachResizeHandle(itemCard, item) {
 
 function selectElement(id) {
   selectedElementId = id;
+  /* ม.5: เปิดแถบคุณสมบัติให้อัตโนมัติ เพื่อตั้งชื่อ/ประเภทได้ทันที */
+  if (id && !isPanelOpen('inspector')) {
+    uiState.panels.inspector = true;
+    if (uiState.panels.toolbox) {
+      uiState.panels.toolbox = false;
+      applyPanelState('toolbox');
+    }
+    applyPanelState('inspector');
+    saveUiState();
+    syncDrawerScrim();
+  }
   renderCanvas();
   renderInspector();
+}
+
+/* เปลี่ยนประเภทองค์ประกอบ — นักเรียนเลือกเองได้ ไม่ถูกล็อกตามปุ่มที่กดเพิ่ม */
+function changeElementType(id, newType) {
+  const list = getActiveList();
+  const item = list.find((el) => el.id === id);
+  const def = COMPONENT_BY_TYPE[newType];
+  if (!item || !def || item.type === newType) return;
+  captureUndo('เปลี่ยนประเภท');
+  const keep = {
+    label: item.label,
+    colSpan: item.colSpan,
+    placeholder: item.placeholder,
+    required: item.required,
+    subtitle: item.subtitle
+  };
+  const fresh = def.make();
+  Object.keys(item).forEach((k) => {
+    if (k !== 'id') delete item[k];
+  });
+  Object.assign(item, fresh, {
+    id,
+    type: newType,
+    label: (keep.label && String(keep.label).trim()) ? keep.label : fresh.label,
+    colSpan: normalizeColSpan(keep.colSpan)
+  });
+  if (['text', 'password', 'email'].includes(newType)) {
+    if (keep.placeholder) item.placeholder = keep.placeholder;
+    if (typeof keep.required === 'boolean') item.required = keep.required;
+    else if (typeof item.required !== 'boolean') item.required = !!fresh.required;
+  }
+  if (newType === 'heading' && keep.subtitle) item.subtitle = keep.subtitle;
+  selectedElementId = id;
+  commitAll();
+  tipTiewBot('type-change', 'ครูชิโร่: เปลี่ยนประเภทแล้ว — ตั้ง «ชื่อ» ให้ตรงกับช่องได้เลย');
 }
 
 function renderCanvas() {
@@ -1475,34 +1521,52 @@ function renderInspector() {
   if (!item) {
     inspector.innerHTML = `<div class="empty-inspector-state">
       <i class="fa-solid fa-arrow-pointer" aria-hidden="true"></i>
-      <p>คลิกเลือกองค์ประกอบในพื้นที่ออกแบบเพื่อปรับแต่งคุณสมบัติ</p>
+      <p>คลิกองค์ประกอบบนกระดาน แล้วตั้ง <strong>ชื่อ</strong> กับ <strong>ประเภท</strong> ได้เอง</p>
     </div>`;
     return;
   }
 
   const id = safeId(item.id);
+  const typePicker = COMPONENTS.map((c) => {
+    const on = item.type === c.type;
+    return `<button type="button" class="type-chip${on ? ' on' : ''}" role="radio" aria-checked="${on ? 'true' : 'false'}"
+      title="${esc(c.label)}" onclick="changeElementType('${id}', '${c.type}')">
+      <i class="fa-solid ${c.icon}" aria-hidden="true"></i>
+      <span>${esc(c.short)}</span>
+    </button>`;
+  }).join('');
+
   inspector.innerHTML = `
     <div class="inspector-field">
-      <label for="insp-label">ข้อความป้ายชื่อ / หัวข้อ:</label>
-      <input id="insp-label" type="text" value="${esc(item.label || '')}" oninput="updateItemProp('${id}', 'label', this.value)">
+      <label for="insp-label">ชื่อ</label>
+      <input id="insp-label" type="text" value="${esc(item.label || '')}" placeholder="เช่น อีเมล, รหัสผ่าน, เข้าสู่ระบบ"
+             autocomplete="off" oninput="updateItemProp('${id}', 'label', this.value)">
+      <p class="field-hint">ข้อความที่นักเรียนเห็นบนฟอร์ม — ตั้งเองได้</p>
+    </div>
+    <div class="inspector-field">
+      <span class="insp-section-label" id="insp-type-label">ประเภท</span>
+      <div class="type-picker" role="radiogroup" aria-labelledby="insp-type-label">
+        ${typePicker}
+      </div>
+      <p class="field-hint">เลือกประเภทเองได้ เช่น ข้อความ / อีเมล / รหัสผ่าน / ปุ่ม</p>
     </div>
     ${item.type === 'heading' ? `
       <div class="inspector-field">
-        <label for="insp-subtitle">คำอธิบายย่อย (Subtitle):</label>
+        <label for="insp-subtitle">คำอธิบายย่อย</label>
         <input id="insp-subtitle" type="text" value="${esc(item.subtitle || '')}" oninput="updateItemProp('${id}', 'subtitle', this.value)">
       </div>
     ` : ''}
     ${['text', 'password', 'email'].includes(item.type) ? `
       <div class="inspector-field">
-        <label for="insp-placeholder">ข้อความกำกับ (Placeholder):</label>
+        <label for="insp-placeholder">ข้อความในช่องว่าง (Placeholder)</label>
         <input id="insp-placeholder" type="text" value="${esc(item.placeholder || '')}" oninput="updateItemProp('${id}', 'placeholder', this.value)">
       </div>
-      <div class="inspector-field">
-        <label for="insp-required"><input id="insp-required" type="checkbox" ${item.required ? 'checked' : ''} onchange="updateItemProp('${id}', 'required', this.checked)"> จำเป็นต้องกรอก (Required)</label>
+      <div class="inspector-field inspector-check">
+        <label for="insp-required"><input id="insp-required" type="checkbox" ${item.required ? 'checked' : ''} onchange="updateItemProp('${id}', 'required', this.checked)"> จำเป็นต้องกรอก</label>
       </div>
     ` : ''}
     <div class="inspector-field">
-      <label for="insp-colspan">ความกว้างบนกระดาน:</label>
+      <label for="insp-colspan">ความกว้างบนกระดาน</label>
       <select id="insp-colspan" onchange="updateItemProp('${id}', 'colSpan', parseInt(this.value))">
         <option value="12" ${normalizeColSpan(item.colSpan) === 12 ? 'selected' : ''}>เต็มแถว</option>
         <option value="6" ${normalizeColSpan(item.colSpan) === 6 ? 'selected' : ''}>ครึ่งแถว (คู่กันได้)</option>
@@ -1511,6 +1575,10 @@ function renderInspector() {
     </div>
     <p class="inspector-hint">ลากชิ้นเพื่อย้าย — วางข้าง ๆ เพื่อจัดคู่ — ลากขอบขวาหรือกดชิปความกว้างเพื่อย่อ/ขยาย</p>
   `;
+  const nameInput = document.getElementById('insp-label');
+  if (nameInput && document.activeElement !== nameInput) {
+    /* keep focus if already typing; otherwise ready for ม.5 to rename */
+  }
 }
 
 function updateItemProp(id, prop, val) {
@@ -1571,7 +1639,7 @@ function commitAll(opts = {}) {
   renderStudioPreviewStage();
   regenerateCode();
   saveState();
-  if (selectedElementId) tipTiewBot('selected', 'ครูชิโร่: แก้ข้อความด้านขวาได้เลย — เห็นผลบนกระดานทันที');
+  if (selectedElementId) tipTiewBot('selected', 'ครูชิโร่: ตั้ง «ชื่อ» กับ «ประเภท» ด้านขวาได้เลย — เปลี่ยนเองได้');
 }
 
 // ==========================================================================
