@@ -1,38 +1,37 @@
 /* ==========================================================================
-   STUDIO CHROME — Spark Admin–inspired light product UI
-   (soft pastel surfaces / forest+lime accents — not cool-slate Apple luxury)
+   STUDIO CHROME — Spark Admin light product UI + soft blue accent
+   (soft pastel surfaces — not cool-slate Apple luxury; accent is blue per user)
    สไตล์การ์ดฟอร์มที่ export ยังอยู่ใน CARD_CSS ใน app.js
-   Ref: https://preview.themewagon.com/spark-admin/
+   Ref surfaces: https://preview.themewagon.com/spark-admin/
    ========================================================================== */
 :root {
-  /* Spark Admin soft light admin — mint wash, white cards, forest primary, lime spark */
+  /* Soft light admin ground (mint-ish) + soft blue accent system */
   --bg-app: #f4f6f5;
   --bg-app-deep: #e9efef;
   --bg-hero: #ffffff;
   --surface-panel: #ffffff;
-  --surface-subtle: #f8faf9;
-  --surface-glass: rgba(255, 255, 255, 0.82);
-  --border-color: rgba(11, 19, 15, 0.08);
-  --border-hairline: rgba(11, 19, 15, 0.055);
-  --border-hover: rgba(11, 19, 15, 0.14);
-  --border-soft: #e9efef;
+  --surface-subtle: #f7f9fb;
+  --surface-glass: rgba(255, 255, 255, 0.84);
+  --border-color: rgba(15, 23, 42, 0.08);
+  --border-hairline: rgba(15, 23, 42, 0.055);
+  --border-hover: rgba(15, 23, 42, 0.14);
+  --border-soft: #e8eef3;
 
-  --text-main: #0b130f;
-  --text-muted: #6c7e75;
-  --text-tertiary: #879a91;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-tertiary: #94a3b8;
   --text-inverse: #ffffff;
 
-  /* Primary fills = forest (Spark Create btn); lime = highlight / active spark */
-  --accent-primary: #072f1f;
-  --accent-hover: #1a3e30;
-  --accent-pressed: #051c12;
-  --accent-light: rgba(34, 197, 94, 0.1);
-  --accent-deep: #051c12;
-  --accent-tint: #dcfce7;
-  --accent-soft: #e1fcd2;
-  --accent-lime: #b4f105;
-  --accent-lime-hover: #c1f824;
-  --accent-lime-soft: rgba(180, 241, 5, 0.18);
+  /* Soft blue family — friendly product accent (not rejected cool-slate sapphire lux) */
+  --accent-primary: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-pressed: #1d4ed8;
+  --accent-light: rgba(59, 130, 246, 0.12);
+  --accent-deep: #1e40af;
+  --accent-tint: #eff6ff;
+  --accent-soft: #dbeafe;
+  --accent-spark: #60a5fa;
+  --accent-spark-soft: rgba(59, 130, 246, 0.18);
 
   --success-color: #22c55e;
   --sky-color: var(--accent-primary);
@@ -50,18 +49,18 @@
   --dock-clearance: 108px;
 
   --rail-width: 44px;
-  /* Soft Spark card elevation (green-ink shadow, not cool slate) */
-  --shadow-sm: 0 2px 8px rgba(11, 19, 15, 0.02);
-  --shadow-md: 0 10px 30px rgba(11, 19, 15, 0.04);
-  --shadow-lg: 0 20px 50px rgba(11, 19, 15, 0.08);
+  /* Soft admin card elevation */
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 10px 28px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 18px 44px rgba(15, 23, 42, 0.07);
   --shadow-shell:
     0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 2px 8px rgba(11, 19, 15, 0.02),
-    0 10px 30px rgba(11, 19, 15, 0.04);
+    0 2px 8px rgba(15, 23, 42, 0.03),
+    0 10px 28px rgba(15, 23, 42, 0.05);
   --shadow-dock:
-    0 2px 8px rgba(11, 19, 15, 0.03),
-    0 12px 36px rgba(11, 19, 15, 0.08),
-    0 0 0 1px rgba(11, 19, 15, 0.04);
+    0 2px 8px rgba(15, 23, 42, 0.04),
+    0 12px 36px rgba(15, 23, 42, 0.08),
+    0 0 0 1px rgba(15, 23, 42, 0.05);
   --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
@@ -837,8 +836,8 @@ body.layout-b .canvas-dropzone {
 }
 #builder-canvas[data-view="wysiwyg"] .canvas-item:hover,
 #builder-canvas[data-view="wysiwyg"] .canvas-item.selected {
-  border-color: rgba(7, 47, 31, 0.35);
-  box-shadow: 0 0 0 2px var(--accent-lime-soft);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 0 2px var(--accent-spark-soft);
   border-radius: 12px;
 }
 #builder-canvas[data-view="wysiwyg"] .item-order-hint { display: none; }
@@ -911,13 +910,13 @@ body.layout-b .canvas-dropzone {
   position: absolute;
   /* เกาะขอบบนของการ์ด (ครึ่งใน ครึ่งนอก) → ไม่ทับเนื้อหาข้างในเลย
      การ์ดเผื่อ padding-top 18px ไว้ให้แล้ว (ดู .canvas-item) */
-  top: -12px;
+  top: -14px;
   left: 10px;
   right: 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: 8px;
   z-index: 3;
   /* ปล่อยให้ช่องว่างตรงกลางคลิกทะลุได้ ให้เฉพาะป้าย/ปุ่มที่กดได้จริง */
   pointer-events: none;
@@ -928,66 +927,93 @@ body.layout-b .canvas-dropzone {
 }
 
 .canvas-item .ctrl-btn {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: var(--text-muted);
-  font-size: 13px;
+  color: var(--text-main);
+  font-size: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   touch-action: manipulation;
+  transition: background-color 0.15s var(--ease-apple), color 0.15s var(--ease-apple);
 }
 
-/* รวมปุ่มลูกศร/ลบเป็นกล่องเดียว เกาะขอบการ์ด (ไม่ลอยทับเนื้อหา) */
+.canvas-item .ctrl-btn i {
+  display: block;
+  line-height: 1;
+  font-size: 12px;
+}
+
+/* รวมปุ่มลูกศร/ลบเป็นกล่องเดียว — finished segmented control */
 .canvas-item .item-btn-group {
   display: flex;
   align-items: stretch;
-  background: var(--surface-panel);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(15, 23, 42, 0.02);
 }
 
 .canvas-item .ctrl-btn + .ctrl-btn {
-  border-left: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-soft);
 }
 
-.canvas-item.selected .item-btn-group,
 .canvas-item:hover .item-btn-group {
-  border-color: var(--border-hover);
+  border-color: #cbd5e1;
 }
 
 .canvas-item.selected .item-btn-group {
   border-color: var(--accent-primary);
+  box-shadow:
+    0 2px 10px rgba(37, 99, 235, 0.14),
+    0 0 0 1px var(--accent-spark-soft);
 }
 
-/* ปุ่มเลื่อนตำแหน่ง (ขึ้น/ลง) — โทนฟ้า */
+/* ปุ่มเลื่อนตำแหน่ง (ขึ้น/ลง) — soft blue */
+.canvas-item .ctrl-btn.ctrl-move {
+  color: var(--accent-deep);
+  background: var(--accent-tint);
+}
 .canvas-item .ctrl-btn.ctrl-move:hover:not(:disabled) {
-  background-color: #e0f2fe;
-  color: #0369a1;
+  background-color: var(--accent-soft);
+  color: var(--accent-hover);
+}
+.canvas-item.selected .ctrl-btn.ctrl-move:not(:disabled) {
+  background: var(--accent-primary);
+  color: #fff;
+}
+.canvas-item.selected .ctrl-btn.ctrl-move:hover:not(:disabled) {
+  background: var(--accent-hover);
+  color: #fff;
 }
 
 /* ปุ่มลบ — โทนแดง (อันตราย) */
+.canvas-item .ctrl-btn.ctrl-delete {
+  color: #b91c1c;
+  background: #fff;
+}
 .canvas-item .ctrl-btn.ctrl-delete:hover {
   background-color: #fee2e2;
   color: #dc2626;
 }
 
 .canvas-item .ctrl-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.35;
   cursor: not-allowed;
+  filter: grayscale(0.2);
 }
 
 .canvas-item .ctrl-btn:focus-visible {
   outline: 2px solid var(--accent-primary);
   outline-offset: -2px;
+  z-index: 1;
 }
 
 /* ลากการ์ดเพื่อสลับตำแหน่ง (นอกจากกดปุ่มลูกศร) */
@@ -1001,25 +1027,27 @@ body.layout-b .canvas-dropzone {
 
 /* ป้ายลำดับ — อยู่ในแถวควบคุมบนขอบการ์ด (ไม่กินพื้นที่เนื้อหาข้างใน) */
 .canvas-item .item-order-hint {
-  background: var(--surface-panel);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 0 10px;
+  background: #fff;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 0 12px;
   font-size: 11px;
   font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--text-muted);
-  line-height: 34px;
-  min-height: 36px;
+  line-height: 32px;
+  min-height: 34px;
   white-space: nowrap;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
   display: inline-flex;
   align-items: center;
 }
 
 .canvas-item.selected .item-order-hint {
-  color: var(--accent-primary);
+  color: var(--accent-deep);
   border-color: var(--accent-primary);
-  background: var(--accent-light);
+  background: var(--accent-tint);
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.12);
 }
 
 /* จอสัมผัส: เป้าแตะ ≥44px — เก็บแถบควบคุมไว้ใน padding การ์ด (ไม่ลอยทับชิ้นก่อนหน้า) */
@@ -1029,8 +1057,10 @@ body.layout-b .canvas-dropzone {
     height: 44px;
     min-width: 44px;
     min-height: 44px;
-    font-size: 15px;
+    font-size: 14px;
   }
+  .canvas-item .ctrl-btn i { font-size: 14px; }
+  .canvas-item .item-btn-group { border-radius: 14px; }
   .canvas-item { padding-top: 52px; }
   .canvas-item .item-controls {
     top: 6px;
@@ -1041,6 +1071,7 @@ body.layout-b .canvas-dropzone {
     line-height: 42px;
     min-height: 44px;
     font-size: 12px;
+    border-radius: 14px;
   }
   /* โชว์ปุ่มลูกศรเฉพาะชิ้นที่เลือก — กันซ้อนทับบนจอแคบ */
   .canvas-item:not(.selected) .item-controls {
@@ -1180,7 +1211,7 @@ body.layout-b .canvas-dropzone {
   color: var(--accent-primary);
 }
 .btn-outline-full.btn-tone-info:hover {
-  background-color: var(--accent-lime-soft);
+  background-color: var(--accent-spark-soft);
   border-color: transparent;
   color: var(--accent-hover);
 }
@@ -2090,12 +2121,12 @@ body.layout-b .canvas-dropzone {
 }
 .lock-chip[hidden] { display: none !important; }
 
-/* Teacher-gated CTAs: soft forest fill + lock; sample-form label white when locked */
+/* Teacher-gated CTAs: soft blue fill + lock; sample-form label white when locked */
 .teacher-gated-cta.is-locked,
 .btn.teacher-gated-btn.is-locked {
-  background: #1a3e30 !important;
+  background: var(--accent-primary) !important;
   color: #ffffff !important;
-  border: 1px solid #072f1f !important;
+  border: 1px solid var(--accent-hover) !important;
   box-shadow: var(--shadow-sm) !important;
   cursor: pointer;
   opacity: 1;
@@ -2105,9 +2136,9 @@ body.layout-b .canvas-dropzone {
 }
 .teacher-gated-cta.is-locked:hover,
 .btn.teacher-gated-btn.is-locked:hover {
-  background: #072f1f !important;
+  background: var(--accent-hover) !important;
   color: #ffffff !important;
-  border-color: #051c12 !important;
+  border-color: var(--accent-pressed) !important;
 }
 .gated-lock-ico {
   flex: 0 0 auto;
@@ -2120,8 +2151,8 @@ body.layout-b .canvas-dropzone {
 .gated-lock-ico[hidden] { display: none !important; }
 .teacher-gated-cta.is-locked .gated-lock-ico,
 .btn.teacher-gated-btn.is-locked .gated-lock-ico {
-  /* lime spark on the lock (Spark accent, not flat gray) */
-  color: var(--accent-lime);
+  /* soft blue spark on the lock (not flat gray) */
+  color: var(--accent-soft);
 }
 .teacher-gated-cta.is-locked .gated-cta-label,
 .btn.teacher-gated-btn.is-locked .gated-cta-label {
@@ -2290,7 +2321,7 @@ body.layout-b .canvas-dropzone {
 .otp-digit:focus {
   outline: none;
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 4px var(--accent-lime-soft);
+  box-shadow: 0 0 0 4px var(--accent-spark-soft);
 }
 .otp-digit.is-error {
   border-color: #e11d48;
@@ -2506,8 +2537,8 @@ body.layout-b .canvas-dropzone {
       rgba(233, 239, 239, 0.28) 56%,
       rgba(244, 246, 245, 0.56) 74%,
       rgba(233, 239, 239, 0.96) 100%),
-    radial-gradient(ellipse 100% 42% at 50% -4%, rgba(220, 252, 231, 0.55), transparent 62%),
-    radial-gradient(ellipse 55% 36% at 82% 72%, rgba(225, 252, 210, 0.22), transparent 55%),
+    radial-gradient(ellipse 100% 42% at 50% -4%, rgba(219, 234, 254, 0.45), transparent 62%),
+    radial-gradient(ellipse 55% 36% at 82% 72%, rgba(236, 253, 245, 0.2), transparent 55%),
     radial-gradient(ellipse 40% 30% at 12% 88%, rgba(233, 239, 239, 0.35), transparent 60%);
   backdrop-filter: blur(2px) saturate(108%);
 }
@@ -2995,7 +3026,7 @@ body.layout-b .canvas-preview-card .canvas-item:hover,
 body.layout-b .canvas-preview-card .canvas-item.selected {
   background: #fff;
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px var(--accent-lime-soft);
+  box-shadow: 0 0 0 2px var(--accent-spark-soft);
 }
 
 body.layout-b .empty-canvas-state {
@@ -3008,8 +3039,8 @@ body.layout-b .empty-canvas-icon {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: var(--accent-lime);
-  color: var(--accent-deep);
+  background: var(--accent-primary);
+  color: #fff;
   opacity: 1;
   font-size: 32px;
   font-weight: 300;
@@ -3017,7 +3048,7 @@ body.layout-b .empty-canvas-icon {
   display: grid;
   place-items: center;
   margin: 0 auto 6px;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.28);
 }
 
 body.layout-b .empty-canvas-title {
@@ -3165,14 +3196,14 @@ body.layout-b .gated-cta-label {
 }
 .dock-btn:hover { background: rgba(0, 0, 0, 0.04); }
 .dock-btn.on {
-  background: var(--accent-lime-soft);
+  background: var(--accent-tint);
   color: var(--accent-deep);
 }
 .dock-ico {
   width: 30px;
   height: 30px;
   border-radius: 10px;
-  background: rgba(11, 19, 15, 0.04);
+  background: rgba(15, 23, 42, 0.04);
   color: var(--text-main);
   display: grid;
   place-items: center;
@@ -3180,7 +3211,7 @@ body.layout-b .gated-cta-label {
 }
 .dock-ico svg { display: block; }
 .dock-btn.on .dock-ico {
-  background: var(--accent-lime);
+  background: var(--accent-soft);
   color: var(--accent-deep);
 }
 .dock-label { line-height: 1.1; }
