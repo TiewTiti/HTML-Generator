@@ -1,40 +1,53 @@
 /* ==========================================================================
-   ENTERPRISE SLATE LIGHT THEME & CORE UTILITIES
-   (สไตล์ของ "ตัวเครื่องมือ" — ส่วนสไตล์ของ "การ์ดฟอร์ม" ที่นักเรียนสร้าง
-    อยู่ใน CARD_CSS ในไฟล์ app.js เพราะต้องใช้ชุดเดียวกันกับไฟล์ที่ export)
+   STUDIO CHROME — Apple Store–inspired calm layout
+   (แรงบันดาลใจด้าน whitespace / typography / soft surfaces — ไม่ใช่การโคลนแบรนด์)
+   สไตล์การ์ดฟอร์มที่ export ยังอยู่ใน CARD_CSS ใน app.js
    ========================================================================== */
 :root {
-  --bg-app: #f8fafc;
+  --bg-app: #f5f5f7;
+  --bg-hero: #ffffff;
   --surface-panel: #ffffff;
-  --surface-subtle: #f1f5f9;
-  --border-color: #e2e8f0;
-  --border-hover: #cbd5e1;
+  --surface-subtle: #fbfbfd;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-hairline: rgba(0, 0, 0, 0.056);
+  --border-hover: rgba(0, 0, 0, 0.16);
 
-  --text-main: #0f172a;
-  --text-muted: #475569;
+  --text-main: #1d1d1f;
+  --text-muted: #6e6e73;
+  --text-tertiary: #86868b;
   --text-inverse: #ffffff;
 
-  --accent-primary: #2563eb;
-  --accent-hover: #1d4ed8;
-  --accent-light: #eff6ff;
+  --accent-primary: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-pressed: #006edb;
+  --accent-light: rgba(0, 113, 227, 0.08);
+  --accent-deep: #0058b0;
+  --accent-tint: #e8f1ff;
+  --accent-soft: #cfe2ff;
 
-  --success-color: #047857;
-  --sky-color: #0369a1;
+  --success-color: #248a3d;
+  --sky-color: #0071e3;
+  --danger: #d70015;
 
-  --font-main: 'Prompt', 'Inter', sans-serif;
+  /* Chrome UI: Apple SF first; Noto Sans Thai before Latin-only fallbacks (fixes Thai เพี้ยน) */
+  --font-main: -apple-system, BlinkMacSystemFont, "SF Pro TH", "SF Pro Text", "Noto Sans Thai", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro TH", "SF Pro Display", "SF Pro Text", "Noto Sans Thai", "Segoe UI", "Helvetica Neue", sans-serif;
+  --radius-panel: 28px;
+  --radius-control: 12px;
+  --radius-dock: 22px;
 
-  /* ความสูงจริงของหัวเว็บ (ตราโรงเรียน 56px + padding บน/ล่าง 12px×2 + เส้นขอบล่าง 1px)
-     ใช้คำนวณความสูงของกระดาน/แถบด้านข้างให้ "พอดีกับจอ" พอดี
-     เดิมใช้เลข 65px (ค่าตกค้างจากหัวเว็บเวอร์ชันก่อน) → แถบด้านข้างยื่นเลยขอบล่างจอ 16px
-     ทำให้การ์ด "ส่งไปยังขั้นตอนที่ 2" ติดขอบล่างจอและแถบขาวด้านล่างถูกตัดทิ้ง */
-  --header-height: 81px;
+  --header-height: 48px;
+  --hero-pad-y: 52px;
+  --dock-clearance: 108px;
 
-  /* ความกว้าง "รางเปิดแถบ" ที่กันไว้ด้านข้างตอนกดปิดแถบ (จอใหญ่)
-     แคบพอให้เนื้อหา (กระดาน/หน้าตัวอย่าง) ได้พื้นที่คืนเกือบเต็ม แต่ยังมีปุ่มเปิดแถบโผล่อยู่ */
   --rail-width: 44px;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  /* Layered Apple-style elevation (soft ambient, not hard mock cards) */
+  --shadow-sm: 0 1px 1px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.04), 0 18px 48px rgba(0, 0, 0, 0.08);
+  --shadow-shell: 0 2px 4px rgba(0, 0, 0, 0.02), 0 12px 32px rgba(0, 0, 0, 0.04), 0 28px 72px rgba(0, 0, 0, 0.05);
+  --shadow-dock: 0 2px 6px rgba(0, 0, 0, 0.04), 0 12px 40px rgba(0, 0, 0, 0.1), 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+  --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 * {
@@ -48,14 +61,34 @@
     ทำให้กดปิดแล้วค่า hidden=true แต่ยังเห็นอยู่ — เจอบั๊กนี้ที่ "โหมดสอนอ่านโค้ด" ปิดไม่ได้) */
 [hidden] { display: none !important; }
 
+html, body {
+  height: 100%;
+}
+
 body {
   font-family: var(--font-main);
   background-color: var(--bg-app);
   color: var(--text-main);
-  line-height: 1.5;
+  line-height: 1.47059;
+  /* Neutral tracking — negative Latin tracking squashes Thai combining marks */
+  letter-spacing: 0;
+  font-weight: 400;
   min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
+}
+
+/* Latin display titles may tighten; Thai UI copy stays untracked */
+.studio-hero-title,
+.brand-nav-name {
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
 }
 
 /* ช่วยเรื่องการเข้าถึง: ซ่อนข้อความไว้ให้ screen reader อ่าน */
@@ -71,107 +104,213 @@ body {
   border: 0;
 }
 
-/* Header Navbar */
+/* Header — Apple global-nav glass */
 .app-header {
-  background-color: var(--surface-panel);
-  border-bottom: 1px solid var(--border-color);
-  padding: 12px 24px;
+  flex: 0 0 auto;
+  background-color: rgba(251, 251, 253, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.16);
+  padding: 8px 28px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  box-shadow: var(--shadow-sm);
-  z-index: 10;
+  gap: 16px;
+  z-index: 20;
 }
 
 .header-branding {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  min-width: 0;
 }
 
 .brand-icon {
   flex: 0 0 auto;
-  /* ตราโรงเรียนเป็นทรงสูง (สัดส่วน ~0.69) → ทำกรอบทรงสูงตาม (ไม่ใช่จัตุรัส)
-     เพื่อให้ตราเต็มกรอบจริง ๆ ไม่เหลือที่ว่างข้าง ๆ มากเกินไป */
-  width: 38px;
-  height: 56px;
-  /* ตราโรงเรียนไฟล์ใหม่เป็น PNG โปร่งใส (ไม่มีพื้นขาวของตัวเองแล้ว)
-     → ไม่ต้องมีกรอบขาว/เส้นขอบอีก ตราจึงกลมกลืนกับพื้นหัวเว็บโดยตรง */
-  background-color: transparent;
-  border: 0;
-  /* ไม่ใส่ padding: ให้ตราเต็มกรอบเลย */
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background:
+    linear-gradient(145deg, #f6d56a 0%, #e8b84a 45%, #1d4f91 46%, #2a6bb8 100%);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.35);
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  color: #fff;
   overflow: hidden;
 }
 
 .brand-icon img {
   display: block;
-  width: 100%;
-  height: 100%;
-  /* ตราโรงเรียนเป็นรูปทรงสูง → ใช้ contain เพื่อไม่ให้ยอดแหลม/วงข้อความถูกตัด */
-  object-fit: contain;
+  width: 118%;
+  height: 118%;
+  object-fit: cover;
+  object-position: center 42%;
 }
 
-.brand-info h1 {
-  font-size: 18px;
-  font-weight: 700;
+.brand-info { min-width: 0; }
+
+.brand-nav-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--text-main);
-  line-height: 1.2;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.brand-info p {
-  font-size: 12px;
+.brand-info h1,
+.brand-info p { display: none; }
+
+/* Hero / intro — Apple-clean type over frosted plate; ambient cards stay behind */
+.studio-hero {
+  flex: 0 0 auto;
+  text-align: center;
+  padding: var(--hero-pad-y) 24px 32px;
+  border-bottom: 0;
+  background: transparent;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Soft frosted scrim — wash, not a card; keeps hero type clear of backdrop type */
+.studio-hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: -6px;
+  bottom: -4px;
+  width: min(880px, 100%);
+  transform: translateX(-50%);
+  border-radius: 0;
+  background:
+    radial-gradient(ellipse 72% 70% at 50% 38%,
+      rgba(251, 251, 253, 0.96) 0%,
+      rgba(248, 249, 251, 0.88) 42%,
+      rgba(245, 245, 247, 0.45) 72%,
+      rgba(245, 245, 247, 0) 100%);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  -webkit-mask-image: radial-gradient(ellipse 78% 78% at 50% 40%, #000 35%, transparent 78%);
+  mask-image: radial-gradient(ellipse 78% 78% at 50% 40%, #000 35%, transparent 78%);
+  pointer-events: none;
+}
+
+.studio-hero-eyebrow { display: none; }
+
+.studio-hero-title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5.8vw, 56px);
+  font-weight: 600;
+  /* Latin display — mild tighten only (title is English) */
+  letter-spacing: -0.012em;
+  line-height: 1.07143;
+  color: var(--text-main);
+  text-wrap: balance;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.studio-hero-sub {
+  margin: 0 auto 28px;
+  max-width: 28em;
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: 0;
   color: var(--text-muted);
+  line-height: 1.4211;
+  text-wrap: pretty;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--accent-primary);
+  border: 0;
+  box-shadow: none;
+  font-weight: 500;
+}
+.btn-ghost:hover {
+  background: rgba(0, 113, 227, 0.08);
+  color: var(--accent-hover);
+}
+
+.header-meta {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* Step tabs: screen-reader / JS only in layout B (dock replaces them visually) */
+.sr-only-nav {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  background: transparent !important;
 }
 
 .step-navigator {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background-color: var(--surface-subtle);
-  padding: 4px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  gap: 4px;
+  background-color: rgba(0, 0, 0, 0.04);
+  padding: 3px;
+  border-radius: 980px;
+  border: 0;
 }
 
 .step-tab-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 7px 14px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: 980px;
   cursor: pointer;
   font-family: var(--font-main);
   font-size: 13px;
   font-weight: 500;
   color: var(--text-muted);
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .step-tab-btn .step-number {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background-color: #cbd5e1;
+  background-color: rgba(0, 0, 0, 0.08);
   color: var(--text-main);
-  font-size: 12px;
+  font-size: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .step-tab-btn.active {
   background-color: var(--surface-panel);
-  color: var(--accent-primary);
+  color: var(--text-main);
   box-shadow: var(--shadow-sm);
   font-weight: 600;
 }
@@ -181,25 +320,35 @@ body {
   color: #fff;
 }
 
+.step-tab-btn:hover:not(.active) {
+  color: var(--text-main);
+}
+
 .step-label {
   white-space: nowrap;
 }
 
 .step-divider {
-  color: #cbd5e1;
-  font-size: 12px;
+  width: 1px;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.12);
+  font-size: 0;
 }
 
 /* App Container Layout */
 .app-container {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .step-panel {
   display: none;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .step-panel.active {
@@ -209,31 +358,34 @@ body {
 /* Step 1 Layout Grid */
 .builder-layout {
   display: grid;
-  /* ค่าเริ่มต้น = แถบเครื่องมือ + แถบคุณสมบัติ "เปิด" ทั้งคู่ (เครื่องมือ 280px · กระดาน · คุณสมบัติ 320px)
-     กรณีที่ผู้ใช้กดซ่อนแถบใด ตัวเลขคอลัมน์จะถูกกำหนดใหม่ในบล็อกด้านล่าง (แถบที่ซ่อน = display:none) */
-  grid-template-columns: 280px 1fr 320px;
+  grid-template-columns: 268px 1fr 300px;
   width: 100%;
-  min-height: calc(100vh - var(--header-height));
+  min-height: 0;
+  height: 100%;
+  gap: 0;
+  padding: 12px 12px 12px;
+  background: var(--bg-app);
 }
 
-/* Sidebars Base — โครง: หัวแถบ (มีปุ่มย่อ/ขยาย) + เนื้อหาที่เลื่อนได้ */
+/* Sidebars — soft panels, quieter chrome */
 .toolbox-sidebar,
 .inspector-sidebar,
 .studio-controls-sidebar {
   background-color: var(--surface-panel);
-  border-right: 1px solid var(--border-color);
-  padding: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-panel);
+  padding: 18px 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  overflow: hidden;               /* ตัวเลื่อนอยู่ใน .sidebar-body */
-  max-height: calc(100vh - var(--header-height));
+  gap: 12px;
+  overflow: hidden;
+  max-height: 100%;
+  box-shadow: var(--shadow-sm);
 }
 
-.inspector-sidebar {
-  border-right: none;
-  border-left: 1px solid var(--border-color);
-}
+.toolbox-sidebar { margin-right: 8px; }
+.inspector-sidebar { margin-left: 8px; border-right: none; border-left: 1px solid var(--border-color); }
+.studio-controls-sidebar { margin-right: 8px; }
 
 .sidebar-header {
   display: flex;
@@ -353,8 +505,9 @@ body {
 }
 
 .sidebar-header h2 {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--text-main);
   display: flex;
   align-items: center;
@@ -364,7 +517,8 @@ body {
 .sidebar-header p {
   font-size: 12px;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 4px;
+  font-weight: 400;
 }
 
 .sidebar-note {
@@ -462,10 +616,10 @@ body {
 
 .category-title {
   font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 500;
+  text-transform: none;
   color: var(--text-muted);
-  letter-spacing: 0.5px;
+  letter-spacing: -0.01em;
 }
 
 .component-grid {
@@ -478,20 +632,20 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  background-color: var(--surface-panel);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  padding: 11px 14px;
+  background-color: var(--surface-subtle);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
   font-family: var(--font-main);
   font-size: 13px;
   color: var(--text-main);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
   text-align: left;
 }
 
 .comp-btn:hover {
-  border-color: var(--accent-primary);
+  border-color: transparent;
   background-color: var(--accent-light);
   color: var(--accent-primary);
 }
@@ -505,14 +659,15 @@ body {
   border-top: 1px solid var(--border-color);
 }
 
-/* Canvas Viewport */
+/* Canvas Viewport — calm center */
 .canvas-viewport {
-  background-color: var(--bg-app);
-  padding: 24px;
+  background-color: transparent;
+  padding: 8px 4px 4px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .canvas-header {
@@ -521,6 +676,7 @@ body {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+  padding: 4px 6px;
 }
 
 .canvas-title-group {
@@ -531,15 +687,17 @@ body {
 }
 
 .canvas-title-group h2 {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .canvas-dropzone {
   flex: 1;
   background-color: var(--surface-panel);
-  border: 2px dashed var(--border-hover);
-  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-sm);
   padding: 24px;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -742,13 +900,13 @@ body {
   line-height: 1.4;
 }
 
-/* Forward Action Card (ขั้นตอนที่ 1 → 2) */
+/* Forward Action (ขั้นตอนที่ 1 → 2) — soft surface, not a loud card */
 .forward-action-card {
   margin-top: auto;
-  padding: 16px;
-  background-color: var(--accent-light);
-  border: 1px solid #bfdbfe;
-  border-radius: 10px;
+  padding: 18px 16px;
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-panel);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -769,7 +927,7 @@ body {
 /* Buttons System */
 .btn {
   padding: 8px 14px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   font-family: var(--font-main);
   font-size: 13px;
   font-weight: 500;
@@ -779,7 +937,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
 
 .btn:disabled {
@@ -787,64 +945,76 @@ body {
   cursor: not-allowed;
 }
 
-.btn-primary { background-color: var(--accent-primary); color: #fff; }
+.btn-primary { background-color: var(--accent-primary); color: #fff; border-color: transparent; border-radius: 980px; }
 .btn-primary:hover { background-color: var(--accent-hover); }
 
-.btn-sky { background-color: var(--sky-color); color: #fff; }
-.btn-sky:hover { background-color: #075985; }
+.btn-sky { background-color: var(--accent-primary); color: #fff; border-color: transparent; border-radius: 980px; }
+.btn-sky:hover { background-color: var(--accent-hover); }
 
-.btn-success { background-color: var(--success-color); color: #fff; }
-.btn-success:hover { background-color: #065f46; }
+.btn-success { background-color: var(--success-color); color: #fff; border-color: transparent; border-radius: 980px; }
+.btn-success:hover { background-color: #1f7a36; }
 
-.btn-secondary { background-color: var(--surface-subtle); border-color: var(--border-color); color: var(--text-main); }
-.btn-secondary:hover { background-color: var(--border-hover); }
+.btn-secondary {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: transparent;
+  color: var(--text-main);
+  border-radius: 980px;
+}
+.btn-secondary:hover { background-color: rgba(0, 0, 0, 0.08); }
 
-.btn-outline-full { width: 100%; border-color: var(--border-color); background: transparent; color: var(--text-main); }
+.btn-outline-full {
+  width: 100%;
+  border-color: var(--border-color);
+  background: transparent;
+  color: var(--text-main);
+  border-radius: var(--radius-control);
+}
 .btn-outline-full:hover { background-color: var(--surface-subtle); }
 
-/* ปุ่มโทนสีในกล่อง "โครงสร้างฟอร์มมาตรฐาน / ล้างข้อมูล" — ฟ้า = โหลด, แดง = ล้าง (อันตราย) */
 .btn-outline-full.btn-tone-info {
-  border-color: #93c5fd;
-  background-color: #eff6ff;
-  color: #1d4ed8;
+  border-color: transparent;
+  background-color: var(--accent-light);
+  color: var(--accent-primary);
 }
 .btn-outline-full.btn-tone-info:hover {
-  background-color: #dbeafe;
-  border-color: #60a5fa;
-  color: #1e40af;
+  background-color: rgba(0, 113, 227, 0.14);
+  border-color: transparent;
+  color: var(--accent-hover);
 }
 
 .btn-outline-full.btn-tone-danger {
-  border-color: #fca5a5;
-  background-color: #fef2f2;
-  color: #b91c1c;
+  border-color: transparent;
+  background-color: rgba(255, 59, 48, 0.08);
+  color: #d70015;
 }
 .btn-outline-full.btn-tone-danger:hover {
-  background-color: #fee2e2;
-  border-color: #f87171;
-  color: #991b1b;
+  background-color: rgba(255, 59, 48, 0.14);
+  border-color: transparent;
+  color: #b80012;
 }
 
-.btn-sm { padding: 6px 10px; font-size: 12px; }
-.btn-md { padding: 10px 16px; font-size: 13px; }
-.btn-lg { padding: 12px 20px; font-size: 14px; font-weight: 600; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-md { padding: 10px 18px; font-size: 13px; }
+.btn-lg { padding: 12px 22px; font-size: 14px; font-weight: 600; }
 .btn-full { width: 100%; }
 
 .badge {
-  padding: 2px 8px;
-  border-radius: 12px;
+  padding: 4px 10px;
+  border-radius: 980px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
 }
-.badge-sky { background-color: #e0f2fe; color: #0369a1; }
+.badge-sky { background-color: var(--accent-light); color: var(--accent-primary); }
 
 /* Step 2 Layout Grid */
 .studio-layout {
   display: grid;
-  /* ค่าเริ่มต้น = แถบตกแต่ง "เปิด" (360px · หน้าตัวอย่าง) — ถ้ากดซ่อนจะเหลือคอลัมน์เดียว */
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: 340px 1fr;
   width: 100%;
-  min-height: calc(100vh - var(--header-height));
+  min-height: 0;
+  height: 100%;
+  padding: 12px;
+  background: var(--bg-app);
 }
 
 .control-scroll-body {
@@ -1159,39 +1329,53 @@ body {
 .grad-chip.active { outline: 2px solid var(--accent-primary); outline-offset: 1px; }
 .grad-chip:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
 
-/* ----- แถบ "เพิ่มเร็ว" (จอเล็ก): หยิบองค์ประกอบได้ทันทีโดยไม่ต้องเปิดกล่องเครื่องมือ ----- */
+/* ----- Mobile quickbar (Figma: card above canvas) ----- */
 .quickbar { display: none; }
 
-.quickbar-label { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+.quickbar-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
 
 .quickbar-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   gap: 6px;
-  overflow-x: auto;
-  padding-bottom: 4px;
   min-width: 0;
 }
 
 .quick-tile {
-  flex: 0 0 auto;
-  min-width: 64px;
+  min-width: 0;
   min-height: 54px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 6px 8px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background-color: var(--surface-panel);
+  padding: 8px 4px;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background-color: #fff;
   font-family: var(--font-main);
-  font-size: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
   color: var(--text-main);
   cursor: pointer;
+  transition: background-color 0.2s var(--ease-apple);
 }
 
-.quick-tile i { font-size: 15px; color: var(--accent-primary); }
+.quick-tile-glyph {
+  color: var(--accent-primary);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+}
+.quick-tile-label { line-height: 1.2; text-align: center; }
 .quick-tile:active { background-color: var(--accent-light); }
 .quick-tile:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
 
@@ -1284,25 +1468,23 @@ body {
 
 /* (รอบที่ 11) ปุ่ม "ประมวลผลและสร้างโค้ด" ถูกลบ — โค้ดอัปเดตอัตโนมัติอยู่แล้ว จึงไม่ต้องมี .compute-action-card */
 
-/* Studio Preview Viewport */
+/* Studio Preview Viewport — soft stage, not heavy slate slab */
 .studio-preview-viewport {
-  background-color: #0f172a;
-  padding: 24px;
+  background-color: #1d1d1f;
+  border-radius: var(--radius-panel);
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  /* รอบที่ 14: ให้คอลัมน์นี้ "เลื่อนในตัวเอง" เหมือนแถบตกแต่ง (aside)
-     เดิมไม่จำกัดความสูง → คอลัมน์ยืดยาวตามเนื้อหา ทำให้ทั้งหน้าเลื่อน และฝั่งซ้าย (แถบตกแต่ง) เลื่อนหลุดจอ
-     ตอนนี้ทั้ง 2 ฝั่งมีความสูงเท่าจอและเลื่อนแยกกันคนละฝั่ง เหมือนกัน */
-  max-height: calc(100vh - var(--header-height));
+  gap: 16px;
+  max-height: 100%;
+  min-height: 0;
   overflow-y: auto;
-  /* ให้เห็นว่าคอลัมน์นี้เลื่อนได้ (macOS ซ่อน scrollbar จนกว่าจะเลื่อน) */
   scrollbar-width: thin;
-  scrollbar-color: #475569 #0f172a;
+  scrollbar-color: #6e6e73 #1d1d1f;
 }
-.studio-preview-viewport::-webkit-scrollbar { width: 10px; }
-.studio-preview-viewport::-webkit-scrollbar-track { background-color: #0f172a; }
-.studio-preview-viewport::-webkit-scrollbar-thumb { background-color: #475569; border-radius: 8px; border: 2px solid #0f172a; }
+.studio-preview-viewport::-webkit-scrollbar { width: 8px; }
+.studio-preview-viewport::-webkit-scrollbar-track { background-color: transparent; }
+.studio-preview-viewport::-webkit-scrollbar-thumb { background-color: #6e6e73; border-radius: 8px; }
 
 .preview-toolbar {
   display: flex;
@@ -1310,12 +1492,13 @@ body {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  color: #fff;
+  color: #f5f5f7;
 }
 
 .toolbar-left h2 {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .toolbar-right {
@@ -1543,19 +1726,23 @@ body {
 .app-toast {
   position: fixed;
   left: 50%;
-  bottom: 24px;
-  transform: translate(-50%, 20px);
-  max-width: min(560px, 92vw);
+  bottom: 96px;
+  transform: translate(-50%, 12px);
+  max-width: min(420px, 88vw);
   padding: 12px 18px;
-  background-color: #0f172a;
-  color: #f8fafc;
+  background-color: rgba(29, 29, 31, 0.92);
+  color: #f5f5f7;
   font-size: 13px;
-  line-height: 1.45;
-  border-radius: 10px;
-  box-shadow: var(--shadow-lg);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.38462;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition: opacity 0.32s var(--ease-apple), transform 0.32s var(--ease-apple);
   z-index: 200;
 }
 
@@ -1570,10 +1757,23 @@ body {
    (สลับลำดับด้วย order) ส่วนเครื่องมือ/คุณสมบัติไปอยู่ด้านล่างเป็นกลุ่มที่ย่อได้
    ========================================================================== */
 @media (max-width: 1100px) {
+  body {
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+  .app-container,
+  .step-panel.active {
+    overflow: visible;
+    min-height: auto;
+  }
+
   .builder-layout,
   .studio-layout {
     grid-template-columns: 1fr;
     min-height: auto;
+    height: auto;
+    padding: 10px;
   }
 
   /* สลับลำดับ: กระดาน/หน้าตัวอย่างขึ้นก่อน เสมอ */
@@ -1587,20 +1787,15 @@ body {
   .toolbox-sidebar,
   .inspector-sidebar,
   .studio-controls-sidebar {
-    border-right: none;
-    border-left: none;
-    border-bottom: 1px solid var(--border-color);
+    margin: 0 0 10px;
     max-height: none;
     overflow: visible;
   }
 
   .sidebar-body { overflow: visible; padding-right: 0; }
 
-  /* รอบที่ 14: จอเล็กเรียงเป็นคอลัมน์เดียว → ยกเลิกการเลื่อนในคอลัมน์ ให้ทั้งหน้าเลื่อนปกติ (เหมือนแถบตกแต่ง) */
   .studio-preview-viewport { max-height: none; }
 
-  /* บนจอเล็กทุกอย่างเรียงเป็นคอลัมน์เดียวเสมอ (ต้องเขียน selector ให้ specificity สูงกว่า
-     กฎคอลัมน์ด้านบน ไม่งั้นแถบที่เปิดอยู่จะถูกจัดเป็นคอลัมน์แคบ ๆ แล้วล้นแนวนอน) */
   .builder-layout,
   .builder-layout.inspector-hidden:not(.toolbox-hidden),
   .builder-layout.toolbox-hidden:not(.inspector-hidden),
@@ -1608,19 +1803,12 @@ body {
   .studio-layout,
   .studio-layout.controls-hidden { grid-template-columns: 1fr; }
 
-  /* ปุ่มเปิดแถบบนจอสัมผัส/จอเล็ก: เป้าแตะ ≥ 44px */
   .panel-open-btn { min-height: 44px; padding: 10px 14px; font-size: 13px; }
 
-  /* แถบ "เพิ่มเร็ว" — หยิบองค์ประกอบได้ทันทีโดยไม่ต้องเลื่อนลงไปหากล่องเครื่องมือ */
-  .quickbar { display: flex; flex-direction: column; gap: 4px; }
-
-  /* หัวเว็บแบบกะทัดรัดบนแท็บเล็ต/มือถือ → กระดานออกแบบเลื่อนขึ้นมาใกล้ขอบบนมากขึ้น */
-  .app-header { padding: 12px 16px; }
-  .brand-info p { display: none; }
-  .brand-info h1 { font-size: 17px; }
+  .app-header { padding: 10px 16px; }
+  .studio-hero { padding: 20px 16px 16px; }
+  .studio-hero-title { font-size: clamp(24px, 6vw, 32px); }
   .step-navigator { padding: 3px; }
-
-  .inspector-sidebar { border-top: 1px solid var(--border-color); }
 
   .canvas-dropzone { min-height: 320px; }
 
@@ -1635,11 +1823,10 @@ body {
     padding: 10px 12px;
   }
 
-  /* ย่อหัวเว็บให้เล็กลง → เห็นกระดานออกแบบเร็วขึ้นบนจอมือถือ */
-  .brand-icon { width: 30px; height: 44px; border-radius: 7px; }
-  .brand-info { align-items: center; }
-  .brand-info h1 { font-size: 17px; }
-  .brand-info p { display: none; }
+  .brand-icon { width: 24px; height: 24px; }
+  .brand-nav-name { font-size: 12px; }
+  .studio-hero { padding: 16px 14px 14px; }
+  .studio-hero-sub { font-size: 14px; }
 
   .step-navigator { width: 100%; gap: 4px; padding: 3px; }
 
@@ -1682,7 +1869,7 @@ body {
 }
 
 /* ==========================================================================
-   Teacher OTP · Bot ครูทิว · Empty state · Lock chips · reduced-motion
+   Teacher OTP · Bot ครูชิโร่ · Empty state · Lock chips · reduced-motion
    ========================================================================== */
 
 .lock-chip {
@@ -1699,6 +1886,75 @@ body {
   vertical-align: middle;
 }
 .lock-chip[hidden] { display: none !important; }
+
+/* Teacher-gated CTAs: soft-blue fill + lock; sample-form label white when locked */
+.teacher-gated-cta.is-locked,
+.btn.teacher-gated-btn.is-locked {
+  background: #6aa8ef !important;
+  color: #ffffff !important;
+  border: 1px solid #5b9ce6 !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  opacity: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.teacher-gated-cta.is-locked:hover,
+.btn.teacher-gated-btn.is-locked:hover {
+  background: #5b9ce6 !important;
+  color: #ffffff !important;
+  border-color: #4d90dc !important;
+}
+.gated-lock-ico {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  vertical-align: -2px;
+  color: inherit;
+}
+.gated-lock-ico[hidden] { display: none !important; }
+.teacher-gated-cta.is-locked .gated-lock-ico,
+.btn.teacher-gated-btn.is-locked .gated-lock-ico {
+  /* soft-blue family tint on the lock (not flat gray) */
+  color: #d6e9ff;
+}
+.teacher-gated-cta.is-locked .gated-cta-label,
+.btn.teacher-gated-btn.is-locked .gated-cta-label {
+  color: #ffffff;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Destructive clear */
+.btn-clear-danger {
+  background: #fff5f5 !important;
+  color: #d70015 !important;
+  border: 1px solid #ffd4d8 !important;
+  border-radius: 980px;
+  font-weight: 500;
+}
+.btn-clear-danger:hover {
+  background: #ffe8ea !important;
+  color: #b80012 !important;
+}
+.hero-lock-hint,
+.template-lock-hint {
+  width: 100%;
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--text-tertiary);
+}
+.hero-lock-hint[hidden],
+.template-lock-hint[hidden] { display: none !important; }
+.hero-cta {
+  flex-wrap: wrap;
+}
+.empty-canvas-actions { margin-bottom: 0; }
 
 .teacher-lock-banner {
   display: flex;
@@ -1798,10 +2054,10 @@ body {
 .otp-close:hover { background: #f1f5f9; color: #0f172a; }
 .otp-title {
   margin: 0 0 6px;
-  font-size: 22px;
-  font-weight: 700;
-  color: #0f172a;
-  letter-spacing: 0.02em;
+  font-size: 24px;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.02em;
 }
 .otp-hint {
   margin: 0 0 22px;
@@ -1847,8 +2103,8 @@ body {
   width: 100%;
   padding: 14px 16px;
   border: 0;
-  border-radius: 10px;
-  background: #1e3a5f;
+  border-radius: 980px;
+  background: #0071e3;
   color: #fff;
   font-family: inherit;
   font-size: 15px;
@@ -1857,14 +2113,14 @@ body {
   cursor: pointer;
   transition: background-color 0.15s ease, transform 0.15s ease;
 }
-.otp-verify-btn:hover { background: #152a45; }
+.otp-verify-btn:hover { background: #0077ed; }
 .otp-verify-btn:active { transform: translateY(1px); }
 
-/* ---- Bot ครูทิว ---- */
+/* ---- Bot ครูชิโร่ ---- */
 .tiew-bot {
   position: fixed;
   right: 16px;
-  bottom: 16px;
+  bottom: 96px;
   z-index: 180;
   display: flex;
   flex-direction: column;
@@ -1877,11 +2133,13 @@ body {
 
 .tiew-bot-panel {
   width: min(280px, calc(100vw - 32px));
-  padding: 12px 12px 10px;
-  border-radius: 14px;
-  background: #ffffff;
-  border: 1px solid var(--border-color);
+  padding: 12px 14px 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
   box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
 }
 .tiew-bot-head {
   display: flex;
@@ -1890,45 +2148,89 @@ body {
   gap: 8px;
   margin-bottom: 6px;
   font-size: 13px;
-  color: #0f172a;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+}
+.tiew-bot-head-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.tiew-bot-chip-av {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 35%;
+  background: transparent;
+  flex-shrink: 0;
 }
 .tiew-bot-actions { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
 .tiew-bot-mini {
   border: 0;
-  background: #f1f5f9;
-  color: #475569;
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-muted);
   font-family: inherit;
   font-size: 11px;
-  padding: 4px 7px;
-  border-radius: 6px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 980px;
   cursor: pointer;
+  transition: background-color 0.2s var(--ease-apple), color 0.2s var(--ease-apple);
 }
-.tiew-bot-mini:hover { background: #e2e8f0; color: #0f172a; }
+.tiew-bot-mini:hover { background: rgba(0, 0, 0, 0.08); color: var(--text-main); }
 .tiew-bot-msg {
   margin: 0;
   font-size: 13px;
-  line-height: 1.45;
-  color: #334155;
+  line-height: 1.38462;
+  letter-spacing: -0.01em;
+  color: var(--text-muted);
 }
 
 .tiew-bot-avatar {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 6px 8px 4px;
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  background: #fff;
+  gap: 4px;
+  padding: 6px 8px 6px;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
   box-shadow: var(--shadow-md);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
   cursor: pointer;
   font-family: inherit;
-  color: #0f172a;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: var(--text-main);
+  transition: transform 0.25s var(--ease-apple), box-shadow 0.25s var(--ease-apple);
 }
 .tiew-bot-avatar:hover { box-shadow: var(--shadow-lg); }
 .tiew-bot-avatar:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
-.tiew-bot-name { font-size: 11px; font-weight: 600; }
+.tiew-bot-photo-wrap {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: transparent;
+  display: block;
+}
+.tiew-bot-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  display: block;
+}
+.tiew-bot-name { font-size: 12px; font-weight: 600; }
+@media (max-width: 1100px) {
+  .tiew-bot-photo-wrap { width: 68px; height: 68px; }
+}
+@media (max-width: 700px) {
+  .tiew-bot-photo-wrap { width: 64px; height: 64px; }
+  .tiew-bot-name { font-size: 11px; }
+}
 
 .tiew-bot.is-wave:not(.is-calm) .tiew-bot-avatar {
   animation: tiewWave 0.7s ease 1;
@@ -1940,7 +2242,7 @@ body {
 }
 
 @media (max-width: 700px) {
-  .tiew-bot { right: 10px; bottom: 10px; }
+  .tiew-bot { right: 10px; bottom: 88px; }
   .otp-digit { width: 40px; height: 48px; font-size: 20px; gap: 6px; }
   .otp-digits { gap: 6px; }
 }
@@ -1959,9 +2261,772 @@ body {
   .theme-preset-card,
   .target-btn,
   .step-tab-btn,
-  .ctrl-btn {
+  .ctrl-btn,
+  .dock-btn,
+  .drawer-scrim,
+  body.layout-b .builder-layout > .toolbox-sidebar,
+  body.layout-b .builder-layout > .inspector-sidebar,
+  body.layout-b .studio-layout > .studio-controls-sidebar {
     transition: none !important;
     animation: none !important;
   }
   .tiew-bot.is-wave .tiew-bot-avatar { animation: none !important; }
+}
+
+/* ==========================================================================
+   Ambient template backdrop — luxurious Apple Store squircles + real shots
+   ========================================================================== */
+.template-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 28px;
+  opacity: 1;
+}
+.template-backdrop-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background:
+    /* Hero band nearly opaque; luxury wash opens mid-viewport around the canvas */
+    linear-gradient(180deg,
+      rgba(245, 245, 247, 0.98) 0%,
+      rgba(245, 245, 247, 0.94) 10%,
+      rgba(245, 245, 247, 0.78) 20%,
+      rgba(245, 245, 247, 0.42) 32%,
+      rgba(245, 245, 247, 0.22) 46%,
+      rgba(245, 245, 247, 0.2) 56%,
+      rgba(245, 245, 247, 0.5) 74%,
+      rgba(245, 245, 247, 0.92) 100%),
+    radial-gradient(ellipse 100% 42% at 50% -4%, rgba(230, 238, 248, 0.85), transparent 62%),
+    radial-gradient(ellipse 55% 36% at 82% 72%, rgba(220, 230, 240, 0.26), transparent 55%);
+  backdrop-filter: blur(1.5px);
+}
+.template-backdrop-rail {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  filter: saturate(0.86) contrast(0.97) brightness(1.03);
+}
+/* Drop rails slightly so card type clears the hero band */
+.template-backdrop-rail--a { transform: rotate(-1.4deg) scale(1.06) translateY(8%); }
+.template-backdrop-rail--b { transform: rotate(1.1deg) scale(1.03) translateY(4%); margin-top: -2px; opacity: 0.9; }
+.template-backdrop-track {
+  display: flex;
+  gap: 28px;
+  width: max-content;
+  padding: 18px 36px 28px;
+  animation: tplMarquee 95s linear infinite;
+  will-change: transform;
+}
+.template-backdrop-track--reverse {
+  animation-name: tplMarqueeReverse;
+  animation-duration: 110s;
+}
+@keyframes tplMarquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+@keyframes tplMarqueeReverse {
+  from { transform: translate3d(-50%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+.tpl-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(268px, 48vw);
+  height: min(372px, 56vh);
+  border-radius: 32px;
+  padding: 26px 22px 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 2px 4px rgba(15, 23, 42, 0.03),
+    0 22px 48px rgba(15, 23, 42, 0.08);
+  -webkit-font-smoothing: antialiased;
+}
+.tpl-card-eye {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: rgba(29, 29, 31, 0.36);
+}
+.tpl-card-title {
+  margin: 0;
+  font-size: clamp(17px, 2vw, 20px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: rgba(29, 29, 31, 0.72);
+}
+.tpl-card-sub {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: rgba(29, 29, 31, 0.4);
+}
+.tpl-card-preview {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-top: 18px;
+  min-height: 0;
+  position: relative;
+}
+.tpl-card-shot {
+  display: block;
+  width: 108%;
+  height: auto;
+  max-height: 78%;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 20px 20px 0 0;
+  box-shadow:
+    0 -2px 0 rgba(255, 255, 255, 0.35) inset,
+    0 16px 40px rgba(15, 23, 42, 0.16);
+  transform: translateY(14%);
+  filter: saturate(1.04) contrast(1.03);
+}
+.tpl-card-chev {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #6e6e73;
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  line-height: 1;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+/* Cool Apple Store washes — premium mist / ice / porcelain (not muddy pastels) */
+.tpl-card--rose { background: linear-gradient(165deg, #e9eef6 0%, #dfe7f2 100%); }
+.tpl-card--sky { background: linear-gradient(165deg, #d9e8f7 0%, #c9dcf0 100%); }
+.tpl-card--lilac { background: linear-gradient(165deg, #e6e8f2 0%, #d8dceb 100%); }
+.tpl-card--mint { background: linear-gradient(165deg, #e2eef4 0%, #d3e4ee 100%); }
+.tpl-card--peach { background: linear-gradient(165deg, #e8edf4 0%, #dce4ef 100%); }
+.tpl-card--sand { background: linear-gradient(165deg, #eef1f5 0%, #e2e7ee 100%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .template-backdrop-track,
+  .template-backdrop-track--reverse {
+    animation: none;
+  }
+  .template-backdrop-track { transform: translate3d(-10%, 0, 0); }
+  .template-backdrop-track--reverse { transform: translate3d(-26%, 0, 0); }
+  .template-backdrop-fade { backdrop-filter: none; }
+  .studio-hero::before {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background:
+      radial-gradient(ellipse 72% 70% at 50% 38%,
+        rgba(251, 251, 253, 0.98) 0%,
+        rgba(248, 249, 251, 0.92) 48%,
+        rgba(245, 245, 247, 0) 100%);
+  }
+}
+@media (max-width: 700px) {
+  .template-backdrop { gap: 16px; }
+  .template-backdrop-rail--a { transform: rotate(-0.6deg) scale(1.02) translateY(6%); }
+  .template-backdrop-rail--b { transform: rotate(0.5deg) scale(1.01) translateY(3%); opacity: 0.86; }
+  .template-backdrop-track { gap: 18px; padding: 10px 20px 18px; }
+  .tpl-card { width: min(200px, 58vw); height: min(290px, 48vh); border-radius: 26px; padding: 20px 16px 0; }
+  .tpl-card-shot { width: 112%; max-height: 74%; transform: translateY(16%); }
+}
+
+/* ==========================================================================
+   LAYOUT B — hero + canvas-dominant + thin bottom dock
+   ========================================================================== */
+body.layout-b {
+  overflow: auto;
+  height: auto;
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+}
+body.layout-b > .app-header,
+body.layout-b > .studio-hero,
+body.layout-b > .app-container {
+  position: relative;
+  z-index: 2;
+}
+body.layout-b > .dock-wrap { position: fixed; z-index: 40; }
+body.layout-b > .tiew-bot { position: fixed; z-index: 180; }
+body.layout-b > .modal-backdrop,
+body.layout-b > .otp-backdrop { position: fixed; z-index: 50; }
+
+body.layout-b .app-header {
+  height: var(--header-height);
+  min-height: var(--header-height);
+  padding: 0 22px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background-color: rgba(251, 251, 253, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.16);
+}
+
+body.layout-b .brand-icon {
+  width: 22px;
+  height: 22px;
+}
+body.layout-b .brand-nav-name {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+}
+
+/* Mobile quickbar — Figma card between hero and stage */
+body.layout-b > .quickbar {
+  display: none;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto 12px;
+  padding: 12px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  z-index: 2;
+}
+
+body.layout-b .app-container {
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 20px var(--dock-clearance);
+  overflow: visible;
+  flex: 1 1 auto;
+  background: transparent;
+}
+body.layout-b {
+  background-color: transparent;
+}
+html:has(body.layout-b) {
+  background-color: var(--bg-app);
+}
+
+body.layout-b .step-panel.active {
+  overflow: visible;
+}
+
+body.layout-b .builder-layout,
+body.layout-b .studio-layout {
+  /* Production Apple Store shell — layered elevation + hairline */
+  min-height: 480px;
+  height: auto;
+  border-radius: 28px;
+  background: #fff;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-shell);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  gap: 0;
+}
+
+/* Canvas-first: side panels overlay as drawers when open */
+body.layout-b .builder-layout {
+  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+}
+body.layout-b .builder-layout.inspector-hidden:not(.toolbox-hidden),
+body.layout-b .builder-layout.toolbox-hidden:not(.inspector-hidden),
+body.layout-b .builder-layout.toolbox-hidden.inspector-hidden {
+  grid-template-columns: 1fr;
+}
+
+body.layout-b .builder-layout > .canvas-viewport {
+  grid-column: 1;
+  flex: 1 1 auto;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+body.layout-b .builder-layout > .toolbox-sidebar,
+body.layout-b .builder-layout > .inspector-sidebar {
+  display: flex !important; /* override legacy display:none while animating off-canvas */
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 24;
+  width: min(300px, 86vw);
+  max-width: 300px;
+  margin: 0;
+  box-shadow: var(--shadow-lg);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 0;
+  transition: transform 0.32s var(--ease-apple), opacity 0.24s var(--ease-apple);
+  will-change: transform;
+}
+
+body.layout-b .builder-layout > .toolbox-sidebar {
+  left: 0;
+  border-right: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0 18px 18px 0;
+  transform: translateX(0);
+}
+body.layout-b .builder-layout > .inspector-sidebar {
+  right: 0;
+  border-left: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px 0 0 18px;
+  transform: translateX(0);
+}
+
+body.layout-b .builder-layout.toolbox-hidden > .toolbox-sidebar {
+  transform: translateX(-104%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+body.layout-b .builder-layout.inspector-hidden > .inspector-sidebar {
+  transform: translateX(104%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Drawer scrim — tap outside to close */
+.drawer-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 22;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: rgba(29, 29, 31, 0.18);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.28s var(--ease-apple);
+}
+.drawer-scrim[hidden] { display: none !important; }
+body.layout-b.drawer-open .builder-layout,
+body.layout-b.drawer-open .studio-layout {
+  /* Raise shell above scrim (22) so absolute drawers stay tappable; dock stays at 40 */
+  isolation: isolate;
+  z-index: 23;
+  position: relative;
+}
+
+body.layout-b .rail-btn { display: none !important; }
+
+body.layout-b .studio-layout {
+  grid-template-columns: 1fr;
+}
+body.layout-b .studio-layout.controls-hidden {
+  grid-template-columns: 1fr;
+}
+body.layout-b .studio-layout > .studio-preview-viewport {
+  grid-column: 1;
+  min-height: 420px;
+}
+body.layout-b .studio-layout > .studio-controls-sidebar {
+  display: flex !important;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 24;
+  width: min(320px, 90vw);
+  margin: 0;
+  box-shadow: var(--shadow-lg);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-right: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0 18px 18px 0;
+  transition: transform 0.32s var(--ease-apple), opacity 0.24s var(--ease-apple);
+  transform: translateX(0);
+}
+body.layout-b .studio-layout.controls-hidden > .studio-controls-sidebar {
+  transform: translateX(-104%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+body.layout-b .canvas-header,
+body.layout-b .preview-toolbar {
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(160%) blur(12px);
+  -webkit-backdrop-filter: saturate(160%) blur(12px);
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+  padding: 14px 20px;
+  margin: 0;
+}
+
+body.layout-b .canvas-header h2,
+body.layout-b .preview-toolbar h2 {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+}
+
+body.layout-b .badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 980px;
+  background: #e8f1ff;
+  color: #0058b0;
+  font-weight: 500;
+}
+
+/* Figma canvas-area: grid board, form card centered (no nested white shell) */
+body.layout-b .canvas-dropzone {
+  flex: 1 1 auto;
+  min-height: 360px;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px) 0 0 / 24px 24px,
+    #fafafa;
+  padding: 28px 16px 96px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  grid-template-columns: 1fr;
+  gap: 0;
+  overflow: auto;
+}
+
+body.layout-b .canvas-preview-card {
+  width: min(340px, 88%);
+  background: #fff;
+  border-radius: 22px;
+  padding: 30px 26px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 2px 6px rgba(0, 0, 0, 0.03),
+    0 14px 40px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+}
+
+body.layout-b .canvas-preview-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.25;
+  color: var(--text-main);
+}
+
+body.layout-b .canvas-preview-hint {
+  margin: -4px 0 6px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  line-height: 1.38462;
+}
+
+body.layout-b .canvas-preview-card .canvas-item {
+  grid-column: auto;
+  width: 100%;
+  border-radius: 12px;
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: none;
+  padding: 14px 12px 12px;
+  background: #fbfbfd;
+}
+
+body.layout-b .canvas-preview-card .canvas-item:hover,
+body.layout-b .canvas-preview-card .canvas-item.selected {
+  background: #fff;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.16);
+}
+
+body.layout-b .empty-canvas-state {
+  max-width: 280px;
+  padding: 12px 8px 20px;
+  gap: 10px;
+}
+
+body.layout-b .empty-canvas-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #0071e3;
+  color: #fff;
+  opacity: 1;
+  font-size: 28px;
+  font-weight: 300;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 4px;
+}
+
+body.layout-b .empty-canvas-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+body.layout-b .empty-canvas-sub {
+  font-size: 13px;
+  max-width: 260px;
+  margin: 0 0 4px;
+  color: #6e6e73;
+}
+
+/* Soft Figma chip buttons on the canvas bar */
+body.layout-b .canvas-header .panel-open-btn[aria-expanded="true"] {
+  background: #e8f1ff;
+  color: #0058b0;
+  border: 0;
+  border-radius: 980px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+}
+body.layout-b .canvas-header .panel-open-btn[aria-expanded="false"] {
+  background: #0071e3;
+  color: #fff;
+  border: 0;
+  border-radius: 980px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+}
+body.layout-b .canvas-header .btn-clear-danger {
+  border-radius: 980px;
+  font-size: 12px;
+  padding: 5px 12px;
+}
+
+/* (quickbar styles live on body.layout-b > .quickbar) */
+
+body.layout-b .forward-action-card {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 8px 0 0;
+}
+
+body.layout-b .hero-cta .btn-primary {
+  border-radius: 980px;
+  padding: 12px 22px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  transition: background-color 0.22s var(--ease-apple), color 0.22s var(--ease-apple), border-color 0.22s var(--ease-apple);
+}
+body.layout-b .hero-cta .btn-ghost {
+  border-radius: 980px;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+body.layout-b .gated-cta-label {
+  font-family: var(--font-main);
+  letter-spacing: 0;
+}
+
+/* Bottom tool dock — production frosted glass */
+.dock-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+  display: flex;
+  justify-content: center;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.dock {
+  pointer-events: auto;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: var(--radius-dock);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 0.5px solid rgba(255, 255, 255, 0.55);
+  box-shadow: var(--shadow-dock);
+}
+
+.dock-btn {
+  border: 0;
+  background: transparent;
+  border-radius: 14px;
+  padding: 7px 11px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  min-width: 60px;
+  cursor: pointer;
+  transition: background-color 0.22s var(--ease-apple), color 0.22s var(--ease-apple);
+}
+.dock-btn:hover { background: rgba(0, 0, 0, 0.04); }
+.dock-btn.on {
+  background: var(--accent-tint);
+  color: var(--accent-deep);
+}
+.dock-ico {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-main);
+  display: grid;
+  place-items: center;
+  line-height: 0;
+}
+.dock-ico svg { display: block; }
+.dock-btn.on .dock-ico {
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
+.dock-label { line-height: 1.1; }
+.dock-sep {
+  width: 0.5px;
+  height: 34px;
+  background: rgba(0, 0, 0, 0.12);
+  margin: 0 5px;
+  align-self: center;
+}
+
+body.layout-b .tiew-bot {
+  right: 20px;
+  bottom: 96px;
+}
+
+@media (max-width: 700px) {
+  body.layout-b .studio-hero { padding: 28px 14px 18px; }
+  body.layout-b .studio-hero::before {
+    width: 100%;
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+  }
+  body.layout-b .studio-hero-title { font-size: clamp(30px, 8.5vw, 40px); letter-spacing: -0.01em; }
+  body.layout-b .studio-hero-sub { font-size: 16px; max-width: 22em; letter-spacing: 0; }
+  body.layout-b .header-meta { display: none; }
+  body.layout-b .app-header {
+    flex-direction: row;
+    align-items: center;
+    height: var(--header-height);
+    min-height: var(--header-height);
+    padding: 0 14px;
+  }
+  body.layout-b > .quickbar {
+    display: block;
+    width: calc(100% - 24px);
+    margin: 0 12px 12px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+  /* Mobile drawers: full-height sheets under nav (Figma handoff overlay behavior) */
+  body.layout-b .builder-layout > .toolbox-sidebar,
+  body.layout-b .builder-layout > .inspector-sidebar,
+  body.layout-b .studio-layout > .studio-controls-sidebar {
+    position: fixed;
+    top: var(--header-height, 44px);
+    bottom: 0;
+    max-height: none;
+    z-index: 34; /* above scrim (22) and shell; under dock (40) */
+  }
+  body.layout-b .builder-layout > .toolbox-sidebar,
+  body.layout-b .studio-layout > .studio-controls-sidebar {
+    left: 0;
+    right: auto;
+  }
+  body.layout-b .builder-layout > .inspector-sidebar {
+    right: 0;
+    left: auto;
+  }
+  body.layout-b .app-container { padding: 0 12px var(--dock-clearance); }
+  body.layout-b .builder-layout,
+  body.layout-b .studio-layout {
+    min-height: 380px;
+    border-radius: 20px;
+  }
+  body.layout-b .builder-layout > .canvas-viewport { min-height: 380px; }
+  body.layout-b .canvas-header,
+  body.layout-b .preview-toolbar { padding: 10px 12px; }
+  body.layout-b .canvas-dropzone {
+    min-height: 220px;
+    padding: 20px 12px 100px;
+  }
+  body.layout-b .canvas-preview-card {
+    width: min(320px, 94%);
+    border-radius: 18px;
+    padding: 22px 18px;
+  }
+  body.layout-b .canvas-preview-title { font-size: 20px; }
+  .dock {
+    max-width: calc(100vw - 16px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .dock-btn { min-width: 56px; padding: 6px 8px; }
+  body.layout-b .tiew-bot { bottom: 88px; right: 12px; }
+}
+
+/* Tablet — Variant B (Figma 834) */
+@media (min-width: 701px) and (max-width: 1024px) {
+  body.layout-b .app-container { padding: 0 16px var(--dock-clearance); }
+  body.layout-b .builder-layout,
+  body.layout-b .studio-layout {
+    min-height: 560px;
+    border-radius: 24px;
+  }
+  body.layout-b .builder-layout > .canvas-viewport { min-height: 560px; }
+  body.layout-b .canvas-dropzone {
+    min-height: 420px;
+    padding: 24px 16px 110px;
+  }
 }

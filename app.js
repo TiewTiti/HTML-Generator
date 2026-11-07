@@ -456,6 +456,19 @@ function applyTeacherGateUi() {
   document.querySelectorAll('.teacher-gated-btn .lock-chip, #theme-lock-chip').forEach((el) => {
     el.hidden = unlocked;
   });
+  document.querySelectorAll('.teacher-gated-btn, .teacher-gated-cta').forEach((btn) => {
+    btn.classList.toggle('is-locked', !unlocked);
+    btn.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
+    const label = btn.querySelector('.gated-cta-label');
+    if (label) {
+      label.textContent = unlocked ? 'ใช้แบบฟอร์มตัวอย่าง' : 'ใช้แบบฟอร์มตัวอย่าง · ล็อก';
+    }
+    const lockIco = btn.querySelector('.gated-lock-ico');
+    if (lockIco) lockIco.hidden = unlocked;
+  });
+  document.querySelectorAll('.hero-lock-hint, .template-lock-hint').forEach((el) => {
+    el.hidden = unlocked;
+  });
   const banner = document.getElementById('theme-lock-banner');
   if (banner) banner.hidden = unlocked;
   const grid = document.getElementById('theme-presets-grid');
@@ -517,7 +530,7 @@ function submitTeacherOtp() {
     if (activeStep !== 2) switchMainStep(2);
     if (!isGroupOpen('theme')) toggleGroup('theme');
   }
-  tipTiewBot('unlocked', 'ครูทิว: ปลดล็อกแล้ว — ลองกด «ใช้แบบฟอร์มตัวอย่าง» หรือเลือกชุดธีมได้เลย');
+  tipTiewBot('unlocked', 'ครูชิโร่: ปลดล็อกแล้ว — ลองกด «ใช้แบบฟอร์มตัวอย่าง» หรือเลือกชุดธีมได้เลย');
 }
 function bindTeacherOtpInputs() {
   const wrap = document.getElementById('otp-digits');
@@ -563,7 +576,7 @@ function bindTeacherOtpInputs() {
 function requestLoadDefaultForm() {
   if (!isTeacherUnlocked()) {
     openTeacherUnlockModal('template');
-    tipTiewBot('need-unlock', 'ครูทิว: แบบฟอร์มตัวอย่างต้องใส่รหัสครูก่อนนะ');
+    tipTiewBot('need-unlock', 'ครูชิโร่: แบบฟอร์มตัวอย่างต้องใส่รหัสครูก่อนนะ');
     return;
   }
   loadDefaultFormStructure();
@@ -607,7 +620,7 @@ function undoLastDestructive() {
   toast('เลิกทำแล้ว — คืนงานก่อนหน้าแล้ว');
 }
 
-// ---- Bot ครูทิว ----
+// ---- Bot ครูชิโร่ ----
 function prefersReducedMotion() {
   try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
 }
@@ -632,7 +645,7 @@ function initTiewBot() {
   root.classList.toggle('is-calm', prefersReducedMotion());
   // คำใบ้เริ่มต้นเมื่อกระดานว่าง
   if (!loginElements.length && !registerElements.length) {
-    tipTiewBot('empty', 'ครูทิว: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
+    tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
   }
 }
 function tipTiewBot(key, message) {
@@ -659,7 +672,7 @@ function toggleTiewBotPanel() {
   panel.hidden = !open;
   root.classList.toggle('is-open', open);
   if (open && !document.getElementById('tiew-bot-msg').textContent) {
-    document.getElementById('tiew-bot-msg').textContent = 'ครูทิว: ถามอะไรก็ได้จากปุ่มรอบ ๆ — หรือกดย่อเมื่อไม่ต้องการ';
+    document.getElementById('tiew-bot-msg').textContent = 'ครูชิโร่: ถามอะไรก็ได้จากปุ่มรอบ ๆ — หรือกดย่อเมื่อไม่ต้องการ';
   }
 }
 function minimizeTiewBot() {
@@ -685,13 +698,14 @@ function updateTargetChrome() {
   const badge = document.getElementById('active-target-badge');
   if (badge) {
     const cur = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-    const otherN = builderTarget === 'login' ? regCount : loginCount;
-    badge.textContent = `กำลังแก้: ${cur} · อีกฝั่งมี ${otherN} ช่อง`;
+    const n = builderTarget === 'login' ? loginCount : regCount;
+    badge.textContent = `${cur} · ${n} ช่อง`;
   }
   const loginBtn = document.getElementById('target-login-btn');
   const regBtn = document.getElementById('target-register-btn');
   if (loginBtn) loginBtn.classList.toggle('active', builderTarget === 'login');
   if (regBtn) regBtn.classList.toggle('active', builderTarget === 'register');
+  syncDockHighlight();
 }
 
 // ==========================================================================
@@ -748,7 +762,7 @@ function resetSavedData() {
   updateTargetChrome();
   commitAll();
   toast('ล้างข้อมูลเดิมแล้ว — กด «เลิกทำ» ถ้าต้องการคืน');
-  tipTiewBot('empty', 'ครูทิว: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
+  tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
 }
 
 // ==========================================================================
@@ -761,10 +775,10 @@ const GROUP_KEYS = ['page', 'theme', 'appearance', 'switcher', 'typography'];
 const PANEL_KEYS = ['toolbox', 'inspector', 'controls', 'code', 'teach'];
 const PANEL_LAYOUT = { toolbox: '.builder-layout', inspector: '.builder-layout', controls: '.studio-layout', code: '', teach: '' };
 
-// ค่าเริ่มต้นของ "แถบด้านข้าง": เปิดทุกแถบ (เห็นงาน + เครื่องมือพร้อมกันตั้งแต่แรก)
-// ยกเว้น "โหมดสอนอ่านโค้ด" ที่ปิดไว้เพราะเป็นโหมดเสริม (กดเปิดเองเมื่อต้องสอนอ่านโค้ด)
-const DEFAULT_PANELS = { toolbox: true, inspector: true, controls: true, code: true, teach: false };
-const UI_STATE_VERSION = 3;            // เก็บไว้เป็นร่องรอยของรูปแบบเซฟ (ดูหมายเหตุใน loadUiState)
+// Layout B: canvas-first — side drawers closed by default; dock drives steps
+const DEFAULT_PANELS = { toolbox: false, inspector: false, controls: false, code: true, teach: false };
+const UI_STATE_VERSION = 4;            // v4: layout B defaults (drawers closed)
+let dockMode = 'structure';
 
 function defaultUiState() {
   // groups = {} → กลุ่มย่อยทุกกลุ่ม "พับปิด" (เห็นแค่หัวข้อใหญ่) ตามค่าเริ่มต้นของ isGroupOpen()
@@ -778,11 +792,13 @@ function loadUiState() {
     if (!raw) return;
     const s = JSON.parse(raw);
     if (s && typeof s === 'object') {
-      // เซฟเก็บเฉพาะ "สิ่งที่ผู้ใช้เลือกเอง" — ค่าที่ไม่มีในเซฟ = ใช้ค่าเริ่มต้นปัจจุบัน (แถบเปิด / กลุ่มพับปิด)
-      // จึงอ่านของเก่าได้ทุกเวอร์ชันโดยไม่ต้องย้ายค่า
+      // v4+ = layout B canvas-first defaults; older saves keep groups but reset panel openness once
+      const migratePanels = !(s.v >= 4);
       uiState = {
         groups: Object.assign({}, s.groups || {}),
-        panels: Object.assign({}, DEFAULT_PANELS, s.panels || {}),
+        panels: migratePanels
+          ? Object.assign({}, DEFAULT_PANELS)
+          : Object.assign({}, DEFAULT_PANELS, s.panels || {}),
       };
     }
   } catch (e) { uiState = defaultUiState(); }
@@ -821,27 +837,56 @@ function setAllGroups(open) {
   toast(open ? 'ขยายทุกกลุ่มแล้ว' : 'ย่อทุกกลุ่มแล้ว — กดหัวข้อกลุ่มเพื่อเปิดทีละกลุ่มได้');
 }
 
-// ย่อ/ขยายแถบด้านข้าง (และกล่องโค้ด) — จำเป็นบนจอเล็กที่พื้นที่จำกัด
+// ย่อ/ขยายแถบด้านข้าง (และกล่องโค้ด) — layout B: one drawer at a time + scrim
 function togglePanel(panel, e) {
-  // Ensure only one side panel (toolbox or inspector) is open at a time in step1
-  // (Removed exclusive logic to allow both panels open simultaneously for layout test)
   const wasOpen = isPanelOpen(panel);
   uiState.panels[panel] = !wasOpen;
-  // No mutual exclusivity enforced here
+  /* Figma Variant B drawers: exclusive toolbox ↔ inspector on the builder board */
+  if (!wasOpen && (panel === 'toolbox' || panel === 'inspector')) {
+    const other = panel === 'toolbox' ? 'inspector' : 'toolbox';
+    if (isPanelOpen(other)) {
+      uiState.panels[other] = false;
+      applyPanelState(other);
+    }
+  }
   saveUiState();
   applyPanelState(panel);
+  syncDrawerScrim();
   const fromRail = e && e.currentTarget && e.currentTarget.classList && e.currentTarget.classList.contains('rail-btn');
   if (fromRail && !wasOpen) {
     const headerBtn = document.getElementById('panel-' + panel + '-toggle');
     if (headerBtn && headerBtn.focus) headerBtn.focus({ preventScroll: true });
   }
-  if (isPanelOpen(panel) && window.matchMedia('(max-width: 1100px)').matches) {
-    const sel = { toolbox: '.toolbox-sidebar', inspector: '.inspector-sidebar', controls: '.studio-controls-sidebar' }[panel];
-    const el = sel ? document.querySelector(sel) : null;
-    if (el && el.getBoundingClientRect().top > window.innerHeight - 80 && el.scrollIntoView) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeDrawerPanels() {
+  let changed = false;
+  ['toolbox', 'inspector', 'controls'].forEach((k) => {
+    if (isPanelOpen(k)) {
+      uiState.panels[k] = false;
+      applyPanelState(k);
+      changed = true;
     }
+  });
+  if (changed) saveUiState();
+  syncDrawerScrim();
+}
+
+function syncDrawerScrim() {
+  const open = isPanelOpen('toolbox') || isPanelOpen('inspector') || isPanelOpen('controls');
+  document.body.classList.toggle('drawer-open', !!open);
+  let scrim = document.getElementById('drawer-scrim');
+  if (!scrim) {
+    scrim = document.createElement('button');
+    scrim.type = 'button';
+    scrim.id = 'drawer-scrim';
+    scrim.className = 'drawer-scrim';
+    scrim.setAttribute('aria-label', 'ปิดแถบด้านข้าง');
+    scrim.addEventListener('click', () => { closeDrawerPanels(); });
+    document.body.appendChild(scrim);
   }
+  scrim.hidden = !open;
+  scrim.setAttribute('aria-hidden', open ? 'false' : 'true');
 }
 
 function applyPanelState(key) {
@@ -860,6 +905,11 @@ function applyPanelState(key) {
   const layoutSel = PANEL_LAYOUT[key];
   const layout = layoutSel ? document.querySelector(layoutSel) : null;
   if (layout) layout.classList.toggle(key + '-hidden', !open);
+  /* Keep drawer open class in sync when panels change from applyUiState */
+  if (key === 'toolbox' || key === 'inspector' || key === 'controls') {
+    const anyOpen = isPanelOpen('toolbox') || isPanelOpen('inspector') || isPanelOpen('controls');
+    document.body.classList.toggle('drawer-open', !!anyOpen);
+  }
   // ปุ่มในรางเปิดแถบ (จอใหญ่): บอกสถานะให้ถูก — ตอนนี้แถบปิดอยู่ กดแล้วจะเปิด
   const rail = document.getElementById('panel-' + key + '-rail');
   if (rail) {
@@ -880,6 +930,13 @@ function applyUiState() {
 // ==========================================================================
 document.addEventListener('DOMContentLoaded', () => {
   injectCardCss();
+  /* Preload Noto Sans Thai weights so Thai UI never paints with a synthetic/wrong face */
+  if (document.fonts && document.fonts.load) {
+    [400, 500, 600, 700].forEach((w) => {
+      document.fonts.load(`${w} 16px "Noto Sans Thai"`).catch(() => {});
+      document.fonts.load(`${w} 16px "SF Pro TH"`).catch(() => {});
+    });
+  }
   teacherUnlocked = isTeacherUnlocked();
   const restored = loadState();
   loadUiState();
@@ -887,6 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderThemePresets();
   renderGradientPresets();
   applyUiState();
+  syncDrawerScrim();
   applyConfigToControls();
   applyTeacherGateUi();
   updateTargetChrome();
@@ -898,10 +956,12 @@ document.addEventListener('DOMContentLoaded', () => {
   bindBackgroundEvents();
   bindTeacherOtpInputs();
   initTiewBot();
+  syncDockHighlight();
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       const otp = document.getElementById('teacher-otp-modal');
       if (otp && !otp.hidden) { closeTeacherUnlockModal(); return; }
+      if (document.body.classList.contains('drawer-open')) { closeDrawerPanels(); return; }
       minimizeTiewBot();
     }
   });
@@ -922,8 +982,61 @@ function switchMainStep(step) {
   });
   if (step === 2) {
     renderStudioPreviewStage();
-    tipTiewBot('step2', 'ครูทิว: เลือกสีทีละช่องด้านซ้ายได้เลย — ชุดธีมสำเร็จรูปใช้ได้เมื่อครูปลดล็อก');
+    tipTiewBot('step2', 'ครูชิโร่: เลือกสีทีละช่องได้เลย — ชุดธีมสำเร็จรูปใช้ได้เมื่อครูปลดล็อก');
   }
+  syncDockHighlight();
+}
+
+function syncDockHighlight() {
+  const onStructure = activeStep === 1 && (dockMode === 'structure' || dockMode === 'login' || dockMode === 'register' || dockMode === 'teacher');
+  const map = {
+    structure: onStructure || dockMode === 'structure',
+    color: dockMode === 'color',
+    export: dockMode === 'export',
+    login: builderTarget === 'login' && activeStep === 1,
+    register: builderTarget === 'register' && activeStep === 1,
+    teacher: false
+  };
+  if (dockMode === 'color') { map.structure = false; map.export = false; }
+  if (dockMode === 'export') { map.structure = false; map.color = false; }
+
+  document.querySelectorAll('.dock-btn[data-dock]').forEach((btn) => {
+    const key = btn.getAttribute('data-dock');
+    const on = !!map[key];
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+
+function setDockMode(mode) {
+  dockMode = mode || 'structure';
+  if (mode === 'structure') {
+    switchMainStep(1);
+    tipTiewBot('dock-structure', 'ครูชิโร่: จัดโครงบนกระดาน — กด «เครื่องมือ» เพื่อเพิ่มช่อง');
+  } else if (mode === 'color') {
+    switchMainStep(2);
+    if (!isPanelOpen('controls')) togglePanel('controls');
+    // scroll color panel into view lightly
+    const controls = document.querySelector('.studio-controls-sidebar');
+    if (controls && controls.scrollIntoView) controls.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    tipTiewBot('dock-color', 'ครูชิโร่: เลือกสีทีละช่องได้เลย');
+  } else if (mode === 'export') {
+    switchMainStep(2);
+    if (isPanelOpen('controls')) togglePanel('controls');
+    const codePanel = document.querySelector('.code-exporter-panel');
+    if (codePanel && codePanel.scrollIntoView) codePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!isPanelOpen('code')) togglePanel('code');
+    tipTiewBot('dock-export', 'ครูชิโร่: คัดลอกหรือดาวน์โหลดไฟล์ HTML ได้จากด้านล่าง');
+  } else if (mode === 'login') {
+    switchMainStep(1);
+    setBuilderTarget('login');
+  } else if (mode === 'register') {
+    switchMainStep(1);
+    setBuilderTarget('register');
+  } else if (mode === 'teacher') {
+    openTeacherUnlockModal();
+  }
+  syncDockHighlight();
 }
 
 function setBuilderTarget(target) {
@@ -975,10 +1088,17 @@ function renderComponentButtons() {
   }
   const bar = document.getElementById('quickbar-grid');
   if (bar) {
-    bar.innerHTML = COMPONENTS.map((c) => `
-        <button class="quick-tile" type="button" onclick="addCanvasElement('${c.type}')" aria-label="เพิ่ม ${esc(c.label)}">
-          <i class="fa-solid ${c.icon}" aria-hidden="true"></i><span>${esc(c.short)}</span>
-        </button>`).join('');
+    /* Figma mobile quickbar shows the five primary field types */
+    const quickTypes = ['heading', 'text', 'password', 'email', 'checkbox'];
+    const glyphs = { heading: 'H', text: 'A', password: '●', email: '✉', checkbox: '☑' };
+    bar.innerHTML = quickTypes.map((type) => {
+      const c = COMPONENT_BY_TYPE[type];
+      if (!c) return '';
+      return `<button class="quick-tile" type="button" onclick="addCanvasElement('${c.type}')" aria-label="เพิ่ม ${esc(c.label)}">
+          <span class="quick-tile-glyph" aria-hidden="true">${glyphs[type] || ''}</span>
+          <span class="quick-tile-label">${esc(c.short)}</span>
+        </button>`;
+    }).join('');
   }
 }
 
@@ -1049,22 +1169,36 @@ function renderCanvas() {
 
   if (list.length === 0) {
     const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-    canvas.innerHTML = `<div class="empty-canvas-state" style="grid-column: span 12;">
-      <i class="fa-solid fa-plus-circle empty-canvas-icon" aria-hidden="true"></i>
+    canvas.innerHTML = `<div class="empty-canvas-state">
+      <span class="empty-canvas-icon" aria-hidden="true">+</span>
       <p class="empty-canvas-title">ยังไม่มีองค์ประกอบในฟอร์ม${esc(targetName)}</p>
-      <p class="empty-canvas-sub">เริ่มจากแบบตัวอย่าง (ครูปลดล็อก) หรือเพิ่มช่องเองทีละอัน</p>
+      <p class="empty-canvas-sub">เริ่มจากแบบตัวอย่าง หรือเพิ่มช่องเอง</p>
       <div class="empty-canvas-actions">
-        <button type="button" class="btn btn-primary" onclick="requestLoadDefaultForm()">
-          <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> เริ่มจากแบบฟอร์มตัวอย่าง
+        <button type="button" class="btn btn-primary teacher-gated-btn teacher-gated-cta${isTeacherUnlocked() ? '' : ' is-locked'}"
+                onclick="requestLoadDefaultForm()" aria-disabled="${isTeacherUnlocked() ? 'false' : 'true'}">
+          <svg class="gated-lock-ico" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false"${isTeacherUnlocked() ? ' hidden' : ''}>
+            <path fill="currentColor" d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2Zm-7-2a2 2 0 0 1 4 0v2h-4V7Zm7 12H7v-8h10v8Zm-5-3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/>
+          </svg>
+          <span class="gated-cta-label">${isTeacherUnlocked() ? 'ใช้แบบฟอร์มตัวอย่าง' : 'ใช้แบบฟอร์มตัวอย่าง · ล็อก'}</span>
         </button>
         <button type="button" class="btn btn-secondary" onclick="focusToolboxAdd()">
           เพิ่มช่องเอง
         </button>
       </div>
+      <p class="template-lock-hint"${isTeacherUnlocked() ? ' hidden' : ''}>ต้องใส่รหัสครูก่อน</p>
     </div>`;
-    tipTiewBot('empty', 'ครูทิว: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู)');
+    tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู)');
     return;
   }
+
+  /* Figma Variant B: form sits as a centered preview card on the board grid */
+  const preview = document.createElement('div');
+  preview.className = 'canvas-preview-card';
+  const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+  preview.innerHTML = `
+    <h3 class="canvas-preview-title">${esc(targetName)}</h3>
+    <p class="canvas-preview-hint">พรีวิวบนกระดาน — ยังแก้โครงได้อยู่</p>
+  `;
 
   list.forEach((item, idx) => {
     const isFirst = idx === 0;
@@ -1141,8 +1275,9 @@ function renderCanvas() {
       </div>
       ${contentHTML}
     `;
-    canvas.appendChild(itemCard);
+    preview.appendChild(itemCard);
   });
+  canvas.appendChild(preview);
 }
 
 function renderInspector() {
@@ -1201,8 +1336,7 @@ function updateItemProp(id, prop, val) {
 }
 
 function clearCanvas() {
-  const which = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-  if (!confirm(`ล้างองค์ประกอบทั้งหมดของฟอร์ม${which} ใช่หรือไม่? (มีปุ่มเลิกทำ 1 ครั้ง)`)) return;
+  if (!confirm('ต้องการลบจริงหรือไม่?')) return;
   captureUndo('ล้างกระดาน');
   if (builderTarget === 'login') loginElements = [];
   else registerElements = [];
@@ -1223,7 +1357,7 @@ function loadDefaultFormStructure(skipConfirm) {
   selectedElementId = null;
   commitAll();
   toast('โหลดแบบฟอร์มตัวอย่างให้ทั้งสองฝั่งแล้ว');
-  tipTiewBot('loaded', 'ครูทิว: โครงครบแล้ว — แก้ข้อความด้านขวา หรือไปตกแต่งสีได้เมื่อพร้อม');
+  tipTiewBot('loaded', 'ครูชิโร่: โครงครบแล้ว — แก้ข้อความด้านขวา หรือไปตกแต่งสีได้เมื่อพร้อม');
 }
 
 function focusToolboxAdd() {
@@ -1234,13 +1368,12 @@ function focusToolboxAdd() {
     if (first) first.focus();
     else grid.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
   }
-  tipTiewBot('add-self', 'ครูทิว: กดปุ่มองค์ประกอบด้านซ้ายเพื่อเพิ่มช่องทีละอัน');
+  tipTiewBot('add-self', 'ครูชิโร่: กดปุ่มองค์ประกอบด้านซ้ายเพื่อเพิ่มช่องทีละอัน');
 }
 
 function forwardToStep2() {
-  switchMainStep(2);
-  toast('ไปตกแต่งสีและส่งออกแล้ว');
-  tipTiewBot('forward', 'ครูทิว: โครงครบแล้ว ไปตกแต่งสีได้เมื่อพร้อม');
+  setDockMode('color');
+  toast('ไปเลือกสีแล้ว');
 }
 
 // เรียกหลังแก้ข้อมูลทุกครั้ง: วาดใหม่ + สร้างโค้ดใหม่ + บันทึก
@@ -1251,7 +1384,7 @@ function commitAll(opts = {}) {
   renderStudioPreviewStage();
   regenerateCode();
   saveState();
-  if (selectedElementId) tipTiewBot('selected', 'ครูทิว: แก้ข้อความด้านขวาได้เลย — เห็นผลบนกระดานทันที');
+  if (selectedElementId) tipTiewBot('selected', 'ครูชิโร่: แก้ข้อความด้านขวาได้เลย — เห็นผลบนกระดานทันที');
 }
 
 // ==========================================================================
@@ -1673,7 +1806,7 @@ function renderThemePresets() {
 function applyThemePreset(presetKey, ev) {
   if (!isTeacherUnlocked()) {
     openTeacherUnlockModal('theme');
-    tipTiewBot('theme-lock', 'ครูทิว: ชุดธีมสำเร็จรูปต้องใส่รหัสครูก่อน — เลือกสีทีละช่องด้านล่างได้เลย');
+    tipTiewBot('theme-lock', 'ครูชิโร่: ชุดธีมสำเร็จรูปต้องใส่รหัสครูก่อน — เลือกสีทีละช่องด้านล่างได้เลย');
     return;
   }
   const p = THEME_PRESETS[presetKey];
@@ -2557,5 +2690,5 @@ function downloadStandaloneHTML() {
   toast(exportMode === 'embed'
     ? 'ดาวน์โหลด form-embed.html แล้ว — เปิดดูได้เลย แล้วคัดลอกเนื้อหาไปวางใน <main> ของหน้าเดิม'
     : 'ดาวน์โหลด index.html แล้ว — ดับเบิลคลิกไฟล์เพื่อเปิดบนเบราว์เซอร์ได้เลย (ไม่ต้องต่อเน็ต)');
-  tipTiewBot('export', 'ครูทิว: บันทึกไฟล์แล้ว ดับเบิลคลิก index.html เพื่อเปิด');
+  tipTiewBot('export', 'ครูชิโร่: บันทึกไฟล์แล้ว ดับเบิลคลิก index.html เพื่อเปิด');
 }
