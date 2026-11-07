@@ -1063,8 +1063,7 @@ body.layout-b .canvas-dropzone {
   text-align: center;
 }
 
-.canvas-item .inline-sub,
-.canvas-item .inline-placeholder {
+.canvas-item .inline-sub {
   font-size: 12px;
   font-weight: 400;
   color: var(--text-muted);
@@ -1079,6 +1078,7 @@ body.layout-b .canvas-dropzone {
 
 .canvas-item .inline-label-row .inline-label { flex: 1; }
 
+/* Editable placeholder, styled as the form input — no second line under the field */
 .canvas-item .inline-preview-input {
   width: 100%;
   box-sizing: border-box;
@@ -1088,8 +1088,20 @@ body.layout-b .canvas-dropzone {
   background: #fff;
   font: inherit;
   font-size: 12px;
+  font-weight: 400;
   color: var(--text-tertiary);
-  pointer-events: none;
+}
+
+.canvas-item .inline-preview-input:hover {
+  border-color: #bfdbfe;
+  background: #fff;
+}
+
+.canvas-item .inline-preview-input:focus {
+  outline: none;
+  border-color: var(--accent, #3b82f6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.18);
+  color: var(--text-primary, #0f172a);
 }
 
 .canvas-item .inline-check-row {

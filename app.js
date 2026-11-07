@@ -180,7 +180,7 @@ let exportMode = 'full';          // 'full' = ไฟล์เดียวจบ�
 
 const DEFAULT_LOGIN = () => ([
   { id: 'el-1', type: 'heading',  label: 'เข้าสู่ระบบ', subtitle: 'กรอกบัญชีผู้ใช้เพื่อเข้าสู่ระบบ', colSpan: 12 },
-  { id: 'el-2', type: 'text',     label: 'ชื่อผู้ใช้ หรือ อีเมล', placeholder: 'username / email', required: true, colSpan: 6 },
+  { id: 'el-2', type: 'text',     label: 'ชื่อผู้ใช้ หรือ อีเมล', placeholder: 'ชื่อผู้ใช้ / อีเมล', required: true, colSpan: 6 },
   { id: 'el-3', type: 'password', label: 'รหัสผ่าน', placeholder: '••••••••', required: true, colSpan: 6 },
   { id: 'el-4', type: 'button',   label: 'เข้าสู่ระบบ', colSpan: 12 }
 ]);
@@ -1132,19 +1132,19 @@ function newElementId() { return 'el-' + (idSeq++); }
 // รายการ "องค์ประกอบที่เพิ่มได้" — ใช้ที่เดียว สร้างทั้งกล่องเครื่องมือด้านซ้าย
 // และแถบเพิ่มเร็ว (บนจอมือถือ) ปุ่มสองที่จะไม่มีทางไม่ตรงกัน
 const COMPONENTS = [
-  { type: 'heading',  icon: 'fa-heading',            label: 'หัวข้อ (Heading)',          short: 'หัวข้อ',
+  { type: 'heading',  icon: 'fa-heading',            label: 'หัวข้อ',     short: 'หัวข้อ',
     make: () => ({ label: 'หัวข้อใหม่', subtitle: 'รายละเอียด' }) },
-  { type: 'text',     icon: 'fa-font',               label: 'ช่องข้อความ (Input Text)',  short: 'ข้อความ',
+  { type: 'text',     icon: 'fa-font',               label: 'ช่องข้อความ', short: 'ข้อความ',
     make: () => ({ label: 'ป้ายชื่อข้อความ', placeholder: 'กรอกข้อความ...', required: false }) },
-  { type: 'password', icon: 'fa-key',                label: 'รหัสผ่าน (Password)',       short: 'รหัสผ่าน',
+  { type: 'password', icon: 'fa-key',                label: 'รหัสผ่าน',   short: 'รหัสผ่าน',
     make: () => ({ label: 'รหัสผ่าน', placeholder: '••••••••', required: true }) },
-  { type: 'email',    icon: 'fa-envelope',           label: 'อีเมล (Email Input)',       short: 'อีเมล',
+  { type: 'email',    icon: 'fa-envelope',           label: 'อีเมล',      short: 'อีเมล',
     make: () => ({ label: 'อีเมล', placeholder: 'name@example.com', required: true }) },
-  { type: 'checkbox', icon: 'fa-square-check',       label: 'ตัวเลือก (Checkbox)',       short: 'ตัวเลือก',
+  { type: 'checkbox', icon: 'fa-square-check',       label: 'ตัวเลือก',   short: 'ตัวเลือก',
     make: () => ({ label: 'ยอมรับเงื่อนไขการใช้งาน' }) },
-  { type: 'button',   icon: 'fa-circle-play',        label: 'ปุ่มกด (Submit Button)',    short: 'ปุ่มกด',
+  { type: 'button',   icon: 'fa-circle-play',        label: 'ปุ่มกด',     short: 'ปุ่มกด',
     make: () => ({ label: 'ปุ่มกด' }) },
-  { type: 'divider',  icon: 'fa-minus',              label: 'เส้นแบ่ง (Divider)',        short: 'เส้นแบ่ง',
+  { type: 'divider',  icon: 'fa-minus',              label: 'เส้นแบ่ง',   short: 'เส้นแบ่ง',
     make: () => ({ label: 'เส้นแบ่ง' }) }
 ];
 const COMPONENT_BY_TYPE = {};
@@ -1488,13 +1488,13 @@ function renderCanvas() {
         <input class="inline-edit inline-label is-heading" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อหัวข้อ" placeholder="ชื่อหัวข้อ">
         <input class="inline-edit inline-sub" data-inline-prop="subtitle" type="text" value="${esc(item.subtitle || '')}" aria-label="คำอธิบายย่อย" placeholder="คำอธิบายย่อย (ถ้ามี)">`;
     } else if (['text', 'password', 'email'].includes(item.type)) {
+      /* One field: looks like the input; edits placeholder — no extra type/placeholder line under it */
       contentHTML = `
         <div class="inline-label-row">
           <input class="inline-edit inline-label" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อช่อง" placeholder="ชื่อช่อง">
           ${item.required ? '<span class="wys-req" aria-hidden="true">*</span>' : ''}
         </div>
-        <input class="inline-preview-input" type="${item.type}" value="" placeholder="${esc(item.placeholder || '')}" disabled tabindex="-1" aria-hidden="true">
-        <input class="inline-edit inline-placeholder" data-inline-prop="placeholder" type="text" value="${esc(item.placeholder || '')}" aria-label="ข้อความในช่องว่าง" placeholder="ข้อความในช่องว่าง">`;
+        <input class="inline-edit inline-preview-input" data-inline-prop="placeholder" type="text" value="${esc(item.placeholder || '')}" aria-label="ข้อความในช่องว่าง" placeholder="ข้อความในช่องว่าง">`;
     } else if (item.type === 'checkbox') {
       contentHTML = `
         <label class="inline-check-row">
@@ -1545,7 +1545,7 @@ function renderInspector() {
 
   const id = safeId(item.id);
   const typeOptions = COMPONENTS.map((c) =>
-    `<option value="${c.type}" ${item.type === c.type ? 'selected' : ''}>${esc(c.short)} — ${esc(c.label)}</option>`
+    `<option value="${c.type}" ${item.type === c.type ? 'selected' : ''}>${esc(c.short)}</option>`
   ).join('');
 
   inspector.innerHTML = `
@@ -1590,10 +1590,6 @@ function renderInspector() {
 function syncInlineFromInspector(id, prop, val) {
   const el = document.querySelector(`#builder-canvas .canvas-item[data-element-id="${CSS.escape(id)}"] [data-inline-prop="${prop}"]`);
   if (el && el !== document.activeElement) el.value = val == null ? '' : String(val);
-  if (prop === 'placeholder') {
-    const preview = document.querySelector(`#builder-canvas .canvas-item[data-element-id="${CSS.escape(id)}"] .inline-preview-input`);
-    if (preview) preview.placeholder = val == null ? '' : String(val);
-  }
 }
 
 function updateItemProp(id, prop, val, opts = {}) {
@@ -1624,10 +1620,6 @@ function bindInlineEdits(itemCard, item) {
     });
     el.addEventListener('input', () => {
       updateItemProp(item.id, prop, el.value, { inline: true });
-      if (prop === 'placeholder') {
-        const preview = itemCard.querySelector('.inline-preview-input');
-        if (preview) preview.placeholder = el.value;
-      }
     });
     el.addEventListener('keydown', (e) => {
       e.stopPropagation();
