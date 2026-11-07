@@ -2716,7 +2716,7 @@ body.layout-b .canvas-dropzone {
 }
 
 @media (max-width: 700px) {
-  .tiew-bot { right: 10px; bottom: 88px; }
+  .tiew-bot { right: 10px; bottom: 124px; }
   .otp-digit { width: 40px; height: 48px; font-size: 20px; gap: 6px; }
   .otp-digits { gap: 6px; }
 }
@@ -3484,12 +3484,12 @@ body.layout-b .tiew-bot {
 }
 
 @media (max-width: 700px) {
-  /* Keep ครูชิโร่ above the dock so taps on สี / ส่งออก stay clear */
+  /* Chip + bubble sit fully above the dock, including the drop shadow */
   body.layout-b .tiew-bot {
     right: 10px;
-    bottom: 84px;
+    bottom: 124px;
   }
-  body.layout-b .dock-wrap { bottom: 12px; }
+  body.layout-b .dock-wrap { bottom: 10px; }
   body.layout-b .studio-hero { padding: 28px 14px 18px; }
   body.layout-b .studio-hero::before {
     width: 100%;
@@ -3582,12 +3582,20 @@ body.layout-b .tiew-bot {
   }
   body.layout-b .canvas-preview-title { font-size: 20px; }
   .dock {
-    max-width: calc(100vw - 16px);
+    max-width: calc(100vw - 8px);
+    gap: 0;
+    padding: 4px 2px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
-  .dock-btn { min-width: 56px; padding: 6px 8px; }
-  body.layout-b .tiew-bot { bottom: 88px; right: 12px; }
+  .dock-btn {
+    min-width: 0;
+    padding: 0 4px;
+    gap: 3px;
+    flex: 1 1 auto;
+  }
+  .dock-sep { margin: 0 1px; flex: 0 0 auto; }
+  body.layout-b .tiew-bot { bottom: 124px; right: 10px; }
 }
 
 /* Tablet — Variant B (Figma 834) */
