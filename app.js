@@ -607,10 +607,21 @@ function captureUndo(label) {
     builderTarget,
     previewView,
   };
-  const btn = document.getElementById('undo-btn');
-  if (btn) {
-    btn.hidden = false;
-    btn.innerHTML = `<i class="fa-solid fa-rotate-left" aria-hidden="true"></i> เลิกทำ: ${esc(label || 'ล่าสุด')}`;
+  syncUndoButtons();
+}
+function syncUndoButtons() {
+  const label = undoSnapshot ? (undoSnapshot.label || 'ล่าสุด') : '';
+  const legacy = document.getElementById('undo-btn');
+  if (legacy) {
+    legacy.hidden = !undoSnapshot;
+    if (undoSnapshot) {
+      legacy.innerHTML = `<i class="fa-solid fa-rotate-left" aria-hidden="true"></i> เลิกทำ: ${esc(label)}`;
+    }
+  }
+  const top = document.getElementById('canva-undo');
+  if (top) {
+    top.disabled = !undoSnapshot;
+    top.title = undoSnapshot ? `เลิกทำ: ${label}` : 'เลิกทำ';
   }
 }
 function undoLastDestructive() {
@@ -624,8 +635,7 @@ function undoLastDestructive() {
   selectedElementId = s.selectedElementId;
   builderTarget = s.builderTarget;
   previewView = s.previewView || 'login';
-  const btn = document.getElementById('undo-btn');
-  if (btn) btn.hidden = true;
+  syncUndoButtons();
   applyConfigToControls();
   syncThemeActive(studioConfig.themePreset, null);
   updateTargetChrome();
@@ -718,6 +728,16 @@ function updateTargetChrome() {
   const regBtn = document.getElementById('target-register-btn');
   if (loginBtn) loginBtn.classList.toggle('active', builderTarget === 'login');
   if (regBtn) regBtn.classList.toggle('active', builderTarget === 'register');
+  const canvaLogin = document.getElementById('canva-login');
+  const canvaReg = document.getElementById('canva-register');
+  if (canvaLogin) {
+    canvaLogin.classList.toggle('on', builderTarget === 'login');
+    canvaLogin.setAttribute('aria-pressed', builderTarget === 'login' ? 'true' : 'false');
+  }
+  if (canvaReg) {
+    canvaReg.classList.toggle('on', builderTarget === 'register');
+    canvaReg.setAttribute('aria-pressed', builderTarget === 'register' ? 'true' : 'false');
+  }
   syncDockHighlight();
 }
 
@@ -1025,6 +1045,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadUiState();
   loadCanvasChrome();
   renderComponentButtons();
+  bindCanvasToolDrop();
   renderThemePresets();
   renderGradientPresets();
   applyUiState();
@@ -1119,38 +1140,69 @@ function syncDockHighlight() {
   });
 }
 
+function setWorkspaceMode(mode) {
+  const m = mode === 'preview' || mode === 'code' ? mode : 'design';
+  document.body.classList.toggle('workspace-preview', m === 'preview');
+  document.body.classList.toggle('workspace-code', m === 'code');
+  document.querySelectorAll('[data-workspace]').forEach((b) => {
+    const on = b.getAttribute('data-workspace') === m;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  if (m === 'preview') {
+    switchMainStep(2);
+    setStudioView('preview');
+  } else if (m === 'code') {
+    switchMainStep(2);
+    setStudioView('code');
+  } else {
+    switchMainStep(1);
+  }
+}
+
+function toggleColorPanel(force) {
+  const open = typeof force === 'boolean' ? force : !document.body.classList.contains('colors-open');
+  document.body.classList.toggle('colors-open', open);
+  const btn = document.getElementById('canva-colors');
+  if (btn) {
+    btn.classList.toggle('on', open);
+    btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+  }
+  if (!open) return;
+  uiState.groups.theme = true;
+  uiState.groups.appearance = true;
+  if (!isPanelOpen('controls')) uiState.panels.controls = true;
+  saveUiState();
+  applyGroupState('theme');
+  applyGroupState('appearance');
+  applyPanelState('controls');
+  const themeHead = document.getElementById('group-theme-header');
+  const scroller = document.getElementById('panel-controls-body');
+  if (themeHead && scroller) {
+    const top = themeHead.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop;
+    scroller.scrollTop = Math.max(0, top - 4);
+  }
+}
+
 function setDockMode(mode) {
   dockMode = mode || 'structure';
   if (mode === 'structure') {
-    switchMainStep(1);
-    tipTiewBot('dock-structure', 'ครูชิโร่: กด «เครื่องมือ» เพื่อเพิ่มช่องบนกระดาน');
+    setWorkspaceMode('design');
+    toggleColorPanel(false);
+    tipTiewBot('dock-structure', 'ครูชิโร่: กดเครื่องมือซ้ายเพื่อเพิ่มช่องบนกระดาน');
   } else if (mode === 'color') {
-    switchMainStep(2);
-    setStudioView('preview');
-    if (!isPanelOpen('controls')) togglePanel('controls');
-    /* Dock «สี» should land with ชุดสี and color slots open, not collapsed */
-    uiState.groups.theme = true;
-    uiState.groups.appearance = true;
-    saveUiState();
-    applyGroupState('theme');
-    applyGroupState('appearance');
-    const themeHead = document.getElementById('group-theme-header');
-    const scroller = document.getElementById('panel-controls-body');
-    if (themeHead && scroller) {
-      const top = themeHead.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop;
-      scroller.scrollTop = Math.max(0, top - 4);
-    }
+    setWorkspaceMode('design');
+    toggleColorPanel(true);
     tipTiewBot('dock-color', 'ครูชิโร่: เลือกชุดสี หรือปรับสีทีละช่องได้');
   } else if (mode === 'export') {
-    switchMainStep(2);
-    if (isPanelOpen('controls')) togglePanel('controls');
-    setStudioView('code');
+    setWorkspaceMode('code');
+    toggleColorPanel(false);
     tipTiewBot('dock-export', 'ครูชิโร่: คัดลอกหรือดาวน์โหลด HTML ได้จากมุมมองโค้ด');
   } else if (mode === 'login') {
-    switchMainStep(1);
+    setWorkspaceMode('design');
     setBuilderTarget('login');
   } else if (mode === 'register') {
-    switchMainStep(1);
+    setWorkspaceMode('design');
     setBuilderTarget('register');
   } else if (mode === 'teacher') {
     openTeacherUnlockModal();
@@ -1197,6 +1249,78 @@ const COMPONENTS = [
 const COMPONENT_BY_TYPE = {};
 COMPONENTS.forEach((c) => { COMPONENT_BY_TYPE[c.type] = c; });
 
+const RAIL_LABEL = {
+  heading: 'หัวข้อ', text: 'ข้อความ', password: 'รหัสผ่าน', email: 'อีเมล',
+  checkbox: 'ตัวเลือก', button: 'ปุ่ม', divider: 'เส้น'
+};
+
+function dragTypes(e) {
+  return e.dataTransfer && e.dataTransfer.types ? Array.from(e.dataTransfer.types) : [];
+}
+function dragHasNewType(e) {
+  if (dragSourceId) return false;
+  const types = dragTypes(e);
+  return types.includes('application/x-studio-type') || types.includes('text/plain');
+}
+function readToolType(e) {
+  let custom = '';
+  try { custom = e.dataTransfer.getData('application/x-studio-type'); } catch (err) { custom = ''; }
+  if (custom && COMPONENT_BY_TYPE[custom]) return custom;
+  let plain = '';
+  try { plain = e.dataTransfer.getData('text/plain') || ''; } catch (err) { plain = ''; }
+  if (plain.indexOf('tool:') === 0 && COMPONENT_BY_TYPE[plain.slice(5)]) return plain.slice(5);
+  return '';
+}
+
+function renderCanvaRail() {
+  const rail = document.getElementById('canva-rail');
+  if (!rail) return;
+  rail.innerHTML = COMPONENTS.map((c) => {
+    const name = RAIL_LABEL[c.type] || c.short;
+    return `<button type="button" class="canva-tool" draggable="true" data-type="${c.type}" aria-label="เพิ่ม${esc(name)}">
+      <i class="fa-solid ${c.icon}" aria-hidden="true"></i>
+      <span>${esc(name)}</span>
+    </button>`;
+  }).join('');
+  rail.querySelectorAll('.canva-tool').forEach((btn) => {
+    const type = btn.getAttribute('data-type');
+    btn.addEventListener('click', () => {
+      setWorkspaceMode('design');
+      addCanvasElement(type);
+    });
+    btn.addEventListener('dragstart', (e) => {
+      dragSourceId = null;
+      try {
+        e.dataTransfer.setData('application/x-studio-type', type);
+        e.dataTransfer.setData('text/plain', 'tool:' + type);
+        e.dataTransfer.effectAllowed = 'copy';
+      } catch (err) {}
+    });
+  });
+}
+
+function bindCanvasToolDrop() {
+  const drop = document.getElementById('builder-canvas');
+  if (!drop || drop.dataset.toolDrop) return;
+  drop.dataset.toolDrop = '1';
+  drop.addEventListener('dragover', (e) => {
+    if (!dragHasNewType(e)) return;
+    e.preventDefault();
+    drop.classList.add('is-tool-target');
+  });
+  drop.addEventListener('dragleave', (e) => {
+    if (e.target === drop) drop.classList.remove('is-tool-target');
+  });
+  drop.addEventListener('drop', (e) => {
+    const type = readToolType(e);
+    drop.classList.remove('is-tool-target');
+    if (!type) return;
+    e.preventDefault();
+    setWorkspaceMode('design');
+    addCanvasElement(type);
+  });
+}
+
 function renderComponentButtons() {
   const grid = document.getElementById('component-grid');
   if (grid) {
@@ -1205,6 +1329,7 @@ function renderComponentButtons() {
                 <i class="fa-solid ${c.icon}" aria-hidden="true"></i> ${esc(c.label)}
               </button>`).join('');
   }
+  renderCanvaRail();
   const bar = document.getElementById('quickbar-grid');
   if (bar) {
     /* Figma mobile quickbar shows the five primary field types — SVG/FA icons only (no emoji) */
@@ -1223,16 +1348,18 @@ function renderComponentButtons() {
 function addCanvasElement(type) {
   const list = getActiveList();
   const def = COMPONENT_BY_TYPE[type];
-  if (!def) return;
+  if (!def) return null;
   const newEl = Object.assign({ id: newElementId(), type, colSpan: 12 }, def.make());
   list.push(newEl);
   selectedElementId = newEl.id;
   commitAll();
+  return newEl.id;
 }
 
 function removeElement(id) {
   const list = getActiveList();
   if (list.length <= 1 && !confirm('ลบชิ้นสุดท้ายของฟอร์มนี้ใช่ไหม?')) return;
+  captureUndo('ลบช่อง');
   if (builderTarget === 'login') loginElements = loginElements.filter((el) => el.id !== id);
   else registerElements = registerElements.filter((el) => el.id !== id);
   selectedElementId = null;
@@ -1425,7 +1552,7 @@ function renderCanvas() {
     stage.innerHTML = `<div class="empty-canvas-state">
       <span class="empty-canvas-icon" aria-hidden="true">+</span>
       <p class="empty-canvas-title">ยังไม่มีช่องในฟอร์ม${esc(targetName)}</p>
-      <p class="empty-canvas-sub">เริ่มจากแบบตัวอย่าง หรือเพิ่มช่องเอง</p>
+      <p class="empty-canvas-sub">กดเครื่องมือทางซ้าย หรือลากมาวางบนกระดาน</p>
       <div class="empty-canvas-actions">
         <button type="button" class="btn btn-primary teacher-gated-btn teacher-gated-cta${isTeacherUnlocked() ? '' : ' is-locked'}"
                 onclick="requestLoadDefaultForm()" aria-disabled="${isTeacherUnlocked() ? 'false' : 'true'}">
@@ -1473,6 +1600,7 @@ function renderCanvas() {
     itemCard.onclick = (e) => {
       e.stopPropagation();
       const onField = e.target.closest('[data-inline-prop], .item-controls, .resize-handle, .ctrl-type');
+      if (selectedElementId === item.id && onField) return;
       selectElement(item.id, { focusLabel: !onField });
     };
     itemCard.onkeydown = (e) => {
@@ -1504,9 +1632,11 @@ function renderCanvas() {
       clearDropMarkers();
     });
     itemCard.addEventListener('dragover', (e) => {
-      if (!dragSourceId || dragSourceId === item.id) return;
+      const incoming = dragHasNewType(e);
+      if (!incoming && (!dragSourceId || dragSourceId === item.id)) return;
       e.preventDefault();
-      try { e.dataTransfer.dropEffect = 'move'; } catch (err) {}
+      e.stopPropagation();
+      try { e.dataTransfer.dropEffect = incoming ? 'copy' : 'move'; } catch (err) {}
       const rect = itemCard.getBoundingClientRect();
       const xRatio = (e.clientX - rect.left) / Math.max(1, rect.width);
       const yRatio = (e.clientY - rect.top) / Math.max(1, rect.height);
@@ -1516,6 +1646,17 @@ function renderCanvas() {
       else itemCard.classList.add(yRatio < 0.5 ? 'drop-before' : 'drop-after');
     });
     itemCard.addEventListener('drop', (e) => {
+      const newType = readToolType(e);
+      if (newType) {
+        e.preventDefault();
+        e.stopPropagation();
+        clearDropMarkers();
+        const rect = itemCard.getBoundingClientRect();
+        const xRatio = (e.clientX - rect.left) / Math.max(1, rect.width);
+        const id = addCanvasElement(newType);
+        if (id) placeBeside(id, item.id, xRatio < 0.5);
+        return;
+      }
       if (!dragSourceId || dragSourceId === item.id) return;
       e.preventDefault();
       const rect = itemCard.getBoundingClientRect();
@@ -1561,17 +1702,28 @@ function renderCanvas() {
         <input class="inline-edit inline-label is-muted" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อเส้นแบ่ง" placeholder="เส้นแบ่ง">`;
     }
 
-    /* Compact chrome: type + width + delete — ชื่อพิมพ์บนกระดานโดยตรง */
-    itemCard.innerHTML = `
-      <div class="item-controls">
-        <label class="ctrl-type-wrap" title="ประเภท">
-          <span class="sr-only">ประเภท</span>
-          <select class="ctrl-type" aria-label="ประเภทองค์ประกอบ" onclick="event.stopPropagation()" onchange="event.stopPropagation(); changeElementType('${sid}', this.value)">${typeOptions}</select>
+    const selected = selectedElementId === item.id;
+    const widthBtns = [[4, '1/3'], [6, 'ครึ่ง'], [12, 'เต็มแถว']].map(([n, name]) => {
+      const on = span === n;
+      return `<button type="button" class="float-w${on ? ' on' : ''}" aria-pressed="${on ? 'true' : 'false'}" title="${widthTitle}" onclick="event.stopPropagation(); setElementWidth('${sid}', ${n})">${name}</button>`;
+    }).join('');
+    const floatBar = selected ? `
+      <div class="item-controls float-bar" role="toolbar" aria-label="แก้ช่องที่เลือก">
+        <label class="float-name-wrap">
+          <span class="float-k">ชื่อ</span>
+          <input class="float-name" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อ" placeholder="ชื่อ" onclick="event.stopPropagation()">
         </label>
-        <button type="button" class="ctrl-btn ctrl-width" title="${widthTitle}" aria-label="ความกว้างช่องบนแถว: ${widthLabel}" onclick="event.stopPropagation(); cycleElementWidth('${sid}')">${widthLabel}</button>
-        <button type="button" class="ctrl-btn ctrl-delete" title="ลบองค์ประกอบนี้" aria-label="ลบองค์ประกอบนี้" onclick="event.stopPropagation(); removeElement('${sid}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
-      </div>
-      <p class="width-chip-hint">ปุ่มความกว้าง = ช่องนี้กินกี่ส่วนของแถว (1/3 · ครึ่ง · เต็ม)</p>
+        <label class="ctrl-type-wrap" title="ประเภท">
+          <span class="float-k">ประเภท</span>
+          <select class="ctrl-type" aria-label="ประเภท" onclick="event.stopPropagation()" onchange="event.stopPropagation(); changeElementType('${sid}', this.value)">${typeOptions}</select>
+        </label>
+        <span class="float-k">กว้าง</span>
+        <span class="float-widths" role="group" aria-label="ความกว้าง">${widthBtns}</span>
+        <button type="button" class="ctrl-btn ctrl-delete" title="ลบช่องนี้" aria-label="ลบช่องนี้" onclick="event.stopPropagation(); removeElement('${sid}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      </div>` : '';
+    itemCard.innerHTML = `
+      ${floatBar}
+      <p class="width-chip-hint">กว้าง 1/3 · ครึ่ง · เต็มแถว</p>
       <span class="resize-handle" role="slider" aria-label="ปรับความกว้างของช่องบนแถว" aria-valuetext="${widthLabel}" title="ลากขอบเพื่อปรับว่าช่องกินกี่ส่วนของแถว"></span>
       <div class="item-body">${contentHTML}</div>
     `;
@@ -1673,6 +1825,9 @@ function bindInlineEdits(itemCard, item) {
     });
     el.addEventListener('input', () => {
       updateItemProp(item.id, prop, el.value, { inline: true });
+      itemCard.querySelectorAll(`[data-inline-prop="${prop}"]`).forEach((other) => {
+        if (other !== el) other.value = el.value;
+      });
     });
     el.addEventListener('keydown', (e) => {
       e.stopPropagation();
@@ -1715,12 +1870,15 @@ function loadDefaultFormStructure(skipConfirm) {
 }
 
 function focusToolboxAdd() {
-  const grid = document.getElementById('component-grid');
-  if (!isPanelOpen('toolbox')) togglePanel('toolbox');
-  if (grid) {
-    const first = grid.querySelector('.comp-btn');
-    if (first) first.focus();
-    else grid.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
+  const rail = document.querySelector('#canva-rail .canva-tool');
+  if (rail) rail.focus();
+  else {
+    const grid = document.getElementById('component-grid');
+    if (!isPanelOpen('toolbox')) togglePanel('toolbox');
+    if (grid) {
+      const first = grid.querySelector('.comp-btn');
+      if (first) first.focus();
+    }
   }
   tipTiewBot('add-self', 'ครูชิโร่: กดปุ่มด้านซ้ายเพื่อเพิ่มช่อง');
 }
@@ -3089,28 +3247,33 @@ const TUTORIAL_SEEN_KEY = 'html-generate-studio-tutorial-seen';
 const TUTORIAL_STEPS = [
   {
     title: 'ใส่รหัสครู',
-    body: 'กด «รหัสครู» ที่แถบล่าง แล้วใส่รหัส 6 หลัก เพื่อใช้แบบตัวอย่างและชุดสี',
-    dock: 'teacher'
+    body: 'กด «รหัสครู» บนแถบบน แล้วใส่รหัส 6 หลัก เพื่อใช้แบบตัวอย่างและชุดสี',
+    dock: 'teacher',
+    highlight: '[data-tutorial="teacher"]'
   },
   {
     title: 'ใช้แบบฟอร์มตัวอย่าง',
-    body: 'กด «ใช้แบบฟอร์มตัวอย่าง» จะได้ช่องเข้าสู่ระบบและสมัครสมาชิกบนกระดาน',
-    dock: 'structure'
+    body: 'กด «แบบตัวอย่าง» บนแถบบน จะได้ช่องเข้าสู่ระบบและสมัครบนกระดาน',
+    dock: 'structure',
+    highlight: '[data-tutorial="sample"]'
   },
   {
     title: 'จัดช่องบนกระดาน',
-    body: 'แตะช่องแล้วพิมพ์ชื่อ เลือกประเภท มุมชิ้นมีปุ่มความกว้าง: กว้าง 1/3 แถว ครึ่งแถว หรือเต็มแถว',
-    dock: 'structure'
+    body: 'แตะช่อง แถบลอยมีชื่อ ประเภท และกว้าง 1/3 · ครึ่ง · เต็มแถว ลากช่องมาวางข้างกันได้',
+    dock: 'structure',
+    highlight: '#canva-rail'
   },
   {
     title: 'เลือกชุดสี',
-    body: 'กด «สี» ที่แถบล่าง เลือกชุดสี หรือปรับสีทีละช่อง (ปุ่ม พื้นหลังการ์ด ข้อความ ขอบ)',
-    dock: 'color'
+    body: 'กด «ชุดสี» บนแถบบน เลือกชุดสี หรือปรับสีทีละช่อง (ปุ่ม พื้นหลังการ์ด ข้อความ ขอบ)',
+    dock: 'color',
+    highlight: '[data-tutorial="color"]'
   },
   {
     title: 'ส่งออก',
-    body: 'กด «ส่งออก» แล้วคัดลอกหรือดาวน์โหลดไฟล์ เอาไปเปิดหรือวางในหน้าเว็บได้',
-    dock: 'export'
+    body: 'กด «โค้ด» แล้วคัดลอกหรือดาวน์โหลดไฟล์ เอาไปเปิดหรือวางในหน้าเว็บได้',
+    dock: 'export',
+    highlight: '[data-tutorial="export"]'
   }
 ];
 let tutorialIndex = 0;
@@ -3154,12 +3317,13 @@ function renderTutorialStep() {
   if (body) body.textContent = step.body;
   if (back) back.disabled = tutorialIndex === 0;
   if (next) next.textContent = tutorialIndex === TUTORIAL_STEPS.length - 1 ? 'เสร็จ' : 'ถัดไป';
-  document.querySelectorAll('.dock-btn[data-dock]').forEach((btn) => {
-    btn.classList.toggle('is-tutorial', btn.getAttribute('data-dock') === step.dock);
-  });
+  document.querySelectorAll('.is-tutorial').forEach((el) => el.classList.remove('is-tutorial'));
+  if (step.highlight) {
+    document.querySelectorAll(step.highlight).forEach((el) => el.classList.add('is-tutorial'));
+  }
   if (step.dock === 'color') setDockMode('color');
   else if (step.dock === 'export') setDockMode('export');
-  else if (step.dock === 'structure' && activeStep !== 1) setDockMode('structure');
+  else if (step.dock === 'structure') setDockMode('structure');
 }
 function initTutorial() {
   if (!tutorialSeen()) openTutorial(0);

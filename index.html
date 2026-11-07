@@ -20,7 +20,7 @@
 
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="layout-b">
+<body class="layout-b canva">
   <div class="font-warmup" aria-hidden="true">
     <span style="font-weight:400">อ่า</span>
     <span style="font-weight:500">อ่า</span>
@@ -269,6 +269,28 @@
       </div>
     </div>
 
+    <div class="canva-bar" role="toolbar" aria-label="แถบงาน">
+      <div class="canva-seg" role="group" aria-label="ฟอร์ม">
+        <button type="button" id="canva-login" class="canva-seg-btn on" onclick="setBuilderTarget('login')">เข้าสู่ระบบ</button>
+        <button type="button" id="canva-register" class="canva-seg-btn" onclick="setBuilderTarget('register')">สมัคร</button>
+      </div>
+      <button type="button" id="canva-undo" class="canva-icon-btn" onclick="undoLastDestructive()" disabled aria-label="เลิกทำ" title="เลิกทำ">
+        <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+      </button>
+      <div class="canvas-zoom" role="group" aria-label="ซูม">
+        <button type="button" class="zoom-btn" id="canvas-zoom-out" onclick="nudgeCanvasZoom(-1)" aria-label="ซูมออก" title="ซูมออก">−</button>
+        <button type="button" class="zoom-btn zoom-btn-label" id="canvas-zoom-label" onclick="resetCanvasZoom()" aria-label="รีเซ็ตซูม 100%" title="แตะเพื่อกลับ 100%">100%</button>
+        <button type="button" class="zoom-btn" id="canvas-zoom-in" onclick="nudgeCanvasZoom(1)" aria-label="ซูมเข้า" title="ซูมเข้า">+</button>
+      </div>
+      <div class="canva-seg" role="group" aria-label="มุมมอง">
+        <button type="button" class="canva-seg-btn on" data-workspace="design" aria-pressed="true" onclick="setWorkspaceMode('design')">ออกแบบ</button>
+        <button type="button" class="canva-seg-btn" data-workspace="preview" aria-pressed="false" onclick="setWorkspaceMode('preview')">ตัวอย่าง</button>
+        <button type="button" class="canva-seg-btn" data-workspace="code" data-tutorial="export" aria-pressed="false" onclick="setWorkspaceMode('code')">โค้ด</button>
+      </div>
+      <button type="button" id="canva-colors" class="canva-seg-btn canva-colors-btn" data-tutorial="color" aria-pressed="false" onclick="toggleColorPanel()">ชุดสี</button>
+      <button type="button" class="canva-seg-btn" data-tutorial="sample" onclick="requestLoadDefaultForm()">แบบตัวอย่าง</button>
+      <button type="button" class="canva-seg-btn" data-tutorial="teacher" onclick="openTeacherUnlockModal()">รหัสครู</button>
+    </div>
     <button type="button" class="btn btn-secondary header-help-btn" id="tutorial-open-btn" onclick="openTutorial(0)">แนะนำ</button>
     <span class="header-meta">ชั้น ม.5 · HTML / CSS / JS</span>
 
@@ -284,6 +306,8 @@
       </button>
     </div>
   </header>
+
+  <nav class="canva-rail" id="canva-rail" data-tutorial="arrange" aria-label="เครื่องมือ"></nav>
 
   <!-- Mobile quickbar — Figma Variant B: sits above the canvas shell -->
   <div class="quickbar" id="mobile-quickbar" aria-label="เพิ่มองค์ประกอบเร็ว">
@@ -378,15 +402,7 @@
                       aria-expanded="false" aria-controls="panel-inspector-body"
                       onclick="togglePanel('inspector', event)">คุณสมบัติ</button>
               <button type="button" class="btn btn-sm btn-clear-danger" onclick="clearCanvas()">ล้าง</button>
-              <!-- Deferred UX kept, demoted to quiet trailing chrome -->
-              <div class="canvas-chrome" role="toolbar" aria-label="ซูมและมุมมองกระดาน">
-                <div class="canvas-zoom" role="group" aria-label="ซูม">
-                  <button type="button" class="zoom-btn" id="canvas-zoom-out" onclick="nudgeCanvasZoom(-1)" aria-label="ซูมออก" title="ซูมออก">−</button>
-                  <button type="button" class="zoom-btn zoom-btn-label" id="canvas-zoom-label" onclick="resetCanvasZoom()" aria-label="รีเซ็ตซูม 100%" title="แตะเพื่อกลับ 100%">100%</button>
-                  <button type="button" class="zoom-btn" id="canvas-zoom-in" onclick="nudgeCanvasZoom(1)" aria-label="ซูมเข้า" title="ซูมเข้า">+</button>
-                </div>
-                <button type="button" class="view-mode-btn" id="canvas-view-mode" onclick="toggleCanvasViewMode()" aria-pressed="false" title="สลับโครง / หน้าตาจริง">โครง</button>
-              </div>
+              <button type="button" class="view-mode-btn" id="canvas-view-mode" onclick="toggleCanvasViewMode()" aria-pressed="false" title="สลับโครง / หน้าตาจริง">โครง</button>
             </div>
           </div>
 
@@ -445,6 +461,7 @@
               <h2>ชุดสี</h2>
               <p>เห็นในตัวอย่างทันที</p>
             </div>
+            <button type="button" class="canva-panel-close" onclick="toggleColorPanel(false)" aria-label="ปิดชุดสี">ปิด</button>
           </div>
 
           <div class="sidebar-body" id="panel-controls-body">
