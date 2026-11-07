@@ -437,6 +437,7 @@ const TEACHER_UNLOCK_KEY = 'html-generate-studio-teacher-unlock';
 const BOT_HIDE_KEY = 'html-generate-studio-tiew-bot-hide';
 let teacherUnlocked = false;
 let pendingTeacherAction = null;   // 'template' | 'theme' | null — ทำต่อหลังปลดล็อกสำเร็จ
+let pendingThemeKey = null;        // ธีมที่กดตอนยังล็อก — ใช้หลังปลดล็อกสำเร็จ
 let undoSnapshot = null;           // 1 ระดับก่อนการกระทำทำลายงาน
 const botSeenTips = Object.create(null);
 
@@ -476,8 +477,14 @@ function applyTeacherGateUi() {
     grid.classList.toggle('is-locked', !unlocked);
     grid.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
     grid.querySelectorAll('.theme-preset-card').forEach((btn) => {
-      btn.disabled = !unlocked;
+      // Keep buttons clickable while locked so a tap opens the teacher OTP gate
+      // (disabled + pointer-events:none made presets look broken / unusable).
+      btn.disabled = false;
       btn.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
+      const nameEl = btn.querySelector('.theme-name');
+      btn.title = unlocked
+        ? ('ใช้ชุดสี ' + ((nameEl && nameEl.textContent) || ''))
+        : 'ต้องปลดล็อกด้วยรหัสครู';
     });
   }
   const unlockBtn = document.getElementById('teacher-unlock-btn');
@@ -501,6 +508,9 @@ function closeTeacherUnlockModal() {
   modal.hidden = true;
   modal.setAttribute('aria-hidden', 'true');
   pendingTeacherAction = null;
+  // Keep pendingThemeKey only when unlock succeeded (cleared in submitTeacherOtp).
+  // Cancel/dismiss should drop the staged theme pick.
+  if (!isTeacherUnlocked()) pendingThemeKey = null;
 }
 function readOtpDigits() {
   const inputs = document.querySelectorAll('#otp-digits .otp-digit');
@@ -522,15 +532,18 @@ function submitTeacherOtp() {
     return;
   }
   const next = pendingTeacherAction;
+  const themeKey = pendingThemeKey;
+  pendingThemeKey = null;
   setTeacherUnlocked(true);
   closeTeacherUnlockModal();
-  toast('ปลดล็อกแล้ว — ใช้แบบตัวอย่างและชุดธีมได้');
+  toast('ปลดล็อกแล้ว — ใช้แบบตัวอย่างและชุดสีได้');
   if (next === 'template') loadDefaultFormStructure(true);
   if (next === 'theme') {
     if (activeStep !== 2) switchMainStep(2);
     if (!isGroupOpen('theme')) toggleGroup('theme');
+    if (themeKey && THEME_PRESETS[themeKey]) applyThemePreset(themeKey);
   }
-  tipTiewBot('unlocked', 'ครูชิโร่: ปลดล็อกแล้ว — กด «ใช้แบบฟอร์มตัวอย่าง» หรือเลือกชุดธีมได้');
+  tipTiewBot('unlocked', 'ครูชิโร่: ปลดล็อกแล้ว — กด «ใช้แบบฟอร์มตัวอย่าง» หรือเลือกชุดสีได้');
 }
 function bindTeacherOtpInputs() {
   const wrap = document.getElementById('otp-digits');
@@ -1160,14 +1173,13 @@ function renderComponentButtons() {
   }
   const bar = document.getElementById('quickbar-grid');
   if (bar) {
-    /* Figma mobile quickbar shows the five primary field types */
+    /* Figma mobile quickbar shows the five primary field types — SVG/FA icons only (no emoji) */
     const quickTypes = ['heading', 'text', 'password', 'email', 'checkbox'];
-    const glyphs = { heading: 'H', text: 'A', password: '●', email: '✉', checkbox: '☑' };
     bar.innerHTML = quickTypes.map((type) => {
       const c = COMPONENT_BY_TYPE[type];
       if (!c) return '';
       return `<button class="quick-tile" type="button" onclick="addCanvasElement('${c.type}')" aria-label="เพิ่ม ${esc(c.label)}">
-          <span class="quick-tile-glyph" aria-hidden="true">${glyphs[type] || ''}</span>
+          <span class="quick-tile-glyph" aria-hidden="true"><i class="fa-solid ${c.icon}"></i></span>
           <span class="quick-tile-label">${esc(c.short)}</span>
         </button>`;
     }).join('');
@@ -1403,8 +1415,8 @@ function renderCanvas() {
   preview.className = 'canvas-preview-card';
   const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
   const hint = canvasViewMode === 'wysiwyg'
-    ? 'หน้าตาใกล้ของจริง — แตะชิ้นเพื่อแก้'
-    : 'พรีวิวบนกระดาน — ยังแก้โครงได้อยู่';
+    ? 'แตะชิ้นเพื่อแก้ชื่อ · ปุ่มความกว้างบอกว่าช่องกินกี่ส่วนของแถว'
+    : 'พรีวิวบนกระดาน · กว้าง 1/3 แถว / ครึ่งแถว / เต็มแถว';
   preview.innerHTML = `
     <h3 class="canvas-preview-title">${esc(targetName)}</h3>
     <p class="canvas-preview-hint">${hint}</p>
@@ -1412,13 +1424,18 @@ function renderCanvas() {
 
   list.forEach((item, idx) => {
     const span = normalizeColSpan(item.colSpan);
-    const widthLabel = span === 12 ? 'เต็ม' : span === 6 ? 'ครึ่ง' : '⅓';
+    const widthLabel = span === 12 ? 'เต็มแถว' : span === 6 ? 'ครึ่งแถว' : '1/3 แถว';
+    const widthTitle = span === 12
+      ? 'กว้างเต็มแถว — กดเพื่อสลับ (ช่องกินความกว้างทั้งแถว)'
+      : span === 6
+        ? 'กว้างครึ่งแถว — กดเพื่อสลับ (ช่องกินครึ่งแถว)'
+        : 'กว้าง 1/3 แถว — กดเพื่อสลับ (ช่องกินหนึ่งในสามของแถว)';
     const itemCard = document.createElement('div');
     itemCard.className = `canvas-item col-${span} ${selectedElementId === item.id ? 'selected' : ''}`;
     itemCard.tabIndex = 0;
     itemCard.dataset.elementId = item.id;
     itemCard.setAttribute('aria-label', `องค์ประกอบ ${item.type} : ${item.label || ''} — ความกว้าง ${widthLabel} — ลำดับที่ ${idx + 1} จาก ${list.length}`);
-    itemCard.title = 'คลิกแล้วพิมพ์ชื่อ — ลากเพื่อย้าย / วางข้าง ๆ — ลากขอบขวาเพื่อปรับความกว้าง';
+    itemCard.title = 'คลิกแล้วพิมพ์ชื่อ — ลากเพื่อย้าย / วางข้าง ๆ — ลากขอบขวาหรือปุ่มความกว้างเพื่อปรับว่าช่องกินกี่ส่วนของแถว';
     itemCard.onclick = (e) => {
       e.stopPropagation();
       const onField = e.target.closest('[data-inline-prop], .item-controls, .resize-handle, .ctrl-type');
@@ -1517,10 +1534,11 @@ function renderCanvas() {
           <span class="sr-only">ประเภท</span>
           <select class="ctrl-type" aria-label="ประเภทองค์ประกอบ" onclick="event.stopPropagation()" onchange="event.stopPropagation(); changeElementType('${sid}', this.value)">${typeOptions}</select>
         </label>
-        <button type="button" class="ctrl-btn ctrl-width" title="สลับความกว้าง (เต็ม / ครึ่ง / ⅓)" aria-label="สลับความกว้างองค์ประกอบ" onclick="event.stopPropagation(); cycleElementWidth('${sid}')">${widthLabel}</button>
+        <button type="button" class="ctrl-btn ctrl-width" title="${widthTitle}" aria-label="ความกว้างช่องบนแถว: ${widthLabel}" onclick="event.stopPropagation(); cycleElementWidth('${sid}')">${widthLabel}</button>
         <button type="button" class="ctrl-btn ctrl-delete" title="ลบองค์ประกอบนี้" aria-label="ลบองค์ประกอบนี้" onclick="event.stopPropagation(); removeElement('${sid}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
-      <span class="resize-handle" role="slider" aria-label="ปรับความกว้าง" aria-valuetext="${widthLabel}" title="ลากเพื่อปรับความกว้าง"></span>
+      <p class="width-chip-hint">ปุ่มความกว้าง = ช่องนี้กินกี่ส่วนของแถว (1/3 · ครึ่ง · เต็ม)</p>
+      <span class="resize-handle" role="slider" aria-label="ปรับความกว้างของช่องบนแถว" aria-valuetext="${widthLabel}" title="ลากขอบเพื่อปรับว่าช่องกินกี่ส่วนของแถว"></span>
       <div class="item-body">${contentHTML}</div>
     `;
     attachResizeHandle(itemCard, item);
@@ -1575,11 +1593,12 @@ function renderInspector() {
         </div>
       ` : ''}
       <div class="inspector-field inspector-field-sm">
-        <label for="insp-colspan">ความกว้าง</label>
+        <label for="insp-colspan">ความกว้างบนแถว</label>
+        <p class="control-hint insp-width-hint">ช่องนี้กินกี่ส่วนของแถว — กว้าง 1/3 แถว · ครึ่งแถว · เต็มแถว</p>
         <select id="insp-colspan" onchange="updateItemProp('${id}', 'colSpan', parseInt(this.value))">
           <option value="12" ${normalizeColSpan(item.colSpan) === 12 ? 'selected' : ''}>เต็มแถว</option>
           <option value="6" ${normalizeColSpan(item.colSpan) === 6 ? 'selected' : ''}>ครึ่งแถว</option>
-          <option value="4" ${normalizeColSpan(item.colSpan) === 4 ? 'selected' : ''}>หนึ่งในสาม</option>
+          <option value="4" ${normalizeColSpan(item.colSpan) === 4 ? 'selected' : ''}>กว้าง 1/3 แถว</option>
         </select>
       </div>
       <p class="inspector-hint">พิมพ์ชื่อบนกระดานได้ — แถบนี้เป็นตัวช่วยสั้น ๆ</p>
@@ -1984,7 +2003,7 @@ function fontChoice(stack) {
 // ==========================================================================
 const THEME_PRESETS = {
   corporate: {
-    label: 'Corporate Slate', hint: 'ทางการ เรียบ เทา-น้ำเงิน',
+    label: 'เทาฟ้าทางการ', hint: 'เรียบ เทา-น้ำเงิน',
     accent: '#2563eb', cardBg: '#ffffff', text: '#0f172a', border: '#cbd5e1',
     edge: 'rgba(255,255,255,.5)', shadow: '0 20px 25px -5px rgba(15,23,42,.3)',
     inputBg: '#ffffff', muted: '#64748b', switcherBg: 'rgba(15,23,42,.06)',
@@ -1992,7 +2011,7 @@ const THEME_PRESETS = {
     gradient: 'linear-gradient(135deg, #1d4ed8, #0f172a)'
   },
   minimal: {
-    label: 'Minimal Clean', hint: 'ขาวสะอาด มนน้อย ไม่เบลอ',
+    label: 'ขาวเรียบ', hint: 'สะอาด มนน้อย ไม่เบลอ',
     accent: '#18181b', cardBg: '#ffffff', text: '#09090b', border: '#e4e4e7',
     edge: 'rgba(9,9,11,.12)', shadow: '0 2px 10px rgba(9,9,11,.08)',
     inputBg: '#fafafa', muted: '#71717a', switcherBg: 'transparent',
@@ -2000,7 +2019,7 @@ const THEME_PRESETS = {
     gradient: 'linear-gradient(135deg, #f4f4f5, #d4d4d8)'
   },
   resort: {
-    label: 'Resort Sky', hint: 'ฟ้าทะเล การ์ดมนมาก โปร่งแสง',
+    label: 'ฟ้าทะเล', hint: 'การ์ดมน โปร่งแสง',
     accent: '#0284c7', cardBg: '#ffffff', text: '#0c4a6e', border: '#7dd3fc',
     edge: 'rgba(255,255,255,.65)', shadow: '0 24px 40px -12px rgba(2,132,199,.45)',
     inputBg: '#f0f9ff', muted: '#0369a1', switcherBg: 'rgba(2,132,199,.1)',
@@ -2008,7 +2027,7 @@ const THEME_PRESETS = {
     gradient: 'linear-gradient(160deg, #38bdf8, #0369a1 60%, #082f49)'
   },
   tech: {
-    label: 'Tech Indigo', hint: 'ครามนีออน ฟอนต์ Inter พลิกการ์ด',
+    label: 'ครามเข้ม', hint: 'ฟอนต์ Inter พลิกการ์ด',
     accent: '#4f46e5', cardBg: '#ffffff', text: '#1e1b4b', border: '#c7d2fe',
     edge: 'rgba(199,210,254,.55)', shadow: '0 26px 44px -14px rgba(79,70,229,.5)',
     inputBg: '#f5f3ff', muted: '#6366f1', switcherBg: 'rgba(79,70,229,.12)',
@@ -2016,7 +2035,7 @@ const THEME_PRESETS = {
     gradient: 'linear-gradient(135deg, #312e81, #0f172a)'
   },
   pastel: {
-    label: 'Soft Pastel', hint: 'พาสเทลชมพู นุ่ม ปุ่มแคปซูล',
+    label: 'พาสเทลนุ่ม', hint: 'ชมพูนุ่ม ปุ่มแคปซูล',
     accent: '#ec4899', cardBg: '#fff5f9', text: '#831843', border: '#fbcfe8',
     edge: 'rgba(236,72,153,.25)', shadow: '0 18px 30px -12px rgba(236,72,153,.4)',
     inputBg: '#ffffff', muted: '#a21caf', switcherBg: 'rgba(236,72,153,.1)',
@@ -2024,7 +2043,7 @@ const THEME_PRESETS = {
     gradient: 'linear-gradient(135deg, #fda4af, #fbcfe8 45%, #c7d2fe)'
   },
   slate: {
-    label: 'Deep Slate', hint: 'เทาเข้มจริงจัง แท็บมินิมอล จางนุ่ม',
+    label: 'เทาเข้ม', hint: 'แท็บมินิมอล จางนุ่ม',
     accent: '#0f172a', cardBg: '#f8fafc', text: '#0f172a', border: '#94a3b8',
     edge: 'rgba(15,23,42,.22)', shadow: '0 14px 28px -14px rgba(2,6,23,.6)',
     inputBg: '#ffffff', muted: '#475569', switcherBg: 'rgba(15,23,42,.08)',
@@ -2032,7 +2051,7 @@ const THEME_PRESETS = {
     gradient: 'linear-gradient(135deg, #334155, #020617)'
   },
   retro: {
-    label: 'Warm Cream', hint: 'ครีมอุ่น ฟอนต์ Kanit คมเหลี่ยม',
+    label: 'ครีมอุ่น', hint: 'ฟอนต์ Kanit คมเหลี่ยม',
     accent: '#d97706', cardBg: '#fffbeb', text: '#78350f', border: '#d6b98c',
     edge: 'rgba(120,53,15,.35)', shadow: '8px 8px 0 rgba(120,53,15,.18)',
     inputBg: '#fffdf5', muted: '#92400e', switcherBg: 'rgba(217,119,6,.14)',
@@ -2040,7 +2059,7 @@ const THEME_PRESETS = {
     gradient: 'linear-gradient(135deg, #fef3c7, #f59e0b 55%, #b45309)'
   },
   eco: {
-    label: 'Eco Emerald', hint: 'เขียวธรรมชาติ Sarabun ค่อยจาง',
+    label: 'เขียวธรรมชาติ', hint: 'Sarabun ค่อยจาง',
     accent: '#059669', cardBg: '#ffffff', text: '#064e3b', border: '#6ee7b7',
     edge: 'rgba(5,150,105,.25)', shadow: '0 18px 32px -14px rgba(5,150,105,.45)',
     inputBg: '#f0fdf4', muted: '#047857', switcherBg: 'rgba(5,150,105,.1)',
@@ -2048,7 +2067,7 @@ const THEME_PRESETS = {
     gradient: 'linear-gradient(135deg, #34d399, #059669 55%, #064e3b)'
   },
   glassdark: {
-    label: 'Dark Glass', hint: 'การ์ดเข้ม เบลอจัด เงาลึก',
+    label: 'กระจกเข้ม', hint: 'การ์ดเข้ม เบลอจัด',
     accent: '#38bdf8', cardBg: '#0b1220', text: '#e2e8f0', border: 'rgba(148,163,184,.45)',
     edge: 'rgba(255,255,255,.18)', shadow: '0 30px 60px -20px rgba(0,0,0,.75)',
     inputBg: 'rgba(15,23,42,.55)', muted: '#94a3b8', switcherBg: 'rgba(255,255,255,.09)',
@@ -2056,7 +2075,7 @@ const THEME_PRESETS = {
     gradient: 'linear-gradient(135deg, #0f172a, #1e293b 50%, #020617)'
   },
   sunset: {
-    label: 'Sunset Glow', hint: 'ส้มตะวันตกดิน Kanit เงานุ่ม',
+    label: 'ส้มตะวันตก', hint: 'Kanit เงานุ่ม',
     accent: '#f97316', cardBg: '#fff7ed', text: '#7c2d12', border: '#fdba74',
     edge: 'rgba(249,115,22,.3)', shadow: '0 26px 50px -18px rgba(249,115,22,.55)',
     inputBg: '#ffffff', muted: '#c2410c', switcherBg: 'rgba(249,115,22,.12)',
@@ -2088,8 +2107,8 @@ function renderThemePresets() {
     const varsText = Object.keys(vars).map((k) => `${k}:${vars[k]}`).join(';');
     return `
       <button type="button" class="theme-preset-card" data-theme="${key}" aria-pressed="${studioConfig.themePreset === key}"
-              ${unlocked ? '' : 'disabled'} aria-disabled="${unlocked ? 'false' : 'true'}"
-              onclick="applyThemePreset('${key}', event)" title="${unlocked ? 'ใช้ธีม ' + esc(p.label) : 'ต้องปลดล็อกด้วยรหัสครู'}">
+              aria-disabled="${unlocked ? 'false' : 'true'}"
+              onclick="applyThemePreset('${key}', event)" title="${unlocked ? 'ใช้ชุดสี ' + esc(p.label) : 'ต้องปลดล็อกด้วยรหัสครู'}">
         <span class="theme-swatch" style="${esc(varsText)};background-image:${p.gradient}" aria-hidden="true">
           <span class="mini-card">
             <span class="mini-aa">Aa</span>
@@ -2106,12 +2125,14 @@ function renderThemePresets() {
 
 function applyThemePreset(presetKey, ev) {
   if (!isTeacherUnlocked()) {
+    pendingThemeKey = presetKey;
     openTeacherUnlockModal('theme');
-    tipTiewBot('theme-lock', 'ครูชิโร่: ชุดธีมต้องใส่รหัสครูก่อน — เลือกสีทีละช่องด้านล่างได้');
+    tipTiewBot('theme-lock', 'ครูชิโร่: ชุดสีต้องใส่รหัสครูก่อน — เลือกสีทีละช่องด้านล่างได้');
     return;
   }
   const p = THEME_PRESETS[presetKey];
   if (!p) return;
+  pendingThemeKey = null;
   studioConfig.themePreset = presetKey;
 
   studioConfig.accentColor = p.accent;
@@ -2136,7 +2157,7 @@ function applyThemePreset(presetKey, ev) {
   syncThemeActive(presetKey, ev);
   applyConfigToControls();   // สไลเดอร์/ดรอปดาวน์/สี ขยับตามธีม
   updateStudioStyles();      // ตัวอย่าง + modal + โค้ดที่ export + autosave
-  toast(`ใช้ธีม ${p.label} แล้ว — สี ฟอนต์ และพื้นหลังอัปเดตแล้ว`);
+  toast(`ใช้ชุดสี «${p.label}» แล้ว`);
 }
 
 // ==========================================================================
