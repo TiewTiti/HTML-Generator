@@ -3052,15 +3052,15 @@ function copyFullStandaloneHTML() {
     btn.innerHTML = exportMode === 'embed'
       ? '<i class="fa-solid fa-check" aria-hidden="true"></i> คัดลอกชิ้นส่วนสำเร็จแล้ว!'
       : '<i class="fa-solid fa-check" aria-hidden="true"></i> คัดลอกโค้ดทั้งหน้าเว็บสำเร็จแล้ว!';
-    btn.classList.remove('btn-success');
-    btn.classList.add('btn-sky');
+    btn.classList.remove('btn-success', 'btn-sky');
+    btn.classList.add('btn-primary');
     toast(exportMode === 'embed'
       ? 'คัดลอกแล้ว — วางในหน้าเว็บที่มีอยู่แล้ว สไตล์อยู่ในการ์ด ไม่ทับเมนู'
       : 'คัดลอกแล้ว — วางใน index.html แล้วดับเบิลคลิกเปิดได้');
     setTimeout(() => {
       btn.innerHTML = original;
-      btn.classList.remove('btn-sky');
-      btn.classList.add('btn-success');
+      btn.classList.remove('btn-success', 'btn-sky');
+      btn.classList.add('btn-primary');
     }, 2500);
   }
 }

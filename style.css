@@ -1397,6 +1397,15 @@ body.layout-b .canvas-dropzone {
 
 .btn-success { background-color: var(--success-color); color: #fff; border-color: transparent; border-radius: var(--btn-radius); }
 .btn-success:hover { background-color: #1f7a36; }
+/* Export actions stay on the soft blue accent — no lime or green */
+#copy-standalone-btn,
+#download-standalone-btn {
+  background-color: #3b82f6;
+  border-color: transparent;
+  color: #fff;
+}
+#copy-standalone-btn:hover,
+#download-standalone-btn:hover { background-color: #2563eb; }
 
 .btn-secondary {
   background-color: rgba(0, 0, 0, 0.04);
