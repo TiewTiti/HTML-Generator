@@ -41,8 +41,11 @@
   --font-main: -apple-system, BlinkMacSystemFont, "SF Pro TH", "SF Pro Text", "Noto Sans Thai", "Segoe UI", "Helvetica Neue", sans-serif;
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro TH", "SF Pro Display", "SF Pro Text", "Noto Sans Thai", "Segoe UI", "Helvetica Neue", sans-serif;
   --radius-panel: 24px;
-  --radius-control: 14px;
-  --radius-dock: 18px;
+  --radius-control: 10px;
+  --radius-dock: 14px;
+  --btn-h: 36px;
+  --btn-radius: 10px;
+  --btn-fs: 13px;
 
   --header-height: 48px;
   --hero-pad-y: 52px;
@@ -940,14 +943,15 @@ body.layout-b .canvas-dropzone {
 }
 
 .canvas-item .ctrl-btn {
-  height: 28px;
-  min-width: 28px;
-  padding: 0 8px;
+  height: var(--btn-h);
+  min-height: var(--btn-h);
+  min-width: var(--btn-h);
+  padding: 0 12px;
   border: 1px solid var(--border-soft);
-  border-radius: 980px;
-  background: rgba(255, 255, 255, 0.96);
+  border-radius: var(--btn-radius);
+  background: #fff;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: var(--btn-fs);
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -970,8 +974,8 @@ body.layout-b .canvas-dropzone {
   border-color: var(--accent-soft);
   background: var(--accent-tint);
   min-width: auto;
-  padding: 0 10px;
-  font-size: 10.5px;
+  padding: 0 12px;
+  font-size: var(--btn-fs);
   white-space: nowrap;
 }
 
@@ -1011,16 +1015,16 @@ body.layout-b .canvas-dropzone {
 }
 
 .canvas-item .ctrl-type {
-  height: 28px;
-  max-width: 7.5rem;
-  padding: 0 8px;
+  height: var(--btn-h);
+  max-width: 8.5rem;
+  padding: 0 10px;
   border: 1px solid var(--border-soft);
-  border-radius: 980px;
-  background: rgba(255, 255, 255, 0.96);
-  color: var(--accent-deep);
-  font: inherit;
-  font-size: 11px;
+  border-radius: var(--btn-radius);
+  font-family: var(--font-main);
+  font-size: var(--btn-fs);
   font-weight: 600;
+  background: #fff;
+  color: var(--accent-deep);
   cursor: pointer;
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
 }
@@ -1359,20 +1363,25 @@ body.layout-b .canvas-dropzone {
   line-height: 1.45;
 }
 
-/* Buttons System */
+/* Buttons — one height, one radius, one type scale */
 .btn {
-  padding: 8px 14px;
-  border-radius: var(--radius-control);
+  height: var(--btn-h);
+  min-height: var(--btn-h);
+  padding: 0 14px;
+  border-radius: var(--btn-radius);
   font-family: var(--font-main);
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--btn-fs);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
   cursor: pointer;
   border: 1px solid transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  box-sizing: border-box;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn:disabled {
@@ -1380,29 +1389,32 @@ body.layout-b .canvas-dropzone {
   cursor: not-allowed;
 }
 
-.btn-primary { background-color: var(--accent-primary); color: #fff; border-color: transparent; border-radius: 980px; }
+.btn-primary { background-color: var(--accent-primary); color: #fff; border-color: transparent; border-radius: var(--btn-radius); }
 .btn-primary:hover { background-color: var(--accent-hover); }
 
-.btn-sky { background-color: var(--accent-primary); color: #fff; border-color: transparent; border-radius: 980px; }
+.btn-sky { background-color: var(--accent-primary); color: #fff; border-color: transparent; border-radius: var(--btn-radius); }
 .btn-sky:hover { background-color: var(--accent-hover); }
 
-.btn-success { background-color: var(--success-color); color: #fff; border-color: transparent; border-radius: 980px; }
+.btn-success { background-color: var(--success-color); color: #fff; border-color: transparent; border-radius: var(--btn-radius); }
 .btn-success:hover { background-color: #1f7a36; }
 
 .btn-secondary {
   background-color: rgba(0, 0, 0, 0.04);
   border-color: transparent;
   color: var(--text-main);
-  border-radius: 980px;
+  border-radius: var(--btn-radius);
 }
 .btn-secondary:hover { background-color: rgba(0, 0, 0, 0.08); }
 
 .btn-outline-full {
   width: 100%;
   border-color: var(--border-color);
-  background: transparent;
+  background: #fff;
   color: var(--text-main);
-  border-radius: var(--radius-control);
+  border-radius: var(--btn-radius);
+  height: var(--btn-h);
+  font-size: var(--btn-fs);
+  font-weight: 600;
 }
 .btn-outline-full:hover { background-color: var(--surface-subtle); }
 
@@ -1428,9 +1440,16 @@ body.layout-b .canvas-dropzone {
   color: #b80012;
 }
 
-.btn-sm { padding: 6px 12px; font-size: 12px; }
-.btn-md { padding: 10px 18px; font-size: 13px; }
-.btn-lg { padding: 12px 22px; font-size: 14px; font-weight: 600; }
+.btn-sm,
+.btn-md,
+.btn-lg {
+  height: var(--btn-h);
+  min-height: var(--btn-h);
+  padding: 0 14px;
+  font-size: var(--btn-fs);
+  font-weight: 600;
+  border-radius: var(--btn-radius);
+}
 .btn-full { width: 100%; }
 
 .badge {
@@ -1822,15 +1841,17 @@ body.layout-b .canvas-dropzone {
 
 /* แถบเลือกรูปแบบโค้ดที่ส่งออก: ไฟล์เดียวจบ (ทั้งหน้า) / ชิ้นส่วนแปะในหน้าเดิม */
 .export-mode-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-.export-mode-group { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; }
+.export-mode-group { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface-subtle); border: 1px solid var(--border-color); border-radius: var(--btn-radius); }
 .export-mode-btn {
-  padding: 6px 12px;
+  height: var(--btn-h);
+  min-height: var(--btn-h);
+  padding: 0 14px;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--btn-radius);
   background: transparent;
   font-family: var(--font-main);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--btn-fs);
+  font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
 }
@@ -1874,7 +1895,7 @@ body.layout-b .canvas-dropzone {
 }
 .picker-confirm-note { flex: 1; min-width: 0; color: #1e40af; line-height: 1.45; }
 .picker-confirm-actions { display: flex; gap: 6px; flex: 0 0 auto; }
-.picker-confirm-actions .btn { min-height: 32px; }
+.picker-confirm-actions .btn { min-height: var(--btn-h); height: var(--btn-h); }
 
 .picker-item input[type="color"] {
   border: none;
@@ -2084,7 +2105,7 @@ body.layout-b .canvas-dropzone {
 }
 
 /* ปุ่มในแถวเดียวกันต้องสูงเท่ากัน (เดิมปุ่มซ่อน/สอนถูกกว่า 2 ปุ่มหลัก → แถวดูไม่บาลานซ์) */
-.exporter-actions .btn { min-height: 40px; }
+.exporter-actions .btn { min-height: var(--btn-h); height: var(--btn-h); }
 
 .code-editor-box textarea {
   width: 100%;
@@ -2551,17 +2572,19 @@ body.layout-b .canvas-dropzone {
 }
 .otp-verify-btn {
   width: 100%;
-  padding: 14px 16px;
+  height: var(--btn-h);
+  min-height: var(--btn-h);
+  padding: 0 14px;
   border: 0;
-  border-radius: 980px;
+  border-radius: var(--btn-radius);
   background: var(--accent-primary);
   color: #fff;
   font-family: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: var(--btn-fs);
+  font-weight: 600;
+  letter-spacing: 0;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.15s ease;
+  transition: background-color 0.15s ease;
 }
 .otp-verify-btn:hover { background: var(--accent-hover); }
 .otp-verify-btn:active { transform: translateY(1px); }
@@ -2623,10 +2646,11 @@ body.layout-b .canvas-dropzone {
   background: rgba(0, 0, 0, 0.04);
   color: var(--text-muted);
   font-family: inherit;
-  font-size: 11px;
-  font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 980px;
+  font-size: var(--btn-fs);
+  font-weight: 600;
+  height: var(--btn-h);
+  padding: 0 12px;
+  border-radius: var(--btn-radius);
   cursor: pointer;
   transition: background-color 0.2s var(--ease-apple), color 0.2s var(--ease-apple);
 }
@@ -2692,7 +2716,7 @@ body.layout-b .canvas-dropzone {
 }
 
 @media (max-width: 700px) {
-  .tiew-bot { right: 10px; bottom: 88px; }
+  .tiew-bot { right: 10px; bottom: 188px; }
   .otp-digit { width: 40px; height: 48px; font-size: 20px; gap: 6px; }
   .otp-digits { gap: 6px; }
 }
@@ -3046,9 +3070,7 @@ body.layout-b .builder-layout > .inspector-sidebar {
   max-width: 300px;
   margin: 0;
   box-shadow: var(--shadow-lg);
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  background: #fff;
   border: 0;
   transition: transform 0.32s var(--ease-apple), opacity 0.24s var(--ease-apple);
   will-change: transform;
@@ -3088,9 +3110,10 @@ body.layout-b .builder-layout.inspector-hidden > .inspector-sidebar {
   border: 0;
   padding: 0;
   margin: 0;
-  background: rgba(29, 29, 31, 0.18);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  /* Light dim only — do not blur the page behind the drawer */
+  background: rgba(15, 23, 42, 0.12);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   cursor: pointer;
   opacity: 1;
   transition: opacity 0.28s var(--ease-apple);
@@ -3127,9 +3150,7 @@ body.layout-b .studio-layout > .studio-controls-sidebar {
   width: min(320px, 90vw);
   margin: 0;
   box-shadow: var(--shadow-lg);
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  background: #fff;
   border-right: 0.5px solid rgba(0, 0, 0, 0.08);
   border-radius: 0 18px 18px 0;
   transition: transform 0.32s var(--ease-apple), opacity 0.24s var(--ease-apple);
@@ -3304,11 +3325,12 @@ body.layout-b .empty-canvas-actions {
 
 body.layout-b .empty-canvas-actions .btn {
   width: 100%;
-  border-radius: 980px;
+  height: var(--btn-h);
+  border-radius: var(--btn-radius);
   justify-content: center;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 10px 16px;
+  font-size: var(--btn-fs);
+  font-weight: 600;
+  padding: 0 14px;
 }
 
 body.layout-b .empty-canvas-actions .btn-secondary {
@@ -3323,29 +3345,33 @@ body.layout-b .empty-canvas-state .template-lock-hint {
   color: var(--text-tertiary);
 }
 
-/* Soft Figma chip buttons on the canvas bar */
+/* Canvas toolbar uses the same button size as the rest of the studio */
 body.layout-b .canvas-header .panel-open-btn[aria-expanded="true"] {
   background: var(--accent-tint);
   color: var(--accent-deep);
   border: 0;
-  border-radius: 980px;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 5px 12px;
+  border-radius: var(--btn-radius);
+  height: var(--btn-h);
+  font-size: var(--btn-fs);
+  font-weight: 600;
+  padding: 0 14px;
 }
 body.layout-b .canvas-header .panel-open-btn[aria-expanded="false"] {
   background: var(--accent-primary);
   color: #fff;
   border: 0;
-  border-radius: 980px;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 5px 12px;
+  border-radius: var(--btn-radius);
+  height: var(--btn-h);
+  font-size: var(--btn-fs);
+  font-weight: 600;
+  padding: 0 14px;
 }
 body.layout-b .canvas-header .btn-clear-danger {
-  border-radius: 980px;
-  font-size: 12px;
-  padding: 5px 12px;
+  border-radius: var(--btn-radius);
+  height: var(--btn-h);
+  font-size: var(--btn-fs);
+  font-weight: 600;
+  padding: 0 14px;
 }
 
 /* (quickbar styles live on body.layout-b > .quickbar) */
@@ -3357,19 +3383,14 @@ body.layout-b .forward-action-card {
   padding: 8px 0 0;
 }
 
-body.layout-b .hero-cta .btn-primary {
-  border-radius: 980px;
-  padding: 12px 22px;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0;
-  transition: background-color 0.22s var(--ease-apple), color 0.22s var(--ease-apple), border-color 0.22s var(--ease-apple);
-}
+body.layout-b .hero-cta .btn-primary,
 body.layout-b .hero-cta .btn-ghost {
-  border-radius: 980px;
-  padding: 12px 18px;
-  font-size: 14px;
-  font-weight: 400;
+  height: var(--btn-h);
+  min-height: var(--btn-h);
+  border-radius: var(--btn-radius);
+  padding: 0 16px;
+  font-size: var(--btn-fs);
+  font-weight: 600;
   letter-spacing: 0;
 }
 body.layout-b .gated-cta-label {
@@ -3392,33 +3413,39 @@ body.layout-b .gated-cta-label {
 .dock {
   pointer-events: auto;
   display: flex;
-  gap: 2px;
+  gap: 4px;
   align-items: center;
-  padding: 8px 10px;
+  padding: 6px;
   border-radius: var(--radius-dock);
-  background: var(--surface-glass);
-  backdrop-filter: blur(32px) saturate(190%);
-  -webkit-backdrop-filter: blur(32px) saturate(190%);
-  border: 0.5px solid rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.96);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
   box-shadow: var(--shadow-dock);
+  max-width: calc(100vw - 24px);
+  overflow-x: auto;
 }
 
 .dock-btn {
   border: 0;
   background: transparent;
-  border-radius: 14px;
-  padding: 7px 11px;
-  font: inherit;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  height: var(--btn-h);
+  min-height: var(--btn-h);
+  border-radius: var(--btn-radius);
+  padding: 0 10px;
+  font-family: var(--font-main);
+  font-size: var(--btn-fs);
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--text-main);
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  flex-direction: row;
   align-items: center;
-  gap: 5px;
-  min-width: 60px;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 0 0 auto;
+  white-space: nowrap;
   cursor: pointer;
+  box-sizing: border-box;
   transition: background-color 0.22s var(--ease-apple), color 0.22s var(--ease-apple);
 }
 .dock-btn:hover { background: rgba(0, 0, 0, 0.04); }
@@ -3427,14 +3454,15 @@ body.layout-b .gated-cta-label {
   color: var(--accent-deep);
 }
 .dock-ico {
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  background: rgba(15, 23, 42, 0.04);
-  color: var(--text-main);
+  width: 16px;
+  height: 16px;
+  border-radius: 0;
+  background: transparent;
+  color: currentColor;
   display: grid;
   place-items: center;
   line-height: 0;
+  flex: 0 0 auto;
 }
 .dock-ico svg { display: block; }
 .dock-btn.on .dock-ico {
@@ -3452,10 +3480,16 @@ body.layout-b .gated-cta-label {
 
 body.layout-b .tiew-bot {
   right: 20px;
-  bottom: 96px;
+  bottom: 88px;
 }
 
 @media (max-width: 700px) {
+  /* Chip + bubble sit fully above the dock, including the drop shadow */
+  body.layout-b .tiew-bot {
+    right: 10px;
+    bottom: 188px;
+  }
+  body.layout-b .dock-wrap { bottom: 10px; }
   body.layout-b .studio-hero { padding: 28px 14px 18px; }
   body.layout-b .studio-hero::before {
     width: 100%;
@@ -3548,12 +3582,20 @@ body.layout-b .tiew-bot {
   }
   body.layout-b .canvas-preview-title { font-size: 20px; }
   .dock {
-    max-width: calc(100vw - 16px);
+    max-width: calc(100vw - 8px);
+    gap: 0;
+    padding: 4px 2px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
-  .dock-btn { min-width: 56px; padding: 6px 8px; }
-  body.layout-b .tiew-bot { bottom: 88px; right: 12px; }
+  .dock-btn {
+    min-width: 0;
+    padding: 0 4px;
+    gap: 3px;
+    flex: 1 1 auto;
+  }
+  .dock-sep { margin: 0 1px; flex: 0 0 auto; }
+  body.layout-b .tiew-bot { bottom: 188px; right: 10px; }
 }
 
 /* Tablet — Variant B (Figma 834) */
@@ -3569,4 +3611,62 @@ body.layout-b .tiew-bot {
     min-height: 420px;
     padding: 24px 16px 110px;
   }
+}
+
+/* In-app tutorial — one step, no page blur */
+.tutorial {
+  position: fixed;
+  left: 50%;
+  bottom: 72px;
+  transform: translateX(-50%);
+  z-index: 60;
+  width: min(420px, calc(100vw - 24px));
+  pointer-events: none;
+}
+.tutorial[hidden] { display: none !important; }
+.tutorial-card {
+  pointer-events: auto;
+  background: #fff;
+  border: 1px solid rgba(59, 130, 246, 0.18);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+  padding: 14px 14px 12px;
+}
+.tutorial-kicker {
+  margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #3b82f6;
+}
+.tutorial-kicker svg { display: block; flex: 0 0 auto; }
+.tutorial-title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--text-main);
+}
+.tutorial-body {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: 0;
+  color: var(--text-muted);
+}
+.tutorial-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.header-help-btn { margin-left: 8px; }
+.dock-btn.is-tutorial {
+  outline: 2px solid #3b82f6;
+  outline-offset: 1px;
+}
+@media (max-width: 700px) {
+  .tutorial { bottom: 68px; }
 }
