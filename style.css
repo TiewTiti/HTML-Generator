@@ -42,9 +42,9 @@
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro TH", "SF Pro Display", "SF Pro Text", "Noto Sans Thai", "Segoe UI", "Helvetica Neue", sans-serif;
   --radius-panel: 24px;
   --radius-control: 10px;
-  --radius-dock: 14px;
+  --radius-dock: 22px;
   --btn-h: 36px;
-  --btn-radius: 10px;
+  --btn-radius: 18px;
   --btn-fs: 13px;
 
   --header-height: 48px;
@@ -792,7 +792,7 @@ body.layout-b .canvas-dropzone {
   display: inline-flex;
   align-items: stretch;
   border: 0.5px solid rgba(0, 0, 0, 0.08);
-  border-radius: 980px;
+  border-radius: var(--btn-radius);
   overflow: hidden;
   background: transparent;
 }
@@ -819,11 +819,12 @@ body.layout-b .canvas-dropzone {
 .zoom-btn-label { min-width: 44px; font-variant-numeric: tabular-nums; font-weight: 500; }
 .view-mode-btn {
   border: 0.5px solid rgba(0, 0, 0, 0.08);
-  border-radius: 980px;
+  border-radius: var(--btn-radius);
   background: transparent;
   font-weight: 500;
   font-size: 11px;
   padding: 0 10px;
+  height: var(--btn-h);
 }
 .view-mode-btn[aria-pressed="true"] {
   background: var(--accent-tint);
@@ -1850,7 +1851,7 @@ body.layout-b .canvas-dropzone {
 
 /* แถบเลือกรูปแบบโค้ดที่ส่งออก: ไฟล์เดียวจบ (ทั้งหน้า) / ชิ้นส่วนแปะในหน้าเดิม */
 .export-mode-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-.export-mode-group { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface-subtle); border: 1px solid var(--border-color); border-radius: var(--btn-radius); }
+.export-mode-group { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface-subtle); border: 1px solid var(--border-color); border-radius: calc(var(--btn-radius) + 4px); }
 .export-mode-btn {
   height: var(--btn-h);
   min-height: var(--btn-h);
@@ -2408,7 +2409,7 @@ body.layout-b .canvas-dropzone {
   background: #fff5f5 !important;
   color: #d70015 !important;
   border: 1px solid #ffd4d8 !important;
-  border-radius: 980px;
+  border-radius: var(--btn-radius);
   font-weight: 500;
 }
 .btn-clear-danger:hover {
@@ -3701,24 +3702,27 @@ body.layout-b .tiew-bot {
   max-width: min(420px, 52vw);
 }
 
-/* โครง + สี share one panel system */
+/* โครง + ชุดสี — one quieter list, mint ground, white rows */
 body.layout-b .toolbox-sidebar,
 body.layout-b .studio-controls-sidebar {
   padding: 0;
   gap: 0;
-  background: #fff;
+  background: #f4f7f6;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 body.layout-b .toolbox-sidebar .sidebar-header,
 body.layout-b .studio-controls-sidebar .sidebar-header {
-  padding: 14px 16px 12px;
+  padding: 16px 16px 12px;
   margin: 0;
-  background: #fff;
+  background: #f4f7f6;
+  border-bottom: 0;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 .toolbox-sidebar .sidebar-header h2,
 .studio-controls-sidebar .sidebar-header h2 {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 0;
 }
@@ -3732,8 +3736,8 @@ body.layout-b .studio-controls-sidebar .sidebar-header {
 }
 body.layout-b .toolbox-sidebar .sidebar-body,
 body.layout-b .studio-controls-sidebar .sidebar-body {
-  padding: 12px 16px 16px;
-  gap: 12px;
+  padding: 4px 14px 18px;
+  gap: 16px;
 }
 .tool-section-label,
 .toolbox-sidebar .category-title,
@@ -3741,8 +3745,8 @@ body.layout-b .studio-controls-sidebar .sidebar-body {
 .studio-controls-sidebar .group-tools-label {
   display: flex;
   align-items: center;
-  min-height: 28px;
-  margin: 0;
+  min-height: 22px;
+  margin: 0 2px 6px;
   padding: 0;
   font-size: 12px;
   font-weight: 600;
@@ -3750,42 +3754,86 @@ body.layout-b .studio-controls-sidebar .sidebar-body {
   text-transform: none;
   color: var(--text-muted);
 }
+.studio-controls-sidebar .group-tools {
+  gap: 8px;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.studio-controls-sidebar .control-group {
+  gap: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
 .studio-controls-sidebar .group-header {
   min-height: 40px;
-  padding: 0 8px;
-  border-radius: 10px;
+  padding: 0 12px;
+  border-radius: var(--btn-radius);
+  background: #fff;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0;
 }
-.studio-controls-sidebar .group-body { gap: 12px; padding: 8px 0 4px; }
+.studio-controls-sidebar .group-index {
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.studio-controls-sidebar .group-body {
+  gap: 8px;
+  padding: 8px 2px 2px;
+}
+.studio-controls-sidebar .control-hint {
+  margin: 0 2px;
+}
+.toolbox-sidebar .component-grid { gap: 6px; }
 .toolbox-sidebar .comp-btn {
   min-height: 40px;
   height: 40px;
   padding: 0 12px;
-  border-radius: 10px;
+  border-radius: var(--btn-radius);
   font-size: 13px;
   font-weight: 600;
-  background: #f4f6f5;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+.toolbox-sidebar .comp-btn i {
+  width: 16px;
+  color: #3b82f6;
+  text-align: center;
 }
 .studio-controls-sidebar .picker-item,
 .studio-controls-sidebar .input-field-unit,
 .studio-controls-sidebar .select-field-unit {
   min-height: 40px;
-  padding: 4px 10px;
-  border-radius: 10px;
-  background: #f4f6f5;
+  padding: 4px 12px;
+  border-radius: var(--btn-radius);
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
   font-size: 13px;
   font-weight: 600;
+}
+.studio-controls-sidebar .theme-presets-grid { gap: 8px; }
+.studio-controls-sidebar .theme-preset-card {
+  background: #fff;
+  border-radius: 14px;
+}
+.toolbox-sidebar .target-btn-group {
+  padding: 3px;
+  gap: 3px;
+  background: #fff;
+  border-radius: calc(var(--btn-radius) + 4px);
+  border: 1px solid rgba(15, 23, 42, 0.06);
 }
 .toolbox-sidebar .target-btn,
 .toolbox-sidebar .target-btn.target-btn-login,
 .toolbox-sidebar .target-btn.target-btn-register {
-  min-height: 40px;
+  min-height: 36px;
   padding: 0 8px;
-  border-radius: 10px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: #f4f6f5;
+  border-radius: var(--btn-radius);
+  border: 0;
+  background: transparent;
   color: var(--text-main);
   font-size: 13px;
   font-weight: 600;
@@ -3815,7 +3863,7 @@ body.layout-b .studio-controls-sidebar .sidebar-body {
   padding: 3px;
   background: #f4f6f5;
   border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 12px;
+  border-radius: calc(var(--btn-radius) + 4px);
 }
 .studio-view-btn {
   height: var(--btn-h);
