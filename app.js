@@ -180,14 +180,14 @@ let exportMode = 'full';          // 'full' = ไฟล์เดียวจบ�
 
 const DEFAULT_LOGIN = () => ([
   { id: 'el-1', type: 'heading',  label: 'เข้าสู่ระบบ', subtitle: 'กรอกบัญชีผู้ใช้เพื่อเข้าสู่ระบบ', colSpan: 12 },
-  { id: 'el-2', type: 'text',     label: 'ชื่อผู้ใช้ หรือ อีเมล', placeholder: 'username / email', required: true, colSpan: 12 },
-  { id: 'el-3', type: 'password', label: 'รหัสผ่าน', placeholder: '••••••••', required: true, colSpan: 12 },
+  { id: 'el-2', type: 'text',     label: 'ชื่อผู้ใช้ หรือ อีเมล', placeholder: 'ชื่อผู้ใช้ / อีเมล', required: true, colSpan: 6 },
+  { id: 'el-3', type: 'password', label: 'รหัสผ่าน', placeholder: '••••••••', required: true, colSpan: 6 },
   { id: 'el-4', type: 'button',   label: 'เข้าสู่ระบบ', colSpan: 12 }
 ]);
 const DEFAULT_REGISTER = () => ([
   { id: 'el-5', type: 'heading',  label: 'สมัครสมาชิก', subtitle: 'สร้างบัญชีผู้ใช้ใหม่สำหรับชั้น ม.5', colSpan: 12 },
-  { id: 'el-6', type: 'text',     label: 'ชื่อ-นามสกุล', placeholder: 'นายสมชาย ใจดี', required: true, colSpan: 12 },
-  { id: 'el-7', type: 'email',    label: 'อีเมล', placeholder: 'student@school.ac.th', required: true, colSpan: 12 },
+  { id: 'el-6', type: 'text',     label: 'ชื่อ-นามสกุล', placeholder: 'นายสมชาย ใจดี', required: true, colSpan: 6 },
+  { id: 'el-7', type: 'email',    label: 'อีเมล', placeholder: 'student@school.ac.th', required: true, colSpan: 6 },
   { id: 'el-8', type: 'password', label: 'ตั้งรหัสผ่าน', placeholder: '••••••••', required: true, colSpan: 12 },
   { id: 'el-9', type: 'button',   label: 'ยืนยันการสมัครสมาชิก', colSpan: 12 }
 ]);
@@ -524,13 +524,13 @@ function submitTeacherOtp() {
   const next = pendingTeacherAction;
   setTeacherUnlocked(true);
   closeTeacherUnlockModal();
-  toast('ปลดล็อกของครูแล้ว — ใช้แบบฟอร์มตัวอย่างและชุดธีมได้');
+  toast('ปลดล็อกแล้ว — ใช้แบบตัวอย่างและชุดธีมได้');
   if (next === 'template') loadDefaultFormStructure(true);
   if (next === 'theme') {
     if (activeStep !== 2) switchMainStep(2);
     if (!isGroupOpen('theme')) toggleGroup('theme');
   }
-  tipTiewBot('unlocked', 'ครูชิโร่: ปลดล็อกแล้ว — ลองกด «ใช้แบบฟอร์มตัวอย่าง» หรือเลือกชุดธีมได้เลย');
+  tipTiewBot('unlocked', 'ครูชิโร่: ปลดล็อกแล้ว — กด «ใช้แบบฟอร์มตัวอย่าง» หรือเลือกชุดธีมได้');
 }
 function bindTeacherOtpInputs() {
   const wrap = document.getElementById('otp-digits');
@@ -576,7 +576,7 @@ function bindTeacherOtpInputs() {
 function requestLoadDefaultForm() {
   if (!isTeacherUnlocked()) {
     openTeacherUnlockModal('template');
-    tipTiewBot('need-unlock', 'ครูชิโร่: แบบฟอร์มตัวอย่างต้องใส่รหัสครูก่อนนะ');
+    tipTiewBot('need-unlock', 'ครูชิโร่: แบบตัวอย่างต้องใส่รหัสครูก่อน');
     return;
   }
   loadDefaultFormStructure();
@@ -617,7 +617,7 @@ function undoLastDestructive() {
   syncThemeActive(studioConfig.themePreset, null);
   updateTargetChrome();
   commitAll();
-  toast('เลิกทำแล้ว — คืนงานก่อนหน้าแล้ว');
+  toast('เลิกทำแล้ว — คืนงานก่อนหน้า');
 }
 
 // ---- Bot ครูชิโร่ ----
@@ -645,7 +645,7 @@ function initTiewBot() {
   root.classList.toggle('is-calm', prefersReducedMotion());
   // คำใบ้เริ่มต้นเมื่อกระดานว่าง
   if (!loginElements.length && !registerElements.length) {
-    tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
+    tipTiewBot('empty', 'ครูชิโร่: กด «ใช้แบบฟอร์มตัวอย่าง» (ต้องมีรหัสครู) หรือเพิ่มช่องจากแถบซ้าย');
   }
 }
 function tipTiewBot(key, message) {
@@ -744,7 +744,7 @@ function loadState() {
 }
 
 function resetSavedData() {
-  if (!confirm('ล้างงานทั้งหมดในเครื่องนี้ และเริ่มจากกระดานว่างใช่หรือไม่? (มีปุ่มเลิกทำ 1 ครั้ง)')) return;
+  if (!confirm('ล้างงานในเครื่องนี้แล้วเริ่มกระดานว่างใช่ไหม? (เลิกทำได้ 1 ครั้ง)')) return;
   captureUndo('ล้างงานทั้งหมด');
   try { localStorage.removeItem(STORE_KEY); localStorage.removeItem(UI_KEY); } catch (e) {}
   loginElements = [];
@@ -761,8 +761,8 @@ function resetSavedData() {
   syncThemeActive(studioConfig.themePreset, null);
   updateTargetChrome();
   commitAll();
-  toast('ล้างข้อมูลเดิมแล้ว — กด «เลิกทำ» ถ้าต้องการคืน');
-  tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
+  toast('ล้างข้อมูลแล้ว — กด «เลิกทำ» ถ้าต้องการคืน');
+  tipTiewBot('empty', 'ครูชิโร่: กด «ใช้แบบฟอร์มตัวอย่าง» (ต้องมีรหัสครู) หรือเพิ่มช่องจากแถบซ้าย');
 }
 
 // ==========================================================================
@@ -779,6 +779,76 @@ const PANEL_LAYOUT = { toolbox: '.builder-layout', inspector: '.builder-layout',
 const DEFAULT_PANELS = { toolbox: false, inspector: false, controls: false, code: true, teach: false };
 const UI_STATE_VERSION = 4;            // v4: layout B defaults (drawers closed)
 let dockMode = 'structure';
+
+/* Canvas chrome (behavior-only prototype — does not restyle locked Apple craft) */
+const CANVAS_ZOOM_STEPS = [0.75, 1, 1.25, 1.5];
+const CANVAS_CHROME_KEY = 'lr-studio-canvas-chrome-v1';
+let canvasZoom = 1;
+let canvasViewMode = 'structure'; // structure | wysiwyg
+
+function loadCanvasChrome() {
+  try {
+    const raw = localStorage.getItem(CANVAS_CHROME_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (s && typeof s.zoom === 'number' && CANVAS_ZOOM_STEPS.includes(s.zoom)) canvasZoom = s.zoom;
+    if (s && (s.view === 'structure' || s.view === 'wysiwyg')) canvasViewMode = s.view;
+  } catch (e) { /* ignore */ }
+}
+function saveCanvasChrome() {
+  try { localStorage.setItem(CANVAS_CHROME_KEY, JSON.stringify({ zoom: canvasZoom, view: canvasViewMode })); } catch (e) {}
+}
+function applyCanvasChrome() {
+  const drop = document.getElementById('builder-canvas');
+  const stage = document.getElementById('canvas-zoom-stage');
+  const label = document.getElementById('canvas-zoom-label');
+  const modeBtn = document.getElementById('canvas-view-mode');
+  const outBtn = document.getElementById('canvas-zoom-out');
+  const inBtn = document.getElementById('canvas-zoom-in');
+  if (drop) drop.setAttribute('data-view', canvasViewMode);
+  if (stage) {
+    stage.style.setProperty('--canvas-zoom', String(canvasZoom));
+    /* Prefer layout-aware `zoom` (Chrome/Safari) so scrollports match visual size.
+       Clear transform when zoom works; keep transform fallback for engines without zoom. */
+    const supportsZoom = typeof CSS !== 'undefined' && CSS.supports && CSS.supports('zoom', '1');
+    if (supportsZoom) {
+      stage.style.zoom = String(canvasZoom);
+      stage.style.transform = '';
+      stage.dataset.zoomMode = 'zoom';
+    } else {
+      stage.style.zoom = '';
+      stage.style.transform = canvasZoom === 1 ? '' : `scale(${canvasZoom})`;
+      stage.dataset.zoomMode = 'transform';
+    }
+  }
+  if (label) label.textContent = Math.round(canvasZoom * 100) + '%';
+  if (outBtn) outBtn.disabled = canvasZoom <= CANVAS_ZOOM_STEPS[0];
+  if (inBtn) inBtn.disabled = canvasZoom >= CANVAS_ZOOM_STEPS[CANVAS_ZOOM_STEPS.length - 1];
+  if (modeBtn) {
+    const wysiwyg = canvasViewMode === 'wysiwyg';
+    modeBtn.textContent = wysiwyg ? 'หน้าตาจริง' : 'โครง';
+    modeBtn.setAttribute('aria-pressed', wysiwyg ? 'true' : 'false');
+    modeBtn.title = wysiwyg ? 'สลับกลับโหมดโครง' : 'สลับโหมดหน้าตาจริง (พรีวิวใกล้ของจริง)';
+  }
+}
+function nudgeCanvasZoom(dir) {
+  const idx = CANVAS_ZOOM_STEPS.indexOf(canvasZoom);
+  const next = CANVAS_ZOOM_STEPS[Math.max(0, Math.min(CANVAS_ZOOM_STEPS.length - 1, (idx < 0 ? 1 : idx) + dir))];
+  canvasZoom = next;
+  saveCanvasChrome();
+  applyCanvasChrome();
+}
+function resetCanvasZoom() {
+  canvasZoom = 1;
+  saveCanvasChrome();
+  applyCanvasChrome();
+}
+function toggleCanvasViewMode() {
+  canvasViewMode = canvasViewMode === 'wysiwyg' ? 'structure' : 'wysiwyg';
+  saveCanvasChrome();
+  applyCanvasChrome();
+  renderCanvas();
+}
 
 function defaultUiState() {
   // groups = {} → กลุ่มย่อยทุกกลุ่ม "พับปิด" (เห็นแค่หัวข้อใหญ่) ตามค่าเริ่มต้นของ isGroupOpen()
@@ -834,7 +904,7 @@ function setAllGroups(open) {
   GROUP_KEYS.forEach((k) => { uiState.groups[k] = open; });
   saveUiState();
   applyUiState();
-  toast(open ? 'ขยายทุกกลุ่มแล้ว' : 'ย่อทุกกลุ่มแล้ว — กดหัวข้อกลุ่มเพื่อเปิดทีละกลุ่มได้');
+  toast(open ? 'ขยายทุกกลุ่มแล้ว' : 'ย่อทุกกลุ่มแล้ว — กดหัวข้อกลุ่มเพื่อเปิดทีละอัน');
 }
 
 // ย่อ/ขยายแถบด้านข้าง (และกล่องโค้ด) — layout B: one drawer at a time + scrim
@@ -940,6 +1010,7 @@ document.addEventListener('DOMContentLoaded', () => {
   teacherUnlocked = isTeacherUnlocked();
   const restored = loadState();
   loadUiState();
+  loadCanvasChrome();
   renderComponentButtons();
   renderThemePresets();
   renderGradientPresets();
@@ -949,6 +1020,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyTeacherGateUi();
   updateTargetChrome();
   renderCanvas();
+  applyCanvasChrome();
   renderInspector();
   renderStudioPreviewStage();
   updateStudioStyles();
@@ -965,7 +1037,7 @@ document.addEventListener('DOMContentLoaded', () => {
       minimizeTiewBot();
     }
   });
-  if (restored) toast('โหลดงานที่บันทึกไว้ล่าสุดให้แล้ว');
+  if (restored) toast('โหลดงานล่าสุดแล้ว');
 });
 
 // ==========================================================================
@@ -982,7 +1054,7 @@ function switchMainStep(step) {
   });
   if (step === 2) {
     renderStudioPreviewStage();
-    tipTiewBot('step2', 'ครูชิโร่: เลือกสีทีละช่องได้เลย — ชุดธีมสำเร็จรูปใช้ได้เมื่อครูปลดล็อก');
+    tipTiewBot('step2', 'ครูชิโร่: เลือกสีทีละช่องได้ — ชุดธีมใช้ได้เมื่อครูปลดล็อก');
   }
   syncDockHighlight();
 }
@@ -1012,21 +1084,21 @@ function setDockMode(mode) {
   dockMode = mode || 'structure';
   if (mode === 'structure') {
     switchMainStep(1);
-    tipTiewBot('dock-structure', 'ครูชิโร่: จัดโครงบนกระดาน — กด «เครื่องมือ» เพื่อเพิ่มช่อง');
+    tipTiewBot('dock-structure', 'ครูชิโร่: กด «เครื่องมือ» เพื่อเพิ่มช่องบนกระดาน');
   } else if (mode === 'color') {
     switchMainStep(2);
     if (!isPanelOpen('controls')) togglePanel('controls');
     // scroll color panel into view lightly
     const controls = document.querySelector('.studio-controls-sidebar');
     if (controls && controls.scrollIntoView) controls.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    tipTiewBot('dock-color', 'ครูชิโร่: เลือกสีทีละช่องได้เลย');
+    tipTiewBot('dock-color', 'ครูชิโร่: เลือกสีทีละช่องได้');
   } else if (mode === 'export') {
     switchMainStep(2);
     if (isPanelOpen('controls')) togglePanel('controls');
     const codePanel = document.querySelector('.code-exporter-panel');
     if (codePanel && codePanel.scrollIntoView) codePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (!isPanelOpen('code')) togglePanel('code');
-    tipTiewBot('dock-export', 'ครูชิโร่: คัดลอกหรือดาวน์โหลดไฟล์ HTML ได้จากด้านล่าง');
+    tipTiewBot('dock-export', 'ครูชิโร่: คัดลอกหรือดาวน์โหลด HTML ได้ด้านล่าง');
   } else if (mode === 'login') {
     switchMainStep(1);
     setBuilderTarget('login');
@@ -1060,19 +1132,19 @@ function newElementId() { return 'el-' + (idSeq++); }
 // รายการ "องค์ประกอบที่เพิ่มได้" — ใช้ที่เดียว สร้างทั้งกล่องเครื่องมือด้านซ้าย
 // และแถบเพิ่มเร็ว (บนจอมือถือ) ปุ่มสองที่จะไม่มีทางไม่ตรงกัน
 const COMPONENTS = [
-  { type: 'heading',  icon: 'fa-heading',            label: 'หัวข้อ (Heading)',          short: 'หัวข้อ',
+  { type: 'heading',  icon: 'fa-heading',            label: 'หัวข้อ',     short: 'หัวข้อ',
     make: () => ({ label: 'หัวข้อใหม่', subtitle: 'รายละเอียด' }) },
-  { type: 'text',     icon: 'fa-font',               label: 'ช่องข้อความ (Input Text)',  short: 'ข้อความ',
+  { type: 'text',     icon: 'fa-font',               label: 'ช่องข้อความ', short: 'ข้อความ',
     make: () => ({ label: 'ป้ายชื่อข้อความ', placeholder: 'กรอกข้อความ...', required: false }) },
-  { type: 'password', icon: 'fa-key',                label: 'รหัสผ่าน (Password)',       short: 'รหัสผ่าน',
+  { type: 'password', icon: 'fa-key',                label: 'รหัสผ่าน',   short: 'รหัสผ่าน',
     make: () => ({ label: 'รหัสผ่าน', placeholder: '••••••••', required: true }) },
-  { type: 'email',    icon: 'fa-envelope',           label: 'อีเมล (Email Input)',       short: 'อีเมล',
+  { type: 'email',    icon: 'fa-envelope',           label: 'อีเมล',      short: 'อีเมล',
     make: () => ({ label: 'อีเมล', placeholder: 'name@example.com', required: true }) },
-  { type: 'checkbox', icon: 'fa-square-check',       label: 'ตัวเลือก (Checkbox)',       short: 'ตัวเลือก',
+  { type: 'checkbox', icon: 'fa-square-check',       label: 'ตัวเลือก',   short: 'ตัวเลือก',
     make: () => ({ label: 'ยอมรับเงื่อนไขการใช้งาน' }) },
-  { type: 'button',   icon: 'fa-circle-play',        label: 'ปุ่มกด (Submit Button)',    short: 'ปุ่มกด',
+  { type: 'button',   icon: 'fa-circle-play',        label: 'ปุ่มกด',     short: 'ปุ่มกด',
     make: () => ({ label: 'ปุ่มกด' }) },
-  { type: 'divider',  icon: 'fa-minus',              label: 'เส้นแบ่ง (Divider)',        short: 'เส้นแบ่ง',
+  { type: 'divider',  icon: 'fa-minus',              label: 'เส้นแบ่ง',   short: 'เส้นแบ่ง',
     make: () => ({ label: 'เส้นแบ่ง' }) }
 ];
 const COMPONENT_BY_TYPE = {};
@@ -1114,7 +1186,7 @@ function addCanvasElement(type) {
 
 function removeElement(id) {
   const list = getActiveList();
-  if (list.length <= 1 && !confirm('ลบองค์ประกอบสุดท้ายของฟอร์มนี้ใช่หรือไม่?')) return;
+  if (list.length <= 1 && !confirm('ลบชิ้นสุดท้ายของฟอร์มนี้ใช่ไหม?')) return;
   if (builderTarget === 'login') loginElements = loginElements.filter((el) => el.id !== id);
   else registerElements = registerElements.filter((el) => el.id !== id);
   selectedElementId = null;
@@ -1122,22 +1194,51 @@ function removeElement(id) {
 }
 
 // --------------------------------------------------------------------------
-// ย้ายตำแหน่งองค์ประกอบในฟอร์ม (สลับลำดับ) — ไม่ต้องลบแล้วสร้างใหม่ให้เสียเวลา
-// ลำดับในอาร์เรย์ = ลำดับที่แสดงบนกระดาน และลำดับที่ออกมาในโค้ด HTML
+// จัดตำแหน่งบนกระดานแบบอิสระขึ้น — ลากเรียง + ความกว้าง (colSpan) คู่ขนานได้
+// ลำดับในอาร์เรย์ = ลำดับใน HTML; colSpan 4/6/12 = กว้างบนกริด 12 คอลัมน์
 // --------------------------------------------------------------------------
+const WIDTH_SNAPS = [4, 6, 12];
+
+function normalizeColSpan(n) {
+  const v = Number(n) || 12;
+  if (v <= 4) return 4;
+  if (v <= 6) return 6;
+  return 12;
+}
+
+function cycleElementWidth(id) {
+  const list = getActiveList();
+  const item = list.find((el) => el.id === id);
+  if (!item) return;
+  const cur = normalizeColSpan(item.colSpan);
+  const i = WIDTH_SNAPS.indexOf(cur);
+  item.colSpan = WIDTH_SNAPS[(i + 1) % WIDTH_SNAPS.length];
+  selectedElementId = item.id;
+  commitAll();
+}
+
+function setElementWidth(id, span) {
+  const list = getActiveList();
+  const item = list.find((el) => el.id === id);
+  if (!item) return;
+  item.colSpan = normalizeColSpan(span);
+  selectedElementId = item.id;
+  commitAll({ keepInspector: true });
+}
+
 function moveElement(id, dir) {
   const list = getActiveList();
   const from = list.findIndex((el) => el.id === id);
   if (from < 0) return;
   const to = from + dir;
-  if (to < 0 || to >= list.length) return;   // อยู่บนสุด/ล่างสุดแล้ว ไม่ต้องทำอะไร
+  if (to < 0 || to >= list.length) return;
   const [moved] = list.splice(from, 1);
   list.splice(to, 0, moved);
   selectedElementId = moved.id;
   commitAll();
 }
 
-// ย้าย id ไปไว้ "ก่อน/หลัง" เป้าหมาย (ใช้ตอนลากการ์ดวางทับ)
+// ย้าย id ไปไว้ "ก่อน/หลัง" เป้าหมาย (ลากวางแนวตั้ง)
 function reorderElement(sourceId, targetId, placeBefore) {
   const list = getActiveList();
   const from = list.findIndex((el) => el.id === sourceId);
@@ -1151,27 +1252,133 @@ function reorderElement(sourceId, targetId, placeBefore) {
   commitAll();
 }
 
-function clearDropMarkers() {
-  document.querySelectorAll('#builder-canvas .canvas-item.drop-before, #builder-canvas .canvas-item.drop-after')
-    .forEach((el) => el.classList.remove('drop-before', 'drop-after'));
+// วางข้าง ๆ เป้าหมาย (แนวนอน) — จัดคู่ครึ่งความกว้างให้อยู่แถวเดียวกัน
+function placeBeside(sourceId, targetId, placeLeft) {
+  const list = getActiveList();
+  const from = list.findIndex((el) => el.id === sourceId);
+  const target = list.find((el) => el.id === targetId);
+  if (from < 0 || !target || sourceId === targetId) return;
+  const [moved] = list.splice(from, 1);
+  let to = list.findIndex((el) => el.id === targetId);
+  if (!placeLeft) to += 1;
+  list.splice(to, 0, moved);
+  moved.colSpan = 6;
+  target.colSpan = 6;
+  selectedElementId = moved.id;
+  commitAll();
+  tipTiewBot('beside', 'ครูชิโร่: วางคู่กันแล้ว — ลากขอบขวาเพื่อย่อ/ขยาย');
 }
 
-function selectElement(id) {
+function clearDropMarkers() {
+  document.querySelectorAll('#builder-canvas .canvas-item.drop-before, #builder-canvas .canvas-item.drop-after, #builder-canvas .canvas-item.drop-side-left, #builder-canvas .canvas-item.drop-side-right')
+    .forEach((el) => el.classList.remove('drop-before', 'drop-after', 'drop-side-left', 'drop-side-right'));
+}
+
+function attachResizeHandle(itemCard, item) {
+  const handle = itemCard.querySelector('.resize-handle');
+  if (!handle) return;
+  let startX = 0;
+  let startSpan = 12;
+  let cardWidth = 1;
+  const onMove = (e) => {
+    const x = (e.touches ? e.touches[0].clientX : e.clientX);
+    const dx = x - startX;
+    const ratio = (startSpan / 12) + dx / cardWidth;
+    const snapped = ratio < 0.42 ? 4 : ratio < 0.75 ? 6 : 12;
+    itemCard.classList.remove('col-4', 'col-6', 'col-12');
+    itemCard.classList.add(`col-${snapped}`);
+    itemCard.dataset.pendingSpan = String(snapped);
+  };
+  const onUp = (e) => {
+    document.removeEventListener('pointermove', onMove);
+    document.removeEventListener('pointerup', onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onUp);
+    itemCard.classList.remove('is-resizing');
+    const pending = Number(itemCard.dataset.pendingSpan || startSpan);
+    delete itemCard.dataset.pendingSpan;
+    if (pending !== startSpan) setElementWidth(item.id, pending);
+  };
+  const onDown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    selectElement(item.id);
+    startX = (e.touches ? e.touches[0].clientX : e.clientX);
+    startSpan = normalizeColSpan(item.colSpan);
+    const preview = itemCard.closest('.canvas-preview-card') || itemCard.parentElement;
+    cardWidth = Math.max(1, (preview || itemCard).getBoundingClientRect().width);
+    itemCard.classList.add('is-resizing');
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onUp);
+  };
+  handle.addEventListener('pointerdown', onDown);
+  handle.addEventListener('touchstart', onDown, { passive: false });
+}
+
+function selectElement(id, opts = {}) {
   selectedElementId = id;
+  /* ไม่บังคับเปิดแถบคุณสมบัติใหญ่ — พิมพ์ชื่อบนกระดานได้เลย; แถบเป็นตัวช่วยแบบกะทัดรัด */
   renderCanvas();
   renderInspector();
+  if (id && opts.focusLabel) {
+    requestAnimationFrame(() => {
+      const input = document.querySelector(`#builder-canvas .canvas-item[data-element-id="${CSS.escape(id)}"] [data-inline-prop="label"]`);
+      if (input) {
+        input.focus();
+        if (typeof input.select === 'function') input.select();
+      }
+    });
+  }
+}
+
+/* เปลี่ยนประเภทองค์ประกอบ — นักเรียนเลือกเองได้ ไม่ถูกล็อกตามปุ่มที่กดเพิ่ม */
+function changeElementType(id, newType) {
+  const list = getActiveList();
+  const item = list.find((el) => el.id === id);
+  const def = COMPONENT_BY_TYPE[newType];
+  if (!item || !def || item.type === newType) return;
+  captureUndo('เปลี่ยนประเภท');
+  const keep = {
+    label: item.label,
+    colSpan: item.colSpan,
+    placeholder: item.placeholder,
+    required: item.required,
+    subtitle: item.subtitle
+  };
+  const fresh = def.make();
+  Object.keys(item).forEach((k) => {
+    if (k !== 'id') delete item[k];
+  });
+  Object.assign(item, fresh, {
+    id,
+    type: newType,
+    label: (keep.label && String(keep.label).trim()) ? keep.label : fresh.label,
+    colSpan: normalizeColSpan(keep.colSpan)
+  });
+  if (['text', 'password', 'email'].includes(newType)) {
+    if (keep.placeholder) item.placeholder = keep.placeholder;
+    if (typeof keep.required === 'boolean') item.required = keep.required;
+    else if (typeof item.required !== 'boolean') item.required = !!fresh.required;
+  }
+  if (newType === 'heading' && keep.subtitle) item.subtitle = keep.subtitle;
+  selectedElementId = id;
+  commitAll();
+  tipTiewBot('type-change', 'ครูชิโร่: เปลี่ยนประเภทแล้ว — พิมพ์ชื่อบนกระดานได้');
 }
 
 function renderCanvas() {
-  const canvas = document.getElementById('builder-canvas');
+  const stage = document.getElementById('canvas-zoom-stage') || document.getElementById('builder-canvas');
   const list = getActiveList();
-  canvas.innerHTML = '';
+  stage.innerHTML = '';
+  applyCanvasChrome();
 
   if (list.length === 0) {
     const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-    canvas.innerHTML = `<div class="empty-canvas-state">
+    stage.innerHTML = `<div class="empty-canvas-state">
       <span class="empty-canvas-icon" aria-hidden="true">+</span>
-      <p class="empty-canvas-title">ยังไม่มีองค์ประกอบในฟอร์ม${esc(targetName)}</p>
+      <p class="empty-canvas-title">ยังไม่มีช่องในฟอร์ม${esc(targetName)}</p>
       <p class="empty-canvas-sub">เริ่มจากแบบตัวอย่าง หรือเพิ่มช่องเอง</p>
       <div class="empty-canvas-actions">
         <button type="button" class="btn btn-primary teacher-gated-btn teacher-gated-cta${isTeacherUnlocked() ? '' : ' is-locked'}"
@@ -1187,7 +1394,7 @@ function renderCanvas() {
       </div>
       <p class="template-lock-hint"${isTeacherUnlocked() ? ' hidden' : ''}>ต้องใส่รหัสครูก่อน</p>
     </div>`;
-    tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู)');
+    tipTiewBot('empty', 'ครูชิโร่: กด «ใช้แบบฟอร์มตัวอย่าง» ได้ (ต้องมีรหัสครู)');
     return;
   }
 
@@ -1195,32 +1402,47 @@ function renderCanvas() {
   const preview = document.createElement('div');
   preview.className = 'canvas-preview-card';
   const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+  const hint = canvasViewMode === 'wysiwyg'
+    ? 'หน้าตาใกล้ของจริง — แตะชิ้นเพื่อแก้'
+    : 'พรีวิวบนกระดาน — ยังแก้โครงได้อยู่';
   preview.innerHTML = `
     <h3 class="canvas-preview-title">${esc(targetName)}</h3>
-    <p class="canvas-preview-hint">พรีวิวบนกระดาน — ยังแก้โครงได้อยู่</p>
+    <p class="canvas-preview-hint">${hint}</p>
   `;
 
   list.forEach((item, idx) => {
-    const isFirst = idx === 0;
-    const isLast = idx === list.length - 1;
+    const span = normalizeColSpan(item.colSpan);
+    const widthLabel = span === 12 ? 'เต็ม' : span === 6 ? 'ครึ่ง' : '⅓';
     const itemCard = document.createElement('div');
-    itemCard.className = `canvas-item col-${item.colSpan || 12} ${selectedElementId === item.id ? 'selected' : ''}`;
+    itemCard.className = `canvas-item col-${span} ${selectedElementId === item.id ? 'selected' : ''}`;
     itemCard.tabIndex = 0;
     itemCard.dataset.elementId = item.id;
-    itemCard.setAttribute('aria-label', `องค์ประกอบ ${item.type} : ${item.label || ''} — ลำดับที่ ${idx + 1} จาก ${list.length}`);
-    itemCard.title = 'ลากการ์ดนี้เพื่อสลับตำแหน่งได้เลย';
-    itemCard.onclick = (e) => { e.stopPropagation(); selectElement(item.id); };
+    itemCard.setAttribute('aria-label', `องค์ประกอบ ${item.type} : ${item.label || ''} — ความกว้าง ${widthLabel} — ลำดับที่ ${idx + 1} จาก ${list.length}`);
+    itemCard.title = 'คลิกแล้วพิมพ์ชื่อ — ลากเพื่อย้าย / วางข้าง ๆ — ลากขอบขวาเพื่อปรับความกว้าง';
+    itemCard.onclick = (e) => {
+      e.stopPropagation();
+      const onField = e.target.closest('[data-inline-prop], .item-controls, .resize-handle, .ctrl-type');
+      selectElement(item.id, { focusLabel: !onField });
+    };
     itemCard.onkeydown = (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectElement(item.id); }
+      if (e.target.closest('[data-inline-prop], select, input, textarea, button')) return;
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectElement(item.id, { focusLabel: true }); }
       if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); removeElement(item.id); }
-      // ย้ายตำแหน่งด้วยคีย์บอร์ด: Alt + ลูกศรขึ้น/ลง
       if (e.altKey && e.key === 'ArrowUp') { e.preventDefault(); moveElement(item.id, -1); }
       if (e.altKey && e.key === 'ArrowDown') { e.preventDefault(); moveElement(item.id, 1); }
+      if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        e.preventDefault();
+        cycleElementWidth(item.id);
+      }
     };
 
-    // ----- ลากการ์ดเพื่อสลับตำแหน่ง (ทางเลือกเสริมจากปุ่มลูกศร) -----
+    // ลากจัดตำแหน่ง — บน/ล่าง = เรียงแนวตั้ง, ซ้าย/ขวา = วางคู่
     itemCard.draggable = true;
     itemCard.addEventListener('dragstart', (e) => {
+      if (e.target.closest('.resize-handle, .item-controls, .ctrl-btn, .ctrl-type, [data-inline-prop], input, select, textarea, button')) {
+        e.preventDefault();
+        return;
+      }
       dragSourceId = item.id;
       itemCard.classList.add('dragging');
       try { e.dataTransfer.setData('text/plain', item.id); e.dataTransfer.effectAllowed = 'move'; } catch (err) {}
@@ -1235,49 +1457,77 @@ function renderCanvas() {
       e.preventDefault();
       try { e.dataTransfer.dropEffect = 'move'; } catch (err) {}
       const rect = itemCard.getBoundingClientRect();
-      const placeBefore = (e.clientY - rect.top) < rect.height / 2;
+      const xRatio = (e.clientX - rect.left) / Math.max(1, rect.width);
+      const yRatio = (e.clientY - rect.top) / Math.max(1, rect.height);
       clearDropMarkers();
-      itemCard.classList.add(placeBefore ? 'drop-before' : 'drop-after');
+      if (xRatio < 0.28) itemCard.classList.add('drop-side-left');
+      else if (xRatio > 0.72) itemCard.classList.add('drop-side-right');
+      else itemCard.classList.add(yRatio < 0.5 ? 'drop-before' : 'drop-after');
     });
     itemCard.addEventListener('drop', (e) => {
       if (!dragSourceId || dragSourceId === item.id) return;
       e.preventDefault();
       const rect = itemCard.getBoundingClientRect();
-      const placeBefore = (e.clientY - rect.top) < rect.height / 2;
+      const xRatio = (e.clientX - rect.left) / Math.max(1, rect.width);
+      const yRatio = (e.clientY - rect.top) / Math.max(1, rect.height);
       const sourceId = dragSourceId;
       dragSourceId = null;
       clearDropMarkers();
-      reorderElement(sourceId, item.id, placeBefore);
+      if (xRatio < 0.28) placeBeside(sourceId, item.id, true);
+      else if (xRatio > 0.72) placeBeside(sourceId, item.id, false);
+      else reorderElement(sourceId, item.id, yRatio < 0.5);
     });
 
+    const sid = safeId(item.id);
+    const typeOptions = COMPONENTS.map((c) =>
+      `<option value="${c.type}" ${item.type === c.type ? 'selected' : ''}>${esc(c.short)}</option>`
+    ).join('');
     let contentHTML = '';
     if (item.type === 'heading') {
-      contentHTML = `<h3 style="font-size: 16px; font-weight: 700;">${esc(item.label)}</h3><p style="font-size: 12px; color: var(--text-muted);">${esc(item.subtitle || '')}</p>`;
+      contentHTML = `
+        <input class="inline-edit inline-label is-heading" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อหัวข้อ" placeholder="ชื่อหัวข้อ">
+        <input class="inline-edit inline-sub" data-inline-prop="subtitle" type="text" value="${esc(item.subtitle || '')}" aria-label="คำอธิบายย่อย" placeholder="คำอธิบายย่อย (ถ้ามี)">`;
     } else if (['text', 'password', 'email'].includes(item.type)) {
-      contentHTML = `<label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">${esc(item.label)} ${item.required ? '<span style="color:red">*</span>' : ''}</label>
-                     <input type="${item.type}" placeholder="${esc(item.placeholder)}" disabled style="width:100%; padding: 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">`;
+      /* One field: looks like the input; edits placeholder — no extra type/placeholder line under it */
+      contentHTML = `
+        <div class="inline-label-row">
+          <input class="inline-edit inline-label" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อช่อง" placeholder="ชื่อช่อง">
+          ${item.required ? '<span class="wys-req" aria-hidden="true">*</span>' : ''}
+        </div>
+        <input class="inline-edit inline-preview-input" data-inline-prop="placeholder" type="text" value="${esc(item.placeholder || '')}" aria-label="ข้อความในช่องว่าง" placeholder="ข้อความในช่องว่าง">`;
     } else if (item.type === 'checkbox') {
-      contentHTML = `<label style="font-size: 12px; display: flex; align-items: center; gap: 6px;"><input type="checkbox" disabled> ${esc(item.label)}</label>`;
+      contentHTML = `
+        <label class="inline-check-row">
+          <input type="checkbox" disabled tabindex="-1" aria-hidden="true">
+          <input class="inline-edit inline-label" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อตัวเลือก" placeholder="ชื่อตัวเลือก">
+        </label>`;
     } else if (item.type === 'button') {
-      contentHTML = `<button disabled style="width: 100%; padding: 8px; background: var(--accent-primary); color: #fff; border: none; border-radius: 4px; font-size: 12px;">${esc(item.label)}</button>`;
+      contentHTML = `
+        <input class="inline-edit inline-label is-button" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อปุ่ม" placeholder="ชื่อปุ่ม">`;
     } else if (item.type === 'divider') {
-      contentHTML = `<hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 8px 0;">`;
+      contentHTML = `
+        <hr class="inline-divider" aria-hidden="true">
+        <input class="inline-edit inline-label is-muted" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อเส้นแบ่ง" placeholder="เส้นแบ่ง">`;
     }
 
+    /* Compact chrome: type + width + delete — ชื่อพิมพ์บนกระดานโดยตรง */
     itemCard.innerHTML = `
       <div class="item-controls">
-        <span class="item-order-hint" aria-hidden="true">ลำดับ ${idx + 1}</span>
-        <span class="item-btn-group">
-          <button type="button" class="ctrl-btn ctrl-move" data-dir="up"${isFirst ? ' disabled' : ''} title="ย้ายขึ้น (ไปลำดับก่อนหน้า)" aria-label="ย้ายองค์ประกอบนี้ขึ้นหนึ่งลำดับ" onclick="event.stopPropagation(); moveElement('${safeId(item.id)}', -1)"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
-          <button type="button" class="ctrl-btn ctrl-move" data-dir="down"${isLast ? ' disabled' : ''} title="ย้ายลง (ไปลำดับถัดไป)" aria-label="ย้ายองค์ประกอบนี้ลงหนึ่งลำดับ" onclick="event.stopPropagation(); moveElement('${safeId(item.id)}', 1)"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i></button>
-          <button type="button" class="ctrl-btn ctrl-delete" title="ลบองค์ประกอบนี้" aria-label="ลบองค์ประกอบนี้" onclick="event.stopPropagation(); removeElement('${safeId(item.id)}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
-        </span>
+        <label class="ctrl-type-wrap" title="ประเภท">
+          <span class="sr-only">ประเภท</span>
+          <select class="ctrl-type" aria-label="ประเภทองค์ประกอบ" onclick="event.stopPropagation()" onchange="event.stopPropagation(); changeElementType('${sid}', this.value)">${typeOptions}</select>
+        </label>
+        <button type="button" class="ctrl-btn ctrl-width" title="สลับความกว้าง (เต็ม / ครึ่ง / ⅓)" aria-label="สลับความกว้างองค์ประกอบ" onclick="event.stopPropagation(); cycleElementWidth('${sid}')">${widthLabel}</button>
+        <button type="button" class="ctrl-btn ctrl-delete" title="ลบองค์ประกอบนี้" aria-label="ลบองค์ประกอบนี้" onclick="event.stopPropagation(); removeElement('${sid}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
-      ${contentHTML}
+      <span class="resize-handle" role="slider" aria-label="ปรับความกว้าง" aria-valuetext="${widthLabel}" title="ลากเพื่อปรับความกว้าง"></span>
+      <div class="item-body">${contentHTML}</div>
     `;
+    attachResizeHandle(itemCard, item);
+    bindInlineEdits(itemCard, item);
     preview.appendChild(itemCard);
   });
-  canvas.appendChild(preview);
+  stage.appendChild(preview);
 }
 
 function renderInspector() {
@@ -1287,56 +1537,107 @@ function renderInspector() {
 
   if (!item) {
     inspector.innerHTML = `<div class="empty-inspector-state">
-      <i class="fa-solid fa-arrow-pointer" aria-hidden="true"></i>
-      <p>คลิกเลือกองค์ประกอบในพื้นที่ออกแบบเพื่อปรับแต่งคุณสมบัติ</p>
+      <i class="fa-solid fa-hand-pointer" aria-hidden="true"></i>
+      <p>คลิกชิ้นบนกระดาน แล้ว<strong>พิมพ์ชื่อ</strong><br>สลับประเภทจากเมนูมุมชิ้น</p>
     </div>`;
     return;
   }
 
   const id = safeId(item.id);
+  const typeOptions = COMPONENTS.map((c) =>
+    `<option value="${c.type}" ${item.type === c.type ? 'selected' : ''}>${esc(c.short)}</option>`
+  ).join('');
+
   inspector.innerHTML = `
-    <div class="inspector-field">
-      <label for="insp-label">ข้อความป้ายชื่อ / หัวข้อ:</label>
-      <input id="insp-label" type="text" value="${esc(item.label || '')}" oninput="updateItemProp('${id}', 'label', this.value)">
+    <div class="inspector-compact">
+      <div class="inspector-field inspector-field-sm">
+        <label for="insp-label">ชื่อ</label>
+        <input id="insp-label" type="text" value="${esc(item.label || '')}" placeholder="พิมพ์บนกระดานก็ได้"
+               autocomplete="off" oninput="updateItemProp('${id}', 'label', this.value, { inline: true }); syncInlineFromInspector('${id}', 'label', this.value)">
+      </div>
+      <div class="inspector-field inspector-field-sm">
+        <label for="insp-type">ประเภท</label>
+        <select id="insp-type" onchange="changeElementType('${id}', this.value)">${typeOptions}</select>
+      </div>
+      ${item.type === 'heading' ? `
+        <div class="inspector-field inspector-field-sm">
+          <label for="insp-subtitle">คำอธิบายย่อย</label>
+          <input id="insp-subtitle" type="text" value="${esc(item.subtitle || '')}" oninput="updateItemProp('${id}', 'subtitle', this.value, { inline: true }); syncInlineFromInspector('${id}', 'subtitle', this.value)">
+        </div>
+      ` : ''}
+      ${['text', 'password', 'email'].includes(item.type) ? `
+        <div class="inspector-field inspector-field-sm">
+          <label for="insp-placeholder">ข้อความในช่องว่าง</label>
+          <input id="insp-placeholder" type="text" value="${esc(item.placeholder || '')}" oninput="updateItemProp('${id}', 'placeholder', this.value, { inline: true }); syncInlineFromInspector('${id}', 'placeholder', this.value)">
+        </div>
+        <div class="inspector-field inspector-check inspector-field-sm">
+          <label for="insp-required"><input id="insp-required" type="checkbox" ${item.required ? 'checked' : ''} onchange="updateItemProp('${id}', 'required', this.checked)"> จำเป็นต้องกรอก</label>
+        </div>
+      ` : ''}
+      <div class="inspector-field inspector-field-sm">
+        <label for="insp-colspan">ความกว้าง</label>
+        <select id="insp-colspan" onchange="updateItemProp('${id}', 'colSpan', parseInt(this.value))">
+          <option value="12" ${normalizeColSpan(item.colSpan) === 12 ? 'selected' : ''}>เต็มแถว</option>
+          <option value="6" ${normalizeColSpan(item.colSpan) === 6 ? 'selected' : ''}>ครึ่งแถว</option>
+          <option value="4" ${normalizeColSpan(item.colSpan) === 4 ? 'selected' : ''}>หนึ่งในสาม</option>
+        </select>
+      </div>
+      <p class="inspector-hint">พิมพ์ชื่อบนกระดานได้ — แถบนี้เป็นตัวช่วยสั้น ๆ</p>
     </div>
-    ${item.type === 'heading' ? `
-      <div class="inspector-field">
-        <label for="insp-subtitle">คำอธิบายย่อย (Subtitle):</label>
-        <input id="insp-subtitle" type="text" value="${esc(item.subtitle || '')}" oninput="updateItemProp('${id}', 'subtitle', this.value)">
-      </div>
-    ` : ''}
-    ${['text', 'password', 'email'].includes(item.type) ? `
-      <div class="inspector-field">
-        <label for="insp-placeholder">ข้อความกำกับ (Placeholder):</label>
-        <input id="insp-placeholder" type="text" value="${esc(item.placeholder || '')}" oninput="updateItemProp('${id}', 'placeholder', this.value)">
-      </div>
-      <div class="inspector-field">
-        <label for="insp-required"><input id="insp-required" type="checkbox" ${item.required ? 'checked' : ''} onchange="updateItemProp('${id}', 'required', this.checked)"> จำเป็นต้องกรอก (Required)</label>
-      </div>
-    ` : ''}
-    <div class="inspector-field">
-      <label for="insp-colspan">ความกว้าง (Column Width):</label>
-      <select id="insp-colspan" onchange="updateItemProp('${id}', 'colSpan', parseInt(this.value))">
-        <option value="12" ${item.colSpan === 12 ? 'selected' : ''}>เต็มความกว้าง (100%)</option>
-        <option value="6" ${item.colSpan === 6 ? 'selected' : ''}>ครึ่งหนึ่ง (50%)</option>
-        <option value="4" ${item.colSpan === 4 ? 'selected' : ''}>หนึ่งในสาม (33%)</option>
-      </select>
-    </div>
-    <p class="inspector-hint">แก้ข้อความแล้วหน้าตัวอย่าง/โค้ดด้านล่างจะเปลี่ยนตามทันที — ย้ายลำดับขององค์ประกอบได้โดยกดปุ่มลูกศรขึ้น/ลงบนการ์ด หรือลากการ์ดไปวางในตำแหน่งที่ต้องการ</p>
   `;
 }
 
-function updateItemProp(id, prop, val) {
+function syncInlineFromInspector(id, prop, val) {
+  const el = document.querySelector(`#builder-canvas .canvas-item[data-element-id="${CSS.escape(id)}"] [data-inline-prop="${prop}"]`);
+  if (el && el !== document.activeElement) el.value = val == null ? '' : String(val);
+}
+
+function updateItemProp(id, prop, val, opts = {}) {
   const list = getActiveList();
   const item = list.find((el) => el.id === id);
-  if (item) {
-    item[prop] = val;
-    commitAll({ keepInspector: true });
+  if (!item) return;
+  item[prop] = prop === 'colSpan' ? normalizeColSpan(val) : val;
+  if (opts.inline) {
+    /* พิมพ์บนกระดาน — อย่ารีเฟรช canvas ทับโฟกัส */
+    updateTargetChrome();
+    if (isPanelOpen('inspector')) renderInspector();
+    renderStudioPreviewStage();
+    regenerateCode();
+    saveState();
+    return;
   }
+  commitAll({ keepInspector: true });
+}
+
+function bindInlineEdits(itemCard, item) {
+  itemCard.querySelectorAll('[data-inline-prop]').forEach((el) => {
+    const prop = el.getAttribute('data-inline-prop');
+    el.addEventListener('pointerdown', (e) => e.stopPropagation());
+    el.addEventListener('mousedown', (e) => e.stopPropagation());
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectedElementId !== item.id) selectElement(item.id);
+    });
+    el.addEventListener('input', () => {
+      updateItemProp(item.id, prop, el.value, { inline: true });
+    });
+    el.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        el.blur();
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        el.value = item[prop] == null ? '' : String(item[prop]);
+        el.blur();
+      }
+    });
+  });
 }
 
 function clearCanvas() {
-  if (!confirm('ต้องการลบจริงหรือไม่?')) return;
+  if (!confirm('ลบกระดานนี้ใช่ไหม?')) return;
   captureUndo('ล้างกระดาน');
   if (builderTarget === 'login') loginElements = [];
   else registerElements = [];
@@ -1350,14 +1651,14 @@ function loadDefaultFormStructure(skipConfirm) {
     openTeacherUnlockModal('template');
     return;
   }
-  if (!skipConfirm && !confirm('ใช้แบบฟอร์มตัวอย่างทับงานปัจจุบันของทั้งเข้าสู่ระบบและสมัครสมาชิกใช่หรือไม่? (มีปุ่มเลิกทำ 1 ครั้ง)')) return;
+  if (!skipConfirm && !confirm('ใช้แบบตัวอย่างทับงานเข้าสู่ระบบและสมัครใช่ไหม? (เลิกทำได้ 1 ครั้ง)')) return;
   captureUndo('ใช้แบบฟอร์มตัวอย่าง');
   loginElements = DEFAULT_LOGIN();
   registerElements = DEFAULT_REGISTER();
   selectedElementId = null;
   commitAll();
-  toast('โหลดแบบฟอร์มตัวอย่างให้ทั้งสองฝั่งแล้ว');
-  tipTiewBot('loaded', 'ครูชิโร่: โครงครบแล้ว — แก้ข้อความด้านขวา หรือไปตกแต่งสีได้เมื่อพร้อม');
+  toast('โหลดแบบตัวอย่างทั้งเข้าสู่ระบบและสมัครแล้ว');
+  tipTiewBot('loaded', 'ครูชิโร่: โครงครบแล้ว — คลิกชิ้นแล้วพิมพ์ชื่อ หรือไปเลือกสี');
 }
 
 function focusToolboxAdd() {
@@ -1368,7 +1669,7 @@ function focusToolboxAdd() {
     if (first) first.focus();
     else grid.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
   }
-  tipTiewBot('add-self', 'ครูชิโร่: กดปุ่มองค์ประกอบด้านซ้ายเพื่อเพิ่มช่องทีละอัน');
+  tipTiewBot('add-self', 'ครูชิโร่: กดปุ่มด้านซ้ายเพื่อเพิ่มช่อง');
 }
 
 function forwardToStep2() {
@@ -1384,7 +1685,7 @@ function commitAll(opts = {}) {
   renderStudioPreviewStage();
   regenerateCode();
   saveState();
-  if (selectedElementId) tipTiewBot('selected', 'ครูชิโร่: แก้ข้อความด้านขวาได้เลย — เห็นผลบนกระดานทันที');
+  if (selectedElementId) tipTiewBot('selected', 'ครูชิโร่: พิมพ์ชื่อบนกระดาน — สลับประเภทจากเมนูมุมชิ้น');
 }
 
 // ==========================================================================
@@ -1427,7 +1728,7 @@ function buildAuthMarkup(opts = {}) {
 function renderFormFields(list, scope = '') {
   if (!list || list.length === 0) {
     return `
-          <p class="form-subtitle" style="grid-column: span 12;">ยังไม่มีองค์ประกอบในฟอร์มนี้</p>`;
+          <p class="form-subtitle" style="grid-column: span 12;">ยังไม่มีช่องในฟอร์มนี้</p>`;
   }
   const fid = (elId) => scope + 'field-' + safeId(elId);
 
@@ -1480,7 +1781,7 @@ function bindCard(card) {
   // ในหน้าตัวอย่างไม่ให้ฟอร์มส่งข้อมูลจริง (ไม่มีหลังบ้าน) แต่ยังโชว์ผลการตรวจ required
   card.addEventListener('submit', (e) => {
     e.preventDefault();
-    toast('ฟอร์มกรอกครบแล้ว ✓ (ตัวอย่างนี้ไม่ส่งข้อมูลจริง — ไฟล์ที่ export จะมีแท็ก <form> และการตรวจ required เหมือนกัน)');
+    toast('กรอกครบแล้ว (ตัวอย่างนี้ไม่ส่งข้อมูลจริง)');
   });
 }
 
@@ -1627,7 +1928,7 @@ function commitPendingColors() {
   pendingColors = null;
   updateStudioStyles();
   clearPendingColors();
-  toast('ใช้สีใหม่แล้ว (โค้ดด้านล่างอัปเดตตามเรียบร้อย)');
+  toast('ใช้สีใหม่แล้ว — โค้ดด้านล่างอัปเดตแล้ว');
 }
 
 // กด "ยกเลิก": คืนค่าสีทั้งหมดกลับเป็นชุดก่อนเริ่มแก้
@@ -1806,7 +2107,7 @@ function renderThemePresets() {
 function applyThemePreset(presetKey, ev) {
   if (!isTeacherUnlocked()) {
     openTeacherUnlockModal('theme');
-    tipTiewBot('theme-lock', 'ครูชิโร่: ชุดธีมสำเร็จรูปต้องใส่รหัสครูก่อน — เลือกสีทีละช่องด้านล่างได้เลย');
+    tipTiewBot('theme-lock', 'ครูชิโร่: ชุดธีมต้องใส่รหัสครูก่อน — เลือกสีทีละช่องด้านล่างได้');
     return;
   }
   const p = THEME_PRESETS[presetKey];
@@ -1835,7 +2136,7 @@ function applyThemePreset(presetKey, ev) {
   syncThemeActive(presetKey, ev);
   applyConfigToControls();   // สไลเดอร์/ดรอปดาวน์/สี ขยับตามธีม
   updateStudioStyles();      // ตัวอย่าง + modal + โค้ดที่ export + autosave
-  toast(`ใช้ธีม ${p.label} แล้ว — สี ฟอนต์ ความมน ความเบลอ พื้นหลัง และอนิเมชันเปลี่ยนพร้อมกันทั้งหน้าตัวอย่างและโค้ดที่ export`);
+  toast(`ใช้ธีม ${p.label} แล้ว — สี ฟอนต์ และพื้นหลังอัปเดตแล้ว`);
 }
 
 // ==========================================================================
@@ -1996,7 +2297,7 @@ async function handleBgFileInput(files, opts) {
       ` • โค้ดที่ export จะใหญ่ขึ้นประมาณ ${addedCode} แต่เปิดใช้ได้แบบออฟไลน์ ไม่ต้องพึ่งลิงก์ภายนอก`,
       'ok'
     );
-    toast(resized ? `ฝังรูปแล้ว (ย่อจาก ${before} เหลือ ${after})` : 'ฝังรูปพื้นหลังแล้ว — ใช้ได้แม้ไม่มีเน็ต');
+    toast(resized ? `ฝังรูปแล้ว (ย่อจาก ${before} → ${after})` : 'ฝังรูปพื้นหลังแล้ว — ใช้ได้แม้ไม่มีเน็ต');
   } catch (e) {
     setBgStatus('อ่านไฟล์นี้ไม่ได้ — ลองบันทึกรูปใหม่เป็น .jpg/.png แล้วเลือกอีกครั้ง', 'warn');
   }
@@ -2067,7 +2368,7 @@ async function applyBgUrlFailed(url, timedOut) {
       info.textContent += ` · ดึงรูปจากลิงก์ให้อัตโนมัติแล้ว (${fmtSize(Math.round(studioConfig.bgImageData.length * 0.75))}) และฝังไว้ในไฟล์ — ต่อไปเปิดแบบออฟไลน์ก็เห็นรูป`;
       info.className = 'bg-status is-ok';
     }
-    toast('ดึงรูปจากลิงก์มาฝังในไฟล์ให้แล้ว — เปิดใช้ได้แม้ไม่มีเน็ต');
+    toast('ฝังรูปจากลิงก์แล้ว — ใช้ได้แม้ไม่มีเน็ต');
     return;
   }
 
@@ -2146,7 +2447,7 @@ function clearBackgroundImage() {
   syncBgUi();
   updateStudioStyles();
   setBgStatus(had ? 'ลบรูปพื้นหลังแล้ว — กลับไปใช้พื้นหลังไล่สี' : 'ยังไม่มีรูปพื้นหลังให้ลบ', had ? 'ok' : 'info');
-  if (had) toast('ลบรูปพื้นหลังแล้ว — ใช้พื้นหลังไล่สีแทน');
+  if (had) toast('ลบรูปพื้นหลังแล้ว — ใช้ไล่สีแทน');
 }
 
 function applyGradientPreset(key, ev) {
@@ -2163,7 +2464,7 @@ function applyGradientPreset(key, ev) {
   syncBgUi();
   updateStudioStyles();
   setBgStatus(`ใช้พื้นหลังสำเร็จรูป "${g.label}" แล้ว (CSS ไล่สี ไม่ต้องใช้เน็ต)${hadImage ? ' — ลบรูปพื้นหลังเดิมออกให้แล้ว' : ''}`, 'ok');
-  toast(`พื้นหลัง "${g.label}" ใช้ได้ทันที และออฟไลน์ได้`);
+  toast(`พื้นหลัง "${g.label}" พร้อมใช้ (ออฟไลน์ได้)`);
 }
 
 // ลากรูปมาวาง (ที่กล่องของมันเอง หรือวางทับหน้าตัวอย่างเลยก็ได้)
@@ -2242,7 +2543,7 @@ function bindModalEvents() {
   // ปุ่มย้อนกลับในหน้าตัวอย่าง: กดได้แต่ไม่พาออกจากเครื่องมือ (ไฟล์ที่ export จะย้อนกลับจริง)
   document.addEventListener('click', (e) => {
     if (e.target.closest('#preview-stage-root .page-back, #modal-preview-stage .page-back')) {
-      toast('ปุ่มนี้อยู่ในหน้าตัวอย่าง — ยังไม่พาไปไหน ส่วนไฟล์ที่ export แล้วจะย้อนกลับไปหน้าก่อนหน้า');
+      toast('ปุ่มนี้ในตัวอย่างยังไม่พาไปไหน — ไฟล์ที่ส่งออกจะย้อนกลับหน้าก่อนได้');
     }
   });
 }
@@ -2585,8 +2886,8 @@ function renderTeachCode() {
 
 function copyCodePart(key) {
   const text = (buildCodeParts(exportMode) || {})[key] || '';
-  const ok = () => toast(`คัดลอก ${partInfo(key).label ? '“' + partInfo(key).label.split('—')[0].trim() + '”' : key} แล้ว (${fmtSize(text.length)}) — เอาไปวางในไฟล์ได้เลย`);
-  const fail = () => toast('คัดลอกอัตโนมัติไม่ได้ — ให้คลิกในกล่องโค้ดด้านบนแล้วกด Ctrl+C (หรือ Cmd+C) เอง');
+  const ok = () => toast(`คัดลอก ${partInfo(key).label ? '“' + partInfo(key).label.split('—')[0].trim() + '”' : key} แล้ว (${fmtSize(text.length)}) — เอาไปวางในไฟล์ได้`);
+  const fail = () => toast('คัดลอกอัตโนมัติไม่ได้ — คลิกในกล่องโค้ดแล้วกด Ctrl+C / Cmd+C');
   if (!text) { fail(); return; }
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(ok).catch(fail);
@@ -2607,8 +2908,8 @@ function setExportMode(mode) {
   const note = document.getElementById('export-mode-note');
   if (note) {
     note.textContent = embed
-      ? 'วางทั้งหมดนี้ใน <main> ของหน้าเดิมได้เลย — สไตล์ถูกล็อกในกรอบ .auth-embed จึงไม่ทับ Navbar ของหน้าแม่'
-      : 'ไฟล์เดียวจบ: คัดลอกไปวางในไฟล์ index.html แล้วดับเบิลคลิกเปิดได้เลย (เต็มหน้าจอ)';
+      ? 'วางทั้งหมดนี้ใน <main> ของหน้าเดิม — สไตล์ถูกล็อกในกรอบ .auth-embed จึงไม่ทับ Navbar'
+      : 'ไฟล์เดียวจบ: วางใน index.html แล้วดับเบิลคลิกเปิดได้ (เต็มจอ)';
   }
   document.getElementById('copy-standalone-btn').innerHTML = embed
     ? '<i class="fa-solid fa-copy" aria-hidden="true"></i> คัดลอกชิ้นส่วน'
@@ -2617,7 +2918,7 @@ function setExportMode(mode) {
     ? '<i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลด form-embed.html'
     : '<i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลดไฟล์';
   regenerateCode();
-  toast(embed ? 'เปลี่ยนเป็นโหมดแปะในหน้าเดิมแล้ว — โค้ดด้านล่างพร้อมวางใน <main>' : 'เปลี่ยนเป็นโหมดไฟล์เดียวจบ (ทั้งหน้า) แล้ว');
+  toast(embed ? 'โหมดแปะในหน้าเดิม — โค้ดด้านล่างวางใน <main> ได้' : 'โหมดไฟล์เดียวจบ (ทั้งหน้า)');
 }
 
 function regenerateCode() {
@@ -2650,10 +2951,10 @@ function copyFullStandaloneHTML() {
       const ok = document.execCommand('copy');
       textarea.setAttribute('readonly', 'readonly');
       if (ok) showCopySuccess();
-      else toast('คัดลอกอัตโนมัติไม่ได้ — ให้คลิกในกล่องโค้ดแล้วกด Ctrl+C (หรือ Cmd+C) เอง');
+      else toast('คัดลอกอัตโนมัติไม่ได้ — คลิกในกล่องโค้ดแล้วกด Ctrl+C / Cmd+C');
     } catch (err) {
       textarea.setAttribute('readonly', 'readonly');
-      toast('คัดลอกอัตโนมัติไม่ได้ — ให้คลิกในกล่องโค้ดแล้วกด Ctrl+C (หรือ Cmd+C) เอง');
+      toast('คัดลอกอัตโนมัติไม่ได้ — คลิกในกล่องโค้ดแล้วกด Ctrl+C / Cmd+C');
     }
   }
 
@@ -2666,8 +2967,8 @@ function copyFullStandaloneHTML() {
     btn.classList.remove('btn-success');
     btn.classList.add('btn-sky');
     toast(exportMode === 'embed'
-      ? 'คัดลอกแล้ว — เอาไปวางใน <main> ของหน้าเดิมได้เลย (สไตล์อยู่ในกรอบ .auth-embed ไม่ทับ Navbar)'
-      : 'คัดลอกโค้ดแล้ว — เอาไปวางในไฟล์ index.html แล้วดับเบิลคลิกเปิดได้เลย');
+      ? 'คัดลอกแล้ว — วางใน <main> ของหน้าเดิมได้ (สไตล์อยู่ใน .auth-embed ไม่ทับ Navbar)'
+      : 'คัดลอกแล้ว — วางใน index.html แล้วดับเบิลคลิกเปิดได้');
     setTimeout(() => {
       btn.innerHTML = original;
       btn.classList.remove('btn-sky');
@@ -2688,7 +2989,7 @@ function downloadStandaloneHTML() {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   toast(exportMode === 'embed'
-    ? 'ดาวน์โหลด form-embed.html แล้ว — เปิดดูได้เลย แล้วคัดลอกเนื้อหาไปวางใน <main> ของหน้าเดิม'
-    : 'ดาวน์โหลด index.html แล้ว — ดับเบิลคลิกไฟล์เพื่อเปิดบนเบราว์เซอร์ได้เลย (ไม่ต้องต่อเน็ต)');
-  tipTiewBot('export', 'ครูชิโร่: บันทึกไฟล์แล้ว ดับเบิลคลิก index.html เพื่อเปิด');
+    ? 'ดาวน์โหลด form-embed.html แล้ว — เปิดดู แล้วคัดลอกไปวางใน <main> ของหน้าเดิม'
+    : 'ดาวน์โหลด index.html แล้ว — ดับเบิลคลิกเพื่อเปิดบนเบราว์เซอร์ (ไม่ต้องต่อเน็ต)');
+  tipTiewBot('export', 'ครูชิโร่: บันทึกแล้ว — ดับเบิลคลิก index.html เพื่อเปิด');
 }
