@@ -283,7 +283,7 @@
     </div>
   </header>
 
-  <section class="studio-hero" aria-label="แนะนำสตูดิโอ">
+  <section class="studio-hero" aria-label="แนะนำ">
     <h1 class="studio-hero-title">Login &amp; Register Studio</h1>
     <p class="studio-hero-sub">จัดโครงบนกระดาน แล้วเลือกสีและส่งออก</p>
     <div class="hero-cta">
@@ -353,7 +353,7 @@
               <button class="btn btn-outline-full btn-tone-danger" onclick="resetSavedData()">
                 <i class="fa-solid fa-trash-can" aria-hidden="true"></i> ล้างงานทั้งหมดในเครื่องนี้
               </button>
-              <p class="sidebar-note" id="autosave-note">งานของคุณถูกบันทึกอัตโนมัติในเบราว์เซอร์เครื่องนี้</p>
+              <p class="sidebar-note" id="autosave-note">งานบันทึกอัตโนมัติในเบราว์เซอร์เครื่องนี้</p>
             </div>
           </div>
         </aside>
@@ -407,7 +407,7 @@
           <div class="sidebar-header">
             <div class="sidebar-heading">
               <h2>คุณสมบัติ</h2>
-              <p>แก้ข้อความของชิ้นที่เลือก</p>
+              <p>แก้ชิ้นที่เลือก</p>
             </div>
           </div>
 
@@ -415,7 +415,7 @@
             <div id="inspector-properties" class="properties-body">
               <div class="empty-inspector-state">
                 <i class="fa-solid fa-arrow-pointer" aria-hidden="true"></i>
-                <p>คลิกเลือกองค์ประกอบในพื้นที่ออกแบบเพื่อปรับแต่งคุณสมบัติ</p>
+                <p>คลิกชิ้นบนกระดานเพื่อแก้ชื่อและประเภท</p>
               </div>
             </div>
 
@@ -488,7 +488,7 @@
               </button>
               <div class="group-body" id="group-theme-body" role="group" aria-labelledby="group-theme-header" hidden>
                 <div id="theme-lock-banner" class="teacher-lock-banner" hidden>
-                  <p>ชุดธีมสำเร็จรูปใช้ได้เมื่อครูปลดล็อกแล้ว — นักเรียนเลือกสีทีละช่องด้านล่างได้ตามปกติ</p>
+                  <p>ชุดธีมใช้ได้เมื่อครูปลดล็อก — เลือกสีทีละช่องด้านล่างได้ตามปกติ</p>
                   <button type="button" class="btn btn-secondary btn-sm" onclick="openTeacherUnlockModal()">
                     <i class="fa-solid fa-key" aria-hidden="true"></i> ใส่รหัสครู
                   </button>
@@ -507,7 +507,7 @@
                 <i class="fa-solid fa-chevron-down group-chevron" aria-hidden="true"></i>
               </button>
               <div class="group-body" id="group-appearance-body" role="group" aria-labelledby="group-appearance-header" hidden>
-                <p class="control-hint">เลือกสีทีละช่องตามชิ้นส่วนที่เห็นบนการ์ด · รูปพื้นหลัง · พื้นหลังสำเร็จรูป · ความโปร่งแสง · ความเบลอ</p>
+                <p class="control-hint">เลือกสีทีละช่องบนการ์ด — รูปพื้นหลัง ความโปร่งแสง และความเบลอ</p>
 
                 <div class="color-picker-grid">
                   <div class="picker-item">
@@ -601,8 +601,8 @@
                   </div>
                   <input type="range" id="slider-card-blur" min="0" max="40" value="16" oninput="updateStudioStyles()">
                 </div>
-                <p class="control-hint">เว้นว่างทั้งช่อง URL และไม่มีรูปที่ฝังไว้ = ใช้พื้นหลังไล่สี (ค่าเริ่มต้น) — กดพื้นหลังสำเร็จรูป หรือลากรูปมาวางทับหน้าตัวอย่างได้เลย
-                  · รูปที่เลือกจากเครื่อง (หรือลากมาวาง) จะถูก <strong>ฝังไว้ในไฟล์</strong> → เปิดใช้ได้แม้ไม่มีเน็ต</p>
+                <p class="control-hint">เว้นว่าง URL และไม่มีรูปฝังไว้ = ใช้ไล่สี (ค่าเริ่มต้น) — กดพื้นหลังสำเร็จรูป หรือลากรูปมาวางทับตัวอย่าง
+                  · รูปจากเครื่อง (หรือลากมาวาง) จะถูก <strong>ฝังในไฟล์</strong> → เปิดได้แม้ไม่มีเน็ต</p>
               </div>
             </div>
 
@@ -703,7 +703,7 @@
             <div class="exporter-header">
               <div class="exporter-title">
                 <h3>ส่งออก HTML</h3>
-                <p>คัดลอกหรือดาวน์โหลดไฟล์เดียว แล้วเปิดได้เลย <span id="code-size-note" class="code-size-note"></span></p>
+                <p>คัดลอกหรือดาวน์โหลดไฟล์เดียว แล้วเปิดได้ <span id="code-size-note" class="code-size-note"></span></p>
               </div>
               <div class="exporter-actions">
                 <button id="panel-code-toggle" class="btn btn-secondary btn-sm panel-toggle-inline" data-label="โค้ด"
@@ -727,7 +727,7 @@
                 <button type="button" class="export-mode-btn" data-mode="embed" onclick="setExportMode('embed')"
                         title="ชิ้นส่วนสำหรับแปะใน main ของหน้าเว็บเดิมที่มี Navbar อยู่แล้ว (สไตล์ไม่ทับกัน)">แปะในหน้าเดิม (body &gt; main)</button>
               </div>
-              <p class="export-mode-note" id="export-mode-note">ไฟล์เดียวจบ: คัดลอกไปวางในไฟล์ index.html แล้วดับเบิลคลิกเปิดได้เลย (เต็มหน้าจอ)</p>
+              <p class="export-mode-note" id="export-mode-note">ไฟล์เดียวจบ: วางใน index.html แล้วดับเบิลคลิกเปิดได้ (เต็มจอ)</p>
             </div>
 
             <div class="code-editor-box" id="panel-code-body">
@@ -737,8 +737,8 @@
 
             <!-- โหมดสอนอ่านโค้ด: แยกโค้ดเป็นส่วน + คำอธิบายภาษาไทย + คัดลอกเฉพาะส่วน (สอนทีละ concept) -->
             <div class="teach-code-panel" id="panel-teach-body" hidden>
-              <p class="teach-intro"><strong>โหมดสอนอ่านโค้ด</strong> — โค้ดชุดเดียวกับกล่องด้านบน แต่แยกเป็นส่วน ๆ
-                พร้อมคำอธิบายว่าส่วนนั้นทำอะไร (โค้ดที่แสดงตัดให้สั้นเพื่ออ่านง่าย — ปุ่ม “คัดลอกส่วนนี้” จะได้โค้ดเต็ม)</p>
+              <p class="teach-intro"><strong>โหมดสอนอ่านโค้ด</strong> — โค้ดชุดเดียวกับด้านบน แยกเป็นส่วน
+                พร้อมคำอธิบายสั้น ๆ (ตัดให้สั้นเพื่ออ่านง่าย — ปุ่ม “คัดลอกส่วนนี้” จะได้โค้ดเต็ม)</p>
               <div id="teach-code-parts"></div>
             </div>
           </div>
@@ -813,7 +813,7 @@
     <div class="otp-card" role="document">
       <button type="button" class="otp-close" aria-label="ปิด" onclick="closeTeacherUnlockModal()"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       <h2 id="otp-title" class="otp-title">รหัสครู</h2>
-      <p class="otp-hint">ใส่รหัส 6 หลักเพื่อปลดล็อกแบบฟอร์มตัวอย่างและชุดธีม</p>
+      <p class="otp-hint">ใส่รหัส 6 หลักเพื่อปลดล็อกแบบตัวอย่างและชุดธีม</p>
       <div class="otp-digits" id="otp-digits" role="group" aria-label="รหัสครู 6 หลัก">
         <input class="otp-digit" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="หลักที่ 1" data-otp-i="0">
         <input class="otp-digit" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="หลักที่ 2" data-otp-i="1">

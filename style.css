@@ -969,6 +969,144 @@ body.layout-b .canvas-dropzone {
   color: var(--accent-hover);
 }
 
+.canvas-item .ctrl-type-wrap {
+  display: inline-flex;
+  margin: 0;
+}
+
+.canvas-item .ctrl-type {
+  height: 28px;
+  max-width: 7.5rem;
+  padding: 0 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: 980px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--accent-deep);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+}
+
+.canvas-item .ctrl-type:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 1px;
+}
+
+.canvas-item .item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding-right: 4px;
+}
+
+.canvas-item .inline-edit {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  padding: 4px 6px;
+  min-width: 0;
+}
+
+.canvas-item .inline-edit:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: var(--border-soft);
+}
+
+.canvas-item .inline-edit:focus {
+  outline: none;
+  background: #fff;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-spark-soft);
+  cursor: text;
+}
+
+.canvas-item .inline-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.canvas-item .inline-label.is-heading {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.canvas-item .inline-label.is-button {
+  text-align: center;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-radius: 980px;
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: transparent;
+}
+
+.canvas-item .inline-label.is-button:hover,
+.canvas-item .inline-label.is-button:focus {
+  background: var(--accent-hover);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 0 3px var(--accent-spark-soft);
+}
+
+.canvas-item .inline-label.is-muted {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.canvas-item .inline-sub,
+.canvas-item .inline-placeholder {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.canvas-item .inline-label-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.canvas-item .inline-label-row .inline-label { flex: 1; }
+
+.canvas-item .inline-preview-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.canvas-item .inline-check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.canvas-item .inline-check-row .inline-label { flex: 1; }
+
+.canvas-item .inline-divider {
+  border: 0;
+  border-top: 1px solid #e2e8f0;
+  margin: 4px 0 0;
+}
+
 .canvas-item .ctrl-btn.ctrl-delete {
   width: 28px;
   padding: 0;
@@ -1044,6 +1182,11 @@ body.layout-b .canvas-dropzone {
     font-size: 13px;
   }
   .canvas-item .ctrl-btn i { font-size: 13px; }
+  .canvas-item .ctrl-type {
+    height: 40px;
+    max-width: 8.5rem;
+    font-size: 13px;
+  }
   .canvas-item .resize-handle {
     width: 16px;
     right: -8px;
@@ -1084,27 +1227,38 @@ body.layout-b .canvas-dropzone {
   color: #cbd5e1;
 }
 
+.inspector-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .inspector-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.inspector-field-sm {
+  margin-bottom: 8px;
 }
 
 .inspector-field label,
 .inspector-field .insp-section-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: var(--text-main);
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
 }
 
 .inspector-field input[type="text"],
 .inspector-field select {
-  padding: 10px 12px;
+  padding: 7px 10px;
   border: 1px solid var(--border-soft);
-  border-radius: 12px;
+  border-radius: 10px;
   font-family: var(--font-main);
-  font-size: 14px;
+  font-size: 13px;
   background: #fff;
   color: var(--text-main);
 }
@@ -1113,15 +1267,7 @@ body.layout-b .canvas-dropzone {
 .inspector-field select:focus {
   outline: none;
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px var(--accent-spark-soft);
-}
-
-.inspector-field .field-hint {
-  margin: 0;
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--text-tertiary);
-  line-height: 1.35;
+  box-shadow: 0 0 0 2px var(--accent-spark-soft);
 }
 
 .inspector-check label {
@@ -1129,64 +1275,16 @@ body.layout-b .canvas-dropzone {
   align-items: center;
   gap: 8px;
   font-weight: 500;
-  cursor: pointer;
-}
-
-/* ประเภท picker — clear chips for ม.5 */
-.type-picker {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
-}
-
-.type-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border: 1px solid var(--border-soft);
-  border-radius: 12px;
-  background: #fff;
-  color: var(--text-main);
-  font: inherit;
   font-size: 13px;
-  font-weight: 500;
+  color: var(--text-main);
   cursor: pointer;
-  text-align: left;
-  transition: background-color 0.15s var(--ease-apple), border-color 0.15s var(--ease-apple), color 0.15s var(--ease-apple);
-}
-
-.type-chip i {
-  width: 1.1em;
-  color: var(--text-muted);
-  text-align: center;
-}
-
-.type-chip:hover {
-  border-color: var(--accent-soft);
-  background: var(--accent-tint);
-}
-
-.type-chip.on {
-  border-color: var(--accent-primary);
-  background: var(--accent-tint);
-  color: var(--accent-deep);
-  box-shadow: 0 0 0 1px var(--accent-spark-soft);
-}
-
-.type-chip.on i {
-  color: var(--accent-primary);
-}
-
-.type-chip:focus-visible {
-  outline: 2px solid var(--accent-primary);
-  outline-offset: 2px;
 }
 
 .inspector-hint {
-  font-size: 12px;
-  color: var(--text-muted);
+  font-size: 11px;
+  color: var(--text-tertiary);
   line-height: 1.4;
+  margin-top: 2px;
 }
 
 /* Forward Action (ขั้นตอนที่ 1 → 2) — soft surface, not a loud card */

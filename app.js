@@ -524,13 +524,13 @@ function submitTeacherOtp() {
   const next = pendingTeacherAction;
   setTeacherUnlocked(true);
   closeTeacherUnlockModal();
-  toast('ปลดล็อกของครูแล้ว — ใช้แบบฟอร์มตัวอย่างและชุดธีมได้');
+  toast('ปลดล็อกแล้ว — ใช้แบบตัวอย่างและชุดธีมได้');
   if (next === 'template') loadDefaultFormStructure(true);
   if (next === 'theme') {
     if (activeStep !== 2) switchMainStep(2);
     if (!isGroupOpen('theme')) toggleGroup('theme');
   }
-  tipTiewBot('unlocked', 'ครูชิโร่: ปลดล็อกแล้ว — ลองกด «ใช้แบบฟอร์มตัวอย่าง» หรือเลือกชุดธีมได้เลย');
+  tipTiewBot('unlocked', 'ครูชิโร่: ปลดล็อกแล้ว — กด «ใช้แบบฟอร์มตัวอย่าง» หรือเลือกชุดธีมได้');
 }
 function bindTeacherOtpInputs() {
   const wrap = document.getElementById('otp-digits');
@@ -576,7 +576,7 @@ function bindTeacherOtpInputs() {
 function requestLoadDefaultForm() {
   if (!isTeacherUnlocked()) {
     openTeacherUnlockModal('template');
-    tipTiewBot('need-unlock', 'ครูชิโร่: แบบฟอร์มตัวอย่างต้องใส่รหัสครูก่อนนะ');
+    tipTiewBot('need-unlock', 'ครูชิโร่: แบบตัวอย่างต้องใส่รหัสครูก่อน');
     return;
   }
   loadDefaultFormStructure();
@@ -617,7 +617,7 @@ function undoLastDestructive() {
   syncThemeActive(studioConfig.themePreset, null);
   updateTargetChrome();
   commitAll();
-  toast('เลิกทำแล้ว — คืนงานก่อนหน้าแล้ว');
+  toast('เลิกทำแล้ว — คืนงานก่อนหน้า');
 }
 
 // ---- Bot ครูชิโร่ ----
@@ -645,7 +645,7 @@ function initTiewBot() {
   root.classList.toggle('is-calm', prefersReducedMotion());
   // คำใบ้เริ่มต้นเมื่อกระดานว่าง
   if (!loginElements.length && !registerElements.length) {
-    tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
+    tipTiewBot('empty', 'ครูชิโร่: กด «ใช้แบบฟอร์มตัวอย่าง» (ต้องมีรหัสครู) หรือเพิ่มช่องจากแถบซ้าย');
   }
 }
 function tipTiewBot(key, message) {
@@ -744,7 +744,7 @@ function loadState() {
 }
 
 function resetSavedData() {
-  if (!confirm('ล้างงานทั้งหมดในเครื่องนี้ และเริ่มจากกระดานว่างใช่หรือไม่? (มีปุ่มเลิกทำ 1 ครั้ง)')) return;
+  if (!confirm('ล้างงานในเครื่องนี้แล้วเริ่มกระดานว่างใช่ไหม? (เลิกทำได้ 1 ครั้ง)')) return;
   captureUndo('ล้างงานทั้งหมด');
   try { localStorage.removeItem(STORE_KEY); localStorage.removeItem(UI_KEY); } catch (e) {}
   loginElements = [];
@@ -761,8 +761,8 @@ function resetSavedData() {
   syncThemeActive(studioConfig.themePreset, null);
   updateTargetChrome();
   commitAll();
-  toast('ล้างข้อมูลเดิมแล้ว — กด «เลิกทำ» ถ้าต้องการคืน');
-  tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
+  toast('ล้างข้อมูลแล้ว — กด «เลิกทำ» ถ้าต้องการคืน');
+  tipTiewBot('empty', 'ครูชิโร่: กด «ใช้แบบฟอร์มตัวอย่าง» (ต้องมีรหัสครู) หรือเพิ่มช่องจากแถบซ้าย');
 }
 
 // ==========================================================================
@@ -904,7 +904,7 @@ function setAllGroups(open) {
   GROUP_KEYS.forEach((k) => { uiState.groups[k] = open; });
   saveUiState();
   applyUiState();
-  toast(open ? 'ขยายทุกกลุ่มแล้ว' : 'ย่อทุกกลุ่มแล้ว — กดหัวข้อกลุ่มเพื่อเปิดทีละกลุ่มได้');
+  toast(open ? 'ขยายทุกกลุ่มแล้ว' : 'ย่อทุกกลุ่มแล้ว — กดหัวข้อกลุ่มเพื่อเปิดทีละอัน');
 }
 
 // ย่อ/ขยายแถบด้านข้าง (และกล่องโค้ด) — layout B: one drawer at a time + scrim
@@ -1037,7 +1037,7 @@ document.addEventListener('DOMContentLoaded', () => {
       minimizeTiewBot();
     }
   });
-  if (restored) toast('โหลดงานที่บันทึกไว้ล่าสุดให้แล้ว');
+  if (restored) toast('โหลดงานล่าสุดแล้ว');
 });
 
 // ==========================================================================
@@ -1054,7 +1054,7 @@ function switchMainStep(step) {
   });
   if (step === 2) {
     renderStudioPreviewStage();
-    tipTiewBot('step2', 'ครูชิโร่: เลือกสีทีละช่องได้เลย — ชุดธีมสำเร็จรูปใช้ได้เมื่อครูปลดล็อก');
+    tipTiewBot('step2', 'ครูชิโร่: เลือกสีทีละช่องได้ — ชุดธีมใช้ได้เมื่อครูปลดล็อก');
   }
   syncDockHighlight();
 }
@@ -1084,21 +1084,21 @@ function setDockMode(mode) {
   dockMode = mode || 'structure';
   if (mode === 'structure') {
     switchMainStep(1);
-    tipTiewBot('dock-structure', 'ครูชิโร่: จัดโครงบนกระดาน — กด «เครื่องมือ» เพื่อเพิ่มช่อง');
+    tipTiewBot('dock-structure', 'ครูชิโร่: กด «เครื่องมือ» เพื่อเพิ่มช่องบนกระดาน');
   } else if (mode === 'color') {
     switchMainStep(2);
     if (!isPanelOpen('controls')) togglePanel('controls');
     // scroll color panel into view lightly
     const controls = document.querySelector('.studio-controls-sidebar');
     if (controls && controls.scrollIntoView) controls.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    tipTiewBot('dock-color', 'ครูชิโร่: เลือกสีทีละช่องได้เลย');
+    tipTiewBot('dock-color', 'ครูชิโร่: เลือกสีทีละช่องได้');
   } else if (mode === 'export') {
     switchMainStep(2);
     if (isPanelOpen('controls')) togglePanel('controls');
     const codePanel = document.querySelector('.code-exporter-panel');
     if (codePanel && codePanel.scrollIntoView) codePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (!isPanelOpen('code')) togglePanel('code');
-    tipTiewBot('dock-export', 'ครูชิโร่: คัดลอกหรือดาวน์โหลดไฟล์ HTML ได้จากด้านล่าง');
+    tipTiewBot('dock-export', 'ครูชิโร่: คัดลอกหรือดาวน์โหลด HTML ได้ด้านล่าง');
   } else if (mode === 'login') {
     switchMainStep(1);
     setBuilderTarget('login');
@@ -1186,7 +1186,7 @@ function addCanvasElement(type) {
 
 function removeElement(id) {
   const list = getActiveList();
-  if (list.length <= 1 && !confirm('ลบองค์ประกอบสุดท้ายของฟอร์มนี้ใช่หรือไม่?')) return;
+  if (list.length <= 1 && !confirm('ลบชิ้นสุดท้ายของฟอร์มนี้ใช่ไหม?')) return;
   if (builderTarget === 'login') loginElements = loginElements.filter((el) => el.id !== id);
   else registerElements = registerElements.filter((el) => el.id !== id);
   selectedElementId = null;
@@ -1266,7 +1266,7 @@ function placeBeside(sourceId, targetId, placeLeft) {
   target.colSpan = 6;
   selectedElementId = moved.id;
   commitAll();
-  tipTiewBot('beside', 'ครูชิโร่: วางคู่กันแล้ว — ลากขอบขวาเพื่อปรับความกว้างได้');
+  tipTiewBot('beside', 'ครูชิโร่: วางคู่กันแล้ว — ลากขอบขวาเพื่อย่อ/ขยาย');
 }
 
 function clearDropMarkers() {
@@ -1317,21 +1317,20 @@ function attachResizeHandle(itemCard, item) {
   handle.addEventListener('touchstart', onDown, { passive: false });
 }
 
-function selectElement(id) {
+function selectElement(id, opts = {}) {
   selectedElementId = id;
-  /* ม.5: เปิดแถบคุณสมบัติให้อัตโนมัติ เพื่อตั้งชื่อ/ประเภทได้ทันที */
-  if (id && !isPanelOpen('inspector')) {
-    uiState.panels.inspector = true;
-    if (uiState.panels.toolbox) {
-      uiState.panels.toolbox = false;
-      applyPanelState('toolbox');
-    }
-    applyPanelState('inspector');
-    saveUiState();
-    syncDrawerScrim();
-  }
+  /* ไม่บังคับเปิดแถบคุณสมบัติใหญ่ — พิมพ์ชื่อบนกระดานได้เลย; แถบเป็นตัวช่วยแบบกะทัดรัด */
   renderCanvas();
   renderInspector();
+  if (id && opts.focusLabel) {
+    requestAnimationFrame(() => {
+      const input = document.querySelector(`#builder-canvas .canvas-item[data-element-id="${CSS.escape(id)}"] [data-inline-prop="label"]`);
+      if (input) {
+        input.focus();
+        if (typeof input.select === 'function') input.select();
+      }
+    });
+  }
 }
 
 /* เปลี่ยนประเภทองค์ประกอบ — นักเรียนเลือกเองได้ ไม่ถูกล็อกตามปุ่มที่กดเพิ่ม */
@@ -1366,7 +1365,7 @@ function changeElementType(id, newType) {
   if (newType === 'heading' && keep.subtitle) item.subtitle = keep.subtitle;
   selectedElementId = id;
   commitAll();
-  tipTiewBot('type-change', 'ครูชิโร่: เปลี่ยนประเภทแล้ว — ตั้ง «ชื่อ» ให้ตรงกับช่องได้เลย');
+  tipTiewBot('type-change', 'ครูชิโร่: เปลี่ยนประเภทแล้ว — พิมพ์ชื่อบนกระดานได้');
 }
 
 function renderCanvas() {
@@ -1379,7 +1378,7 @@ function renderCanvas() {
     const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
     stage.innerHTML = `<div class="empty-canvas-state">
       <span class="empty-canvas-icon" aria-hidden="true">+</span>
-      <p class="empty-canvas-title">ยังไม่มีองค์ประกอบในฟอร์ม${esc(targetName)}</p>
+      <p class="empty-canvas-title">ยังไม่มีช่องในฟอร์ม${esc(targetName)}</p>
       <p class="empty-canvas-sub">เริ่มจากแบบตัวอย่าง หรือเพิ่มช่องเอง</p>
       <div class="empty-canvas-actions">
         <button type="button" class="btn btn-primary teacher-gated-btn teacher-gated-cta${isTeacherUnlocked() ? '' : ' is-locked'}"
@@ -1395,7 +1394,7 @@ function renderCanvas() {
       </div>
       <p class="template-lock-hint"${isTeacherUnlocked() ? ' hidden' : ''}>ต้องใส่รหัสครูก่อน</p>
     </div>`;
-    tipTiewBot('empty', 'ครูชิโร่: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู)');
+    tipTiewBot('empty', 'ครูชิโร่: กด «ใช้แบบฟอร์มตัวอย่าง» ได้ (ต้องมีรหัสครู)');
     return;
   }
 
@@ -1419,10 +1418,15 @@ function renderCanvas() {
     itemCard.tabIndex = 0;
     itemCard.dataset.elementId = item.id;
     itemCard.setAttribute('aria-label', `องค์ประกอบ ${item.type} : ${item.label || ''} — ความกว้าง ${widthLabel} — ลำดับที่ ${idx + 1} จาก ${list.length}`);
-    itemCard.title = 'ลากเพื่อย้าย — วางข้าง ๆ เพื่อจัดคู่ — ลากขอบขวาเพื่อปรับความกว้าง';
-    itemCard.onclick = (e) => { e.stopPropagation(); selectElement(item.id); };
+    itemCard.title = 'คลิกแล้วพิมพ์ชื่อ — ลากเพื่อย้าย / วางข้าง ๆ — ลากขอบขวาเพื่อปรับความกว้าง';
+    itemCard.onclick = (e) => {
+      e.stopPropagation();
+      const onField = e.target.closest('[data-inline-prop], .item-controls, .resize-handle, .ctrl-type');
+      selectElement(item.id, { focusLabel: !onField });
+    };
     itemCard.onkeydown = (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectElement(item.id); }
+      if (e.target.closest('[data-inline-prop], select, input, textarea, button')) return;
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectElement(item.id, { focusLabel: true }); }
       if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); removeElement(item.id); }
       if (e.altKey && e.key === 'ArrowUp') { e.preventDefault(); moveElement(item.id, -1); }
       if (e.altKey && e.key === 'ArrowDown') { e.preventDefault(); moveElement(item.id, 1); }
@@ -1435,7 +1439,7 @@ function renderCanvas() {
     // ลากจัดตำแหน่ง — บน/ล่าง = เรียงแนวตั้ง, ซ้าย/ขวา = วางคู่
     itemCard.draggable = true;
     itemCard.addEventListener('dragstart', (e) => {
-      if (e.target.closest('.resize-handle, .item-controls, .ctrl-btn')) {
+      if (e.target.closest('.resize-handle, .item-controls, .ctrl-btn, .ctrl-type, [data-inline-prop], input, select, textarea, button')) {
         e.preventDefault();
         return;
       }
@@ -1474,40 +1478,53 @@ function renderCanvas() {
       else reorderElement(sourceId, item.id, yRatio < 0.5);
     });
 
-    const wysiwyg = canvasViewMode === 'wysiwyg';
+    const sid = safeId(item.id);
+    const typeOptions = COMPONENTS.map((c) =>
+      `<option value="${c.type}" ${item.type === c.type ? 'selected' : ''}>${esc(c.short)}</option>`
+    ).join('');
     let contentHTML = '';
     if (item.type === 'heading') {
-      contentHTML = wysiwyg
-        ? `<h3 class="wys-heading">${esc(item.label)}</h3><p class="wys-sub">${esc(item.subtitle || '')}</p>`
-        : `<h3 style="font-size: 16px; font-weight: 700;">${esc(item.label)}</h3><p style="font-size: 12px; color: var(--text-muted);">${esc(item.subtitle || '')}</p>`;
+      contentHTML = `
+        <input class="inline-edit inline-label is-heading" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อหัวข้อ" placeholder="ชื่อหัวข้อ">
+        <input class="inline-edit inline-sub" data-inline-prop="subtitle" type="text" value="${esc(item.subtitle || '')}" aria-label="คำอธิบายย่อย" placeholder="คำอธิบายย่อย (ถ้ามี)">`;
     } else if (['text', 'password', 'email'].includes(item.type)) {
-      contentHTML = wysiwyg
-        ? `<label class="wys-label">${esc(item.label)} ${item.required ? '<span class="wys-req">*</span>' : ''}</label>
-           <input class="wys-input" type="${item.type}" placeholder="${esc(item.placeholder)}" disabled>`
-        : `<label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">${esc(item.label)} ${item.required ? '<span style="color:red">*</span>' : ''}</label>
-                     <input type="${item.type}" placeholder="${esc(item.placeholder)}" disabled style="width:100%; padding: 6px; border:1px solid #cbd5e1; border-radius:4px; font-size:12px;">`;
+      contentHTML = `
+        <div class="inline-label-row">
+          <input class="inline-edit inline-label" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อช่อง" placeholder="ชื่อช่อง">
+          ${item.required ? '<span class="wys-req" aria-hidden="true">*</span>' : ''}
+        </div>
+        <input class="inline-preview-input" type="${item.type}" value="" placeholder="${esc(item.placeholder || '')}" disabled tabindex="-1" aria-hidden="true">
+        <input class="inline-edit inline-placeholder" data-inline-prop="placeholder" type="text" value="${esc(item.placeholder || '')}" aria-label="ข้อความในช่องว่าง" placeholder="ข้อความในช่องว่าง">`;
     } else if (item.type === 'checkbox') {
-      contentHTML = wysiwyg
-        ? `<label class="wys-check"><input type="checkbox" disabled> ${esc(item.label)}</label>`
-        : `<label style="font-size: 12px; display: flex; align-items: center; gap: 6px;"><input type="checkbox" disabled> ${esc(item.label)}</label>`;
+      contentHTML = `
+        <label class="inline-check-row">
+          <input type="checkbox" disabled tabindex="-1" aria-hidden="true">
+          <input class="inline-edit inline-label" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อตัวเลือก" placeholder="ชื่อตัวเลือก">
+        </label>`;
     } else if (item.type === 'button') {
-      contentHTML = wysiwyg
-        ? `<button class="wys-submit" disabled>${esc(item.label)}</button>`
-        : `<button disabled style="width: 100%; padding: 8px; background: var(--accent-primary); color: #fff; border: none; border-radius: 4px; font-size: 12px;">${esc(item.label)}</button>`;
+      contentHTML = `
+        <input class="inline-edit inline-label is-button" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อปุ่ม" placeholder="ชื่อปุ่ม">`;
     } else if (item.type === 'divider') {
-      contentHTML = `<hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 8px 0;">`;
+      contentHTML = `
+        <hr class="inline-divider" aria-hidden="true">
+        <input class="inline-edit inline-label is-muted" data-inline-prop="label" type="text" value="${esc(item.label || '')}" aria-label="ชื่อเส้นแบ่ง" placeholder="เส้นแบ่ง">`;
     }
 
-    /* Quiet student chrome: width chip + delete only (no heavy up/down) */
+    /* Compact chrome: type + width + delete — ชื่อพิมพ์บนกระดานโดยตรง */
     itemCard.innerHTML = `
       <div class="item-controls">
-        <button type="button" class="ctrl-btn ctrl-width" title="สลับความกว้าง (เต็ม / ครึ่ง / ⅓)" aria-label="สลับความกว้างองค์ประกอบ" onclick="event.stopPropagation(); cycleElementWidth('${safeId(item.id)}')">${widthLabel}</button>
-        <button type="button" class="ctrl-btn ctrl-delete" title="ลบองค์ประกอบนี้" aria-label="ลบองค์ประกอบนี้" onclick="event.stopPropagation(); removeElement('${safeId(item.id)}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <label class="ctrl-type-wrap" title="ประเภท">
+          <span class="sr-only">ประเภท</span>
+          <select class="ctrl-type" aria-label="ประเภทองค์ประกอบ" onclick="event.stopPropagation()" onchange="event.stopPropagation(); changeElementType('${sid}', this.value)">${typeOptions}</select>
+        </label>
+        <button type="button" class="ctrl-btn ctrl-width" title="สลับความกว้าง (เต็ม / ครึ่ง / ⅓)" aria-label="สลับความกว้างองค์ประกอบ" onclick="event.stopPropagation(); cycleElementWidth('${sid}')">${widthLabel}</button>
+        <button type="button" class="ctrl-btn ctrl-delete" title="ลบองค์ประกอบนี้" aria-label="ลบองค์ประกอบนี้" onclick="event.stopPropagation(); removeElement('${sid}')"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
       <span class="resize-handle" role="slider" aria-label="ปรับความกว้าง" aria-valuetext="${widthLabel}" title="ลากเพื่อปรับความกว้าง"></span>
-      ${contentHTML}
+      <div class="item-body">${contentHTML}</div>
     `;
     attachResizeHandle(itemCard, item);
+    bindInlineEdits(itemCard, item);
     preview.appendChild(itemCard);
   });
   stage.appendChild(preview);
@@ -1520,78 +1537,115 @@ function renderInspector() {
 
   if (!item) {
     inspector.innerHTML = `<div class="empty-inspector-state">
-      <i class="fa-solid fa-arrow-pointer" aria-hidden="true"></i>
-      <p>คลิกองค์ประกอบบนกระดาน แล้วตั้ง <strong>ชื่อ</strong> กับ <strong>ประเภท</strong> ได้เอง</p>
+      <i class="fa-solid fa-hand-pointer" aria-hidden="true"></i>
+      <p>คลิกชิ้นบนกระดาน แล้ว<strong>พิมพ์ชื่อ</strong><br>สลับประเภทจากเมนูมุมชิ้น</p>
     </div>`;
     return;
   }
 
   const id = safeId(item.id);
-  const typePicker = COMPONENTS.map((c) => {
-    const on = item.type === c.type;
-    return `<button type="button" class="type-chip${on ? ' on' : ''}" role="radio" aria-checked="${on ? 'true' : 'false'}"
-      title="${esc(c.label)}" onclick="changeElementType('${id}', '${c.type}')">
-      <i class="fa-solid ${c.icon}" aria-hidden="true"></i>
-      <span>${esc(c.short)}</span>
-    </button>`;
-  }).join('');
+  const typeOptions = COMPONENTS.map((c) =>
+    `<option value="${c.type}" ${item.type === c.type ? 'selected' : ''}>${esc(c.short)} — ${esc(c.label)}</option>`
+  ).join('');
 
   inspector.innerHTML = `
-    <div class="inspector-field">
-      <label for="insp-label">ชื่อ</label>
-      <input id="insp-label" type="text" value="${esc(item.label || '')}" placeholder="เช่น อีเมล, รหัสผ่าน, เข้าสู่ระบบ"
-             autocomplete="off" oninput="updateItemProp('${id}', 'label', this.value)">
-      <p class="field-hint">ข้อความที่นักเรียนเห็นบนฟอร์ม — ตั้งเองได้</p>
+    <div class="inspector-compact">
+      <div class="inspector-field inspector-field-sm">
+        <label for="insp-label">ชื่อ</label>
+        <input id="insp-label" type="text" value="${esc(item.label || '')}" placeholder="พิมพ์บนกระดานก็ได้"
+               autocomplete="off" oninput="updateItemProp('${id}', 'label', this.value, { inline: true }); syncInlineFromInspector('${id}', 'label', this.value)">
+      </div>
+      <div class="inspector-field inspector-field-sm">
+        <label for="insp-type">ประเภท</label>
+        <select id="insp-type" onchange="changeElementType('${id}', this.value)">${typeOptions}</select>
+      </div>
+      ${item.type === 'heading' ? `
+        <div class="inspector-field inspector-field-sm">
+          <label for="insp-subtitle">คำอธิบายย่อย</label>
+          <input id="insp-subtitle" type="text" value="${esc(item.subtitle || '')}" oninput="updateItemProp('${id}', 'subtitle', this.value, { inline: true }); syncInlineFromInspector('${id}', 'subtitle', this.value)">
+        </div>
+      ` : ''}
+      ${['text', 'password', 'email'].includes(item.type) ? `
+        <div class="inspector-field inspector-field-sm">
+          <label for="insp-placeholder">ข้อความในช่องว่าง</label>
+          <input id="insp-placeholder" type="text" value="${esc(item.placeholder || '')}" oninput="updateItemProp('${id}', 'placeholder', this.value, { inline: true }); syncInlineFromInspector('${id}', 'placeholder', this.value)">
+        </div>
+        <div class="inspector-field inspector-check inspector-field-sm">
+          <label for="insp-required"><input id="insp-required" type="checkbox" ${item.required ? 'checked' : ''} onchange="updateItemProp('${id}', 'required', this.checked)"> จำเป็นต้องกรอก</label>
+        </div>
+      ` : ''}
+      <div class="inspector-field inspector-field-sm">
+        <label for="insp-colspan">ความกว้าง</label>
+        <select id="insp-colspan" onchange="updateItemProp('${id}', 'colSpan', parseInt(this.value))">
+          <option value="12" ${normalizeColSpan(item.colSpan) === 12 ? 'selected' : ''}>เต็มแถว</option>
+          <option value="6" ${normalizeColSpan(item.colSpan) === 6 ? 'selected' : ''}>ครึ่งแถว</option>
+          <option value="4" ${normalizeColSpan(item.colSpan) === 4 ? 'selected' : ''}>หนึ่งในสาม</option>
+        </select>
+      </div>
+      <p class="inspector-hint">พิมพ์ชื่อบนกระดานได้ — แถบนี้เป็นตัวช่วยสั้น ๆ</p>
     </div>
-    <div class="inspector-field">
-      <span class="insp-section-label" id="insp-type-label">ประเภท</span>
-      <div class="type-picker" role="radiogroup" aria-labelledby="insp-type-label">
-        ${typePicker}
-      </div>
-      <p class="field-hint">เลือกประเภทเองได้ เช่น ข้อความ / อีเมล / รหัสผ่าน / ปุ่ม</p>
-    </div>
-    ${item.type === 'heading' ? `
-      <div class="inspector-field">
-        <label for="insp-subtitle">คำอธิบายย่อย</label>
-        <input id="insp-subtitle" type="text" value="${esc(item.subtitle || '')}" oninput="updateItemProp('${id}', 'subtitle', this.value)">
-      </div>
-    ` : ''}
-    ${['text', 'password', 'email'].includes(item.type) ? `
-      <div class="inspector-field">
-        <label for="insp-placeholder">ข้อความในช่องว่าง (Placeholder)</label>
-        <input id="insp-placeholder" type="text" value="${esc(item.placeholder || '')}" oninput="updateItemProp('${id}', 'placeholder', this.value)">
-      </div>
-      <div class="inspector-field inspector-check">
-        <label for="insp-required"><input id="insp-required" type="checkbox" ${item.required ? 'checked' : ''} onchange="updateItemProp('${id}', 'required', this.checked)"> จำเป็นต้องกรอก</label>
-      </div>
-    ` : ''}
-    <div class="inspector-field">
-      <label for="insp-colspan">ความกว้างบนกระดาน</label>
-      <select id="insp-colspan" onchange="updateItemProp('${id}', 'colSpan', parseInt(this.value))">
-        <option value="12" ${normalizeColSpan(item.colSpan) === 12 ? 'selected' : ''}>เต็มแถว</option>
-        <option value="6" ${normalizeColSpan(item.colSpan) === 6 ? 'selected' : ''}>ครึ่งแถว (คู่กันได้)</option>
-        <option value="4" ${normalizeColSpan(item.colSpan) === 4 ? 'selected' : ''}>หนึ่งในสาม</option>
-      </select>
-    </div>
-    <p class="inspector-hint">ลากชิ้นเพื่อย้าย — วางข้าง ๆ เพื่อจัดคู่ — ลากขอบขวาหรือกดชิปความกว้างเพื่อย่อ/ขยาย</p>
   `;
-  const nameInput = document.getElementById('insp-label');
-  if (nameInput && document.activeElement !== nameInput) {
-    /* keep focus if already typing; otherwise ready for ม.5 to rename */
+}
+
+function syncInlineFromInspector(id, prop, val) {
+  const el = document.querySelector(`#builder-canvas .canvas-item[data-element-id="${CSS.escape(id)}"] [data-inline-prop="${prop}"]`);
+  if (el && el !== document.activeElement) el.value = val == null ? '' : String(val);
+  if (prop === 'placeholder') {
+    const preview = document.querySelector(`#builder-canvas .canvas-item[data-element-id="${CSS.escape(id)}"] .inline-preview-input`);
+    if (preview) preview.placeholder = val == null ? '' : String(val);
   }
 }
 
-function updateItemProp(id, prop, val) {
+function updateItemProp(id, prop, val, opts = {}) {
   const list = getActiveList();
   const item = list.find((el) => el.id === id);
-  if (item) {
-    item[prop] = prop === 'colSpan' ? normalizeColSpan(val) : val;
-    commitAll({ keepInspector: true });
+  if (!item) return;
+  item[prop] = prop === 'colSpan' ? normalizeColSpan(val) : val;
+  if (opts.inline) {
+    /* พิมพ์บนกระดาน — อย่ารีเฟรช canvas ทับโฟกัส */
+    updateTargetChrome();
+    if (isPanelOpen('inspector')) renderInspector();
+    renderStudioPreviewStage();
+    regenerateCode();
+    saveState();
+    return;
   }
+  commitAll({ keepInspector: true });
+}
+
+function bindInlineEdits(itemCard, item) {
+  itemCard.querySelectorAll('[data-inline-prop]').forEach((el) => {
+    const prop = el.getAttribute('data-inline-prop');
+    el.addEventListener('pointerdown', (e) => e.stopPropagation());
+    el.addEventListener('mousedown', (e) => e.stopPropagation());
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectedElementId !== item.id) selectElement(item.id);
+    });
+    el.addEventListener('input', () => {
+      updateItemProp(item.id, prop, el.value, { inline: true });
+      if (prop === 'placeholder') {
+        const preview = itemCard.querySelector('.inline-preview-input');
+        if (preview) preview.placeholder = el.value;
+      }
+    });
+    el.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        el.blur();
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        el.value = item[prop] == null ? '' : String(item[prop]);
+        el.blur();
+      }
+    });
+  });
 }
 
 function clearCanvas() {
-  if (!confirm('ต้องการลบจริงหรือไม่?')) return;
+  if (!confirm('ลบกระดานนี้ใช่ไหม?')) return;
   captureUndo('ล้างกระดาน');
   if (builderTarget === 'login') loginElements = [];
   else registerElements = [];
@@ -1605,14 +1659,14 @@ function loadDefaultFormStructure(skipConfirm) {
     openTeacherUnlockModal('template');
     return;
   }
-  if (!skipConfirm && !confirm('ใช้แบบฟอร์มตัวอย่างทับงานปัจจุบันของทั้งเข้าสู่ระบบและสมัครสมาชิกใช่หรือไม่? (มีปุ่มเลิกทำ 1 ครั้ง)')) return;
+  if (!skipConfirm && !confirm('ใช้แบบตัวอย่างทับงานเข้าสู่ระบบและสมัครใช่ไหม? (เลิกทำได้ 1 ครั้ง)')) return;
   captureUndo('ใช้แบบฟอร์มตัวอย่าง');
   loginElements = DEFAULT_LOGIN();
   registerElements = DEFAULT_REGISTER();
   selectedElementId = null;
   commitAll();
-  toast('โหลดแบบฟอร์มตัวอย่างให้ทั้งสองฝั่งแล้ว');
-  tipTiewBot('loaded', 'ครูชิโร่: โครงครบแล้ว — แก้ข้อความด้านขวา หรือไปตกแต่งสีได้เมื่อพร้อม');
+  toast('โหลดแบบตัวอย่างทั้งเข้าสู่ระบบและสมัครแล้ว');
+  tipTiewBot('loaded', 'ครูชิโร่: โครงครบแล้ว — คลิกชิ้นแล้วพิมพ์ชื่อ หรือไปเลือกสี');
 }
 
 function focusToolboxAdd() {
@@ -1623,7 +1677,7 @@ function focusToolboxAdd() {
     if (first) first.focus();
     else grid.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
   }
-  tipTiewBot('add-self', 'ครูชิโร่: กดปุ่มองค์ประกอบด้านซ้ายเพื่อเพิ่มช่องทีละอัน');
+  tipTiewBot('add-self', 'ครูชิโร่: กดปุ่มด้านซ้ายเพื่อเพิ่มช่อง');
 }
 
 function forwardToStep2() {
@@ -1639,7 +1693,7 @@ function commitAll(opts = {}) {
   renderStudioPreviewStage();
   regenerateCode();
   saveState();
-  if (selectedElementId) tipTiewBot('selected', 'ครูชิโร่: ตั้ง «ชื่อ» กับ «ประเภท» ด้านขวาได้เลย — เปลี่ยนเองได้');
+  if (selectedElementId) tipTiewBot('selected', 'ครูชิโร่: พิมพ์ชื่อบนกระดาน — สลับประเภทจากเมนูมุมชิ้น');
 }
 
 // ==========================================================================
@@ -1682,7 +1736,7 @@ function buildAuthMarkup(opts = {}) {
 function renderFormFields(list, scope = '') {
   if (!list || list.length === 0) {
     return `
-          <p class="form-subtitle" style="grid-column: span 12;">ยังไม่มีองค์ประกอบในฟอร์มนี้</p>`;
+          <p class="form-subtitle" style="grid-column: span 12;">ยังไม่มีช่องในฟอร์มนี้</p>`;
   }
   const fid = (elId) => scope + 'field-' + safeId(elId);
 
@@ -1735,7 +1789,7 @@ function bindCard(card) {
   // ในหน้าตัวอย่างไม่ให้ฟอร์มส่งข้อมูลจริง (ไม่มีหลังบ้าน) แต่ยังโชว์ผลการตรวจ required
   card.addEventListener('submit', (e) => {
     e.preventDefault();
-    toast('ฟอร์มกรอกครบแล้ว ✓ (ตัวอย่างนี้ไม่ส่งข้อมูลจริง — ไฟล์ที่ export จะมีแท็ก <form> และการตรวจ required เหมือนกัน)');
+    toast('กรอกครบแล้ว (ตัวอย่างนี้ไม่ส่งข้อมูลจริง)');
   });
 }
 
@@ -1882,7 +1936,7 @@ function commitPendingColors() {
   pendingColors = null;
   updateStudioStyles();
   clearPendingColors();
-  toast('ใช้สีใหม่แล้ว (โค้ดด้านล่างอัปเดตตามเรียบร้อย)');
+  toast('ใช้สีใหม่แล้ว — โค้ดด้านล่างอัปเดตแล้ว');
 }
 
 // กด "ยกเลิก": คืนค่าสีทั้งหมดกลับเป็นชุดก่อนเริ่มแก้
@@ -2061,7 +2115,7 @@ function renderThemePresets() {
 function applyThemePreset(presetKey, ev) {
   if (!isTeacherUnlocked()) {
     openTeacherUnlockModal('theme');
-    tipTiewBot('theme-lock', 'ครูชิโร่: ชุดธีมสำเร็จรูปต้องใส่รหัสครูก่อน — เลือกสีทีละช่องด้านล่างได้เลย');
+    tipTiewBot('theme-lock', 'ครูชิโร่: ชุดธีมต้องใส่รหัสครูก่อน — เลือกสีทีละช่องด้านล่างได้');
     return;
   }
   const p = THEME_PRESETS[presetKey];
@@ -2090,7 +2144,7 @@ function applyThemePreset(presetKey, ev) {
   syncThemeActive(presetKey, ev);
   applyConfigToControls();   // สไลเดอร์/ดรอปดาวน์/สี ขยับตามธีม
   updateStudioStyles();      // ตัวอย่าง + modal + โค้ดที่ export + autosave
-  toast(`ใช้ธีม ${p.label} แล้ว — สี ฟอนต์ ความมน ความเบลอ พื้นหลัง และอนิเมชันเปลี่ยนพร้อมกันทั้งหน้าตัวอย่างและโค้ดที่ export`);
+  toast(`ใช้ธีม ${p.label} แล้ว — สี ฟอนต์ และพื้นหลังอัปเดตแล้ว`);
 }
 
 // ==========================================================================
@@ -2251,7 +2305,7 @@ async function handleBgFileInput(files, opts) {
       ` • โค้ดที่ export จะใหญ่ขึ้นประมาณ ${addedCode} แต่เปิดใช้ได้แบบออฟไลน์ ไม่ต้องพึ่งลิงก์ภายนอก`,
       'ok'
     );
-    toast(resized ? `ฝังรูปแล้ว (ย่อจาก ${before} เหลือ ${after})` : 'ฝังรูปพื้นหลังแล้ว — ใช้ได้แม้ไม่มีเน็ต');
+    toast(resized ? `ฝังรูปแล้ว (ย่อจาก ${before} → ${after})` : 'ฝังรูปพื้นหลังแล้ว — ใช้ได้แม้ไม่มีเน็ต');
   } catch (e) {
     setBgStatus('อ่านไฟล์นี้ไม่ได้ — ลองบันทึกรูปใหม่เป็น .jpg/.png แล้วเลือกอีกครั้ง', 'warn');
   }
@@ -2322,7 +2376,7 @@ async function applyBgUrlFailed(url, timedOut) {
       info.textContent += ` · ดึงรูปจากลิงก์ให้อัตโนมัติแล้ว (${fmtSize(Math.round(studioConfig.bgImageData.length * 0.75))}) และฝังไว้ในไฟล์ — ต่อไปเปิดแบบออฟไลน์ก็เห็นรูป`;
       info.className = 'bg-status is-ok';
     }
-    toast('ดึงรูปจากลิงก์มาฝังในไฟล์ให้แล้ว — เปิดใช้ได้แม้ไม่มีเน็ต');
+    toast('ฝังรูปจากลิงก์แล้ว — ใช้ได้แม้ไม่มีเน็ต');
     return;
   }
 
@@ -2401,7 +2455,7 @@ function clearBackgroundImage() {
   syncBgUi();
   updateStudioStyles();
   setBgStatus(had ? 'ลบรูปพื้นหลังแล้ว — กลับไปใช้พื้นหลังไล่สี' : 'ยังไม่มีรูปพื้นหลังให้ลบ', had ? 'ok' : 'info');
-  if (had) toast('ลบรูปพื้นหลังแล้ว — ใช้พื้นหลังไล่สีแทน');
+  if (had) toast('ลบรูปพื้นหลังแล้ว — ใช้ไล่สีแทน');
 }
 
 function applyGradientPreset(key, ev) {
@@ -2418,7 +2472,7 @@ function applyGradientPreset(key, ev) {
   syncBgUi();
   updateStudioStyles();
   setBgStatus(`ใช้พื้นหลังสำเร็จรูป "${g.label}" แล้ว (CSS ไล่สี ไม่ต้องใช้เน็ต)${hadImage ? ' — ลบรูปพื้นหลังเดิมออกให้แล้ว' : ''}`, 'ok');
-  toast(`พื้นหลัง "${g.label}" ใช้ได้ทันที และออฟไลน์ได้`);
+  toast(`พื้นหลัง "${g.label}" พร้อมใช้ (ออฟไลน์ได้)`);
 }
 
 // ลากรูปมาวาง (ที่กล่องของมันเอง หรือวางทับหน้าตัวอย่างเลยก็ได้)
@@ -2497,7 +2551,7 @@ function bindModalEvents() {
   // ปุ่มย้อนกลับในหน้าตัวอย่าง: กดได้แต่ไม่พาออกจากเครื่องมือ (ไฟล์ที่ export จะย้อนกลับจริง)
   document.addEventListener('click', (e) => {
     if (e.target.closest('#preview-stage-root .page-back, #modal-preview-stage .page-back')) {
-      toast('ปุ่มนี้อยู่ในหน้าตัวอย่าง — ยังไม่พาไปไหน ส่วนไฟล์ที่ export แล้วจะย้อนกลับไปหน้าก่อนหน้า');
+      toast('ปุ่มนี้ในตัวอย่างยังไม่พาไปไหน — ไฟล์ที่ส่งออกจะย้อนกลับหน้าก่อนได้');
     }
   });
 }
@@ -2840,8 +2894,8 @@ function renderTeachCode() {
 
 function copyCodePart(key) {
   const text = (buildCodeParts(exportMode) || {})[key] || '';
-  const ok = () => toast(`คัดลอก ${partInfo(key).label ? '“' + partInfo(key).label.split('—')[0].trim() + '”' : key} แล้ว (${fmtSize(text.length)}) — เอาไปวางในไฟล์ได้เลย`);
-  const fail = () => toast('คัดลอกอัตโนมัติไม่ได้ — ให้คลิกในกล่องโค้ดด้านบนแล้วกด Ctrl+C (หรือ Cmd+C) เอง');
+  const ok = () => toast(`คัดลอก ${partInfo(key).label ? '“' + partInfo(key).label.split('—')[0].trim() + '”' : key} แล้ว (${fmtSize(text.length)}) — เอาไปวางในไฟล์ได้`);
+  const fail = () => toast('คัดลอกอัตโนมัติไม่ได้ — คลิกในกล่องโค้ดแล้วกด Ctrl+C / Cmd+C');
   if (!text) { fail(); return; }
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(ok).catch(fail);
@@ -2862,8 +2916,8 @@ function setExportMode(mode) {
   const note = document.getElementById('export-mode-note');
   if (note) {
     note.textContent = embed
-      ? 'วางทั้งหมดนี้ใน <main> ของหน้าเดิมได้เลย — สไตล์ถูกล็อกในกรอบ .auth-embed จึงไม่ทับ Navbar ของหน้าแม่'
-      : 'ไฟล์เดียวจบ: คัดลอกไปวางในไฟล์ index.html แล้วดับเบิลคลิกเปิดได้เลย (เต็มหน้าจอ)';
+      ? 'วางทั้งหมดนี้ใน <main> ของหน้าเดิม — สไตล์ถูกล็อกในกรอบ .auth-embed จึงไม่ทับ Navbar'
+      : 'ไฟล์เดียวจบ: วางใน index.html แล้วดับเบิลคลิกเปิดได้ (เต็มจอ)';
   }
   document.getElementById('copy-standalone-btn').innerHTML = embed
     ? '<i class="fa-solid fa-copy" aria-hidden="true"></i> คัดลอกชิ้นส่วน'
@@ -2872,7 +2926,7 @@ function setExportMode(mode) {
     ? '<i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลด form-embed.html'
     : '<i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลดไฟล์';
   regenerateCode();
-  toast(embed ? 'เปลี่ยนเป็นโหมดแปะในหน้าเดิมแล้ว — โค้ดด้านล่างพร้อมวางใน <main>' : 'เปลี่ยนเป็นโหมดไฟล์เดียวจบ (ทั้งหน้า) แล้ว');
+  toast(embed ? 'โหมดแปะในหน้าเดิม — โค้ดด้านล่างวางใน <main> ได้' : 'โหมดไฟล์เดียวจบ (ทั้งหน้า)');
 }
 
 function regenerateCode() {
@@ -2905,10 +2959,10 @@ function copyFullStandaloneHTML() {
       const ok = document.execCommand('copy');
       textarea.setAttribute('readonly', 'readonly');
       if (ok) showCopySuccess();
-      else toast('คัดลอกอัตโนมัติไม่ได้ — ให้คลิกในกล่องโค้ดแล้วกด Ctrl+C (หรือ Cmd+C) เอง');
+      else toast('คัดลอกอัตโนมัติไม่ได้ — คลิกในกล่องโค้ดแล้วกด Ctrl+C / Cmd+C');
     } catch (err) {
       textarea.setAttribute('readonly', 'readonly');
-      toast('คัดลอกอัตโนมัติไม่ได้ — ให้คลิกในกล่องโค้ดแล้วกด Ctrl+C (หรือ Cmd+C) เอง');
+      toast('คัดลอกอัตโนมัติไม่ได้ — คลิกในกล่องโค้ดแล้วกด Ctrl+C / Cmd+C');
     }
   }
 
@@ -2921,8 +2975,8 @@ function copyFullStandaloneHTML() {
     btn.classList.remove('btn-success');
     btn.classList.add('btn-sky');
     toast(exportMode === 'embed'
-      ? 'คัดลอกแล้ว — เอาไปวางใน <main> ของหน้าเดิมได้เลย (สไตล์อยู่ในกรอบ .auth-embed ไม่ทับ Navbar)'
-      : 'คัดลอกโค้ดแล้ว — เอาไปวางในไฟล์ index.html แล้วดับเบิลคลิกเปิดได้เลย');
+      ? 'คัดลอกแล้ว — วางใน <main> ของหน้าเดิมได้ (สไตล์อยู่ใน .auth-embed ไม่ทับ Navbar)'
+      : 'คัดลอกแล้ว — วางใน index.html แล้วดับเบิลคลิกเปิดได้');
     setTimeout(() => {
       btn.innerHTML = original;
       btn.classList.remove('btn-sky');
@@ -2943,7 +2997,7 @@ function downloadStandaloneHTML() {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   toast(exportMode === 'embed'
-    ? 'ดาวน์โหลด form-embed.html แล้ว — เปิดดูได้เลย แล้วคัดลอกเนื้อหาไปวางใน <main> ของหน้าเดิม'
-    : 'ดาวน์โหลด index.html แล้ว — ดับเบิลคลิกไฟล์เพื่อเปิดบนเบราว์เซอร์ได้เลย (ไม่ต้องต่อเน็ต)');
-  tipTiewBot('export', 'ครูชิโร่: บันทึกไฟล์แล้ว ดับเบิลคลิก index.html เพื่อเปิด');
+    ? 'ดาวน์โหลด form-embed.html แล้ว — เปิดดู แล้วคัดลอกไปวางใน <main> ของหน้าเดิม'
+    : 'ดาวน์โหลด index.html แล้ว — ดับเบิลคลิกเพื่อเปิดบนเบราว์เซอร์ (ไม่ต้องต่อเน็ต)');
+  tipTiewBot('export', 'ครูชิโร่: บันทึกแล้ว — ดับเบิลคลิก index.html เพื่อเปิด');
 }
