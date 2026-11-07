@@ -158,6 +158,12 @@ const CARD_CSS = `
   .form-row.col-6, .form-row.col-4{ grid-column: span 12; }
   .switcher-tab{ font-size: 12px; padding: 8px 6px; gap: 4px; }
 }
+
+/* ลดการเคลื่อนไหวเมื่อผู้ใช้ตั้ง prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce){
+  .auth-view-pane.active{ animation: none !important; }
+  .form-input, .form-btn, .page-back, .switcher-tab{ transition: none !important; }
+}
 `;
 
 // ==========================================================================
@@ -318,13 +324,13 @@ function updateContrastNote() {
   const t = contrastRatio(c.textColor, cardBg);
   const btn = contrastRatio(c.accentColor, '#ffffff');   // ตัวอักษรบนปุ่มเป็นสีขาว (ดู .form-btn ใน CARD_CSS)
   const warn = [];
-  if (t < 4.5) warn.push(`สีข้อความหลักอ่านบนการ์ดยาก (${t.toFixed(1)}:1)`);
-  if (btn < 4.5) warn.push(`ตัวอักษรสีขาวบนปุ่มสีเน้นหลักอ่านยาก (${btn.toFixed(1)}:1)`);
+  if (t < 4.5) warn.push(`ข้อความอ่านบนการ์ดยาก (${t.toFixed(1)}:1)`);
+  if (btn < 4.5) warn.push(`ตัวอักษรขาวบนปุ่มอ่านยาก (${btn.toFixed(1)}:1)`);
 
   if (warn.length) {
     el.className = 'contrast-note is-warn';
     el.innerHTML = '<strong>สีอาจอ่านยาก:</strong> ' + esc(warn.join(' · ')) +
-      ' — มาตรฐานแนะนำอย่างน้อย <strong>4.5:1</strong> · ลองปรับ “สีข้อความหลัก” ให้เข้มขึ้น/อ่อนลง หรือเปลี่ยน “สีเน้นหลัก” แล้วดูตัวเลขนี้ใหม่' +
+      ' — มาตรฐานแนะนำอย่างน้อย <strong>4.5:1</strong> · ลองปรับ “ข้อความ” หรือ “ปุ่ม” แล้วดูตัวเลขนี้ใหม่' +
       '<br><span class="contrast-hint">(ค่าประมาณ: คิดจากการ์ดที่ผสมกับพื้นหลังของหน้าเมื่อการ์ดโปร่งแสง)</span>';
   } else {
     el.className = 'contrast-note is-ok';
@@ -423,6 +429,272 @@ function injectCardCss() {
 }
 
 // ==========================================================================
+// Teacher unlock (classroom gate — client-side only, ไม่ใช่ security จริง)
+// ปลดล็อกทั้งแบบฟอร์มตัวอย่าง + ชุดธีมสำเร็จรูป · ค่าเริ่มเก็บใน sessionStorage
+// ==========================================================================
+const TEACHER_CODE = '759212';
+const TEACHER_UNLOCK_KEY = 'html-generate-studio-teacher-unlock';
+const BOT_HIDE_KEY = 'html-generate-studio-tiew-bot-hide';
+let teacherUnlocked = false;
+let pendingTeacherAction = null;   // 'template' | 'theme' | null — ทำต่อหลังปลดล็อกสำเร็จ
+let undoSnapshot = null;           // 1 ระดับก่อนการกระทำทำลายงาน
+const botSeenTips = Object.create(null);
+
+function isTeacherUnlocked() {
+  try { return sessionStorage.getItem(TEACHER_UNLOCK_KEY) === '1'; } catch (e) { return teacherUnlocked; }
+}
+function setTeacherUnlocked(on) {
+  teacherUnlocked = !!on;
+  try {
+    if (on) sessionStorage.setItem(TEACHER_UNLOCK_KEY, '1');
+    else sessionStorage.removeItem(TEACHER_UNLOCK_KEY);
+  } catch (e) {}
+  applyTeacherGateUi();
+}
+function applyTeacherGateUi() {
+  const unlocked = isTeacherUnlocked();
+  document.querySelectorAll('.teacher-gated-btn .lock-chip, #theme-lock-chip').forEach((el) => {
+    el.hidden = unlocked;
+  });
+  const banner = document.getElementById('theme-lock-banner');
+  if (banner) banner.hidden = unlocked;
+  const grid = document.getElementById('theme-presets-grid');
+  if (grid) {
+    grid.classList.toggle('is-locked', !unlocked);
+    grid.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
+    grid.querySelectorAll('.theme-preset-card').forEach((btn) => {
+      btn.disabled = !unlocked;
+      btn.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
+    });
+  }
+  const unlockBtn = document.getElementById('teacher-unlock-btn');
+  if (unlockBtn) unlockBtn.hidden = unlocked;
+}
+function openTeacherUnlockModal(nextAction) {
+  pendingTeacherAction = nextAction || null;
+  const modal = document.getElementById('teacher-otp-modal');
+  if (!modal) return;
+  modal.hidden = false;
+  modal.setAttribute('aria-hidden', 'false');
+  const err = document.getElementById('otp-error');
+  if (err) err.hidden = true;
+  const inputs = modal.querySelectorAll('.otp-digit');
+  inputs.forEach((inp) => { inp.value = ''; inp.classList.remove('is-error'); });
+  if (inputs[0]) inputs[0].focus();
+}
+function closeTeacherUnlockModal() {
+  const modal = document.getElementById('teacher-otp-modal');
+  if (!modal) return;
+  modal.hidden = true;
+  modal.setAttribute('aria-hidden', 'true');
+  pendingTeacherAction = null;
+}
+function readOtpDigits() {
+  const inputs = document.querySelectorAll('#otp-digits .otp-digit');
+  return Array.from(inputs).map((i) => i.value.replace(/\D/g, '')).join('');
+}
+function submitTeacherOtp() {
+  const code = readOtpDigits();
+  const err = document.getElementById('otp-error');
+  const inputs = document.querySelectorAll('#otp-digits .otp-digit');
+  if (code.length !== 6) {
+    if (err) { err.hidden = false; err.textContent = 'กรอกให้ครบ 6 หลัก'; }
+    inputs.forEach((i) => i.classList.add('is-error'));
+    return;
+  }
+  if (code !== TEACHER_CODE) {
+    if (err) { err.hidden = false; err.textContent = 'รหัสไม่ถูกต้อง ลองใหม่'; }
+    inputs.forEach((i) => { i.classList.add('is-error'); i.value = ''; });
+    if (inputs[0]) inputs[0].focus();
+    return;
+  }
+  const next = pendingTeacherAction;
+  setTeacherUnlocked(true);
+  closeTeacherUnlockModal();
+  toast('ปลดล็อกของครูแล้ว — ใช้แบบฟอร์มตัวอย่างและชุดธีมได้');
+  if (next === 'template') loadDefaultFormStructure(true);
+  if (next === 'theme') {
+    if (activeStep !== 2) switchMainStep(2);
+    if (!isGroupOpen('theme')) toggleGroup('theme');
+  }
+  tipTiewBot('unlocked', 'ครูทิว: ปลดล็อกแล้ว — ลองกด «ใช้แบบฟอร์มตัวอย่าง» หรือเลือกชุดธีมได้เลย');
+}
+function bindTeacherOtpInputs() {
+  const wrap = document.getElementById('otp-digits');
+  if (!wrap || wrap._bound) return;
+  wrap._bound = true;
+  const inputs = Array.from(wrap.querySelectorAll('.otp-digit'));
+  inputs.forEach((inp, idx) => {
+    inp.addEventListener('input', (e) => {
+      const v = String(e.target.value || '').replace(/\D/g, '').slice(-1);
+      e.target.value = v;
+      e.target.classList.remove('is-error');
+      const err = document.getElementById('otp-error');
+      if (err) err.hidden = true;
+      if (v && inputs[idx + 1]) inputs[idx + 1].focus();
+      if (v && idx === inputs.length - 1 && readOtpDigits().length === 6) submitTeacherOtp();
+    });
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !inp.value && inputs[idx - 1]) {
+        inputs[idx - 1].focus();
+        inputs[idx - 1].value = '';
+        e.preventDefault();
+      }
+      if (e.key === 'Enter') { e.preventDefault(); submitTeacherOtp(); }
+      if (e.key === 'Escape') closeTeacherUnlockModal();
+    });
+    inp.addEventListener('paste', (e) => {
+      const text = (e.clipboardData || window.clipboardData).getData('text') || '';
+      const digits = text.replace(/\D/g, '').slice(0, 6);
+      if (!digits) return;
+      e.preventDefault();
+      digits.split('').forEach((d, i) => { if (inputs[i]) inputs[i].value = d; });
+      const focusAt = Math.min(digits.length, inputs.length - 1);
+      inputs[focusAt].focus();
+      if (digits.length === 6) submitTeacherOtp();
+    });
+  });
+  const modal = document.getElementById('teacher-otp-modal');
+  if (modal && !modal._bound) {
+    modal._bound = true;
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeTeacherUnlockModal(); });
+  }
+}
+function requestLoadDefaultForm() {
+  if (!isTeacherUnlocked()) {
+    openTeacherUnlockModal('template');
+    tipTiewBot('need-unlock', 'ครูทิว: แบบฟอร์มตัวอย่างต้องใส่รหัสครูก่อนนะ');
+    return;
+  }
+  loadDefaultFormStructure();
+}
+
+// ---- Undo 1 ระดับ สำหรับการกระทำทำลายงาน ----
+function captureUndo(label) {
+  undoSnapshot = {
+    label: label || 'เลิกทำ',
+    loginElements: JSON.parse(JSON.stringify(loginElements)),
+    registerElements: JSON.parse(JSON.stringify(registerElements)),
+    studioConfig: JSON.parse(JSON.stringify(studioConfig)),
+    pageTitle,
+    selectedElementId,
+    builderTarget,
+    previewView,
+  };
+  const btn = document.getElementById('undo-btn');
+  if (btn) {
+    btn.hidden = false;
+    btn.innerHTML = `<i class="fa-solid fa-rotate-left" aria-hidden="true"></i> เลิกทำ: ${esc(label || 'ล่าสุด')}`;
+  }
+}
+function undoLastDestructive() {
+  if (!undoSnapshot) { toast('ยังไม่มีสิ่งที่เลิกทำได้'); return; }
+  const s = undoSnapshot;
+  undoSnapshot = null;
+  loginElements = s.loginElements;
+  registerElements = s.registerElements;
+  studioConfig = Object.assign(DEFAULT_CONFIG(), s.studioConfig);
+  pageTitle = s.pageTitle;
+  selectedElementId = s.selectedElementId;
+  builderTarget = s.builderTarget;
+  previewView = s.previewView || 'login';
+  const btn = document.getElementById('undo-btn');
+  if (btn) btn.hidden = true;
+  applyConfigToControls();
+  syncThemeActive(studioConfig.themePreset, null);
+  updateTargetChrome();
+  commitAll();
+  toast('เลิกทำแล้ว — คืนงานก่อนหน้าแล้ว');
+}
+
+// ---- Bot ครูทิว ----
+function prefersReducedMotion() {
+  try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
+}
+function getBotHideMode() {
+  try { return localStorage.getItem(BOT_HIDE_KEY) || ''; } catch (e) { return ''; }
+}
+function setBotHideMode(mode) {
+  try {
+    if (!mode) localStorage.removeItem(BOT_HIDE_KEY);
+    else localStorage.setItem(BOT_HIDE_KEY, mode);
+  } catch (e) {}
+}
+function initTiewBot() {
+  const root = document.getElementById('tiew-bot');
+  if (!root) return;
+  if (getBotHideMode() === 'forever') { root.hidden = true; return; }
+  if (getBotHideMode() === 'session') {
+    // "ซ่อนวันนี้" = ซ่อนในแท็บนี้จนกว่าจะปิดแท็บ (ใช้ session flag บน window)
+    if (window.__tiewBotHiddenSession) { root.hidden = true; return; }
+  }
+  root.hidden = false;
+  root.classList.toggle('is-calm', prefersReducedMotion());
+  // คำใบ้เริ่มต้นเมื่อกระดานว่าง
+  if (!loginElements.length && !registerElements.length) {
+    tipTiewBot('empty', 'ครูทิว: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
+  }
+}
+function tipTiewBot(key, message) {
+  if (botSeenTips[key]) return;
+  botSeenTips[key] = true;
+  const root = document.getElementById('tiew-bot');
+  if (!root || root.hidden) return;
+  const panel = document.getElementById('tiew-bot-panel');
+  const msg = document.getElementById('tiew-bot-msg');
+  if (msg) msg.textContent = message;
+  if (panel) panel.hidden = false;
+  root.classList.add('is-open');
+  if (!prefersReducedMotion()) root.classList.add('is-wave');
+  clearTimeout(root._tipTimer);
+  root._tipTimer = setTimeout(() => {
+    minimizeTiewBot();
+  }, 7000);
+}
+function toggleTiewBotPanel() {
+  const panel = document.getElementById('tiew-bot-panel');
+  const root = document.getElementById('tiew-bot');
+  if (!panel || !root || root.hidden) return;
+  const open = panel.hidden;
+  panel.hidden = !open;
+  root.classList.toggle('is-open', open);
+  if (open && !document.getElementById('tiew-bot-msg').textContent) {
+    document.getElementById('tiew-bot-msg').textContent = 'ครูทิว: ถามอะไรก็ได้จากปุ่มรอบ ๆ — หรือกดย่อเมื่อไม่ต้องการ';
+  }
+}
+function minimizeTiewBot() {
+  const panel = document.getElementById('tiew-bot-panel');
+  const root = document.getElementById('tiew-bot');
+  if (panel) panel.hidden = true;
+  if (root) root.classList.remove('is-open', 'is-wave');
+}
+function hideTiewBot(mode) {
+  const root = document.getElementById('tiew-bot');
+  if (mode === 'forever') setBotHideMode('forever');
+  else { window.__tiewBotHiddenSession = true; setBotHideMode('session'); }
+  if (root) root.hidden = true;
+}
+
+function updateTargetChrome() {
+  const loginCount = loginElements.length;
+  const regCount = registerElements.length;
+  const lc = document.getElementById('target-login-count');
+  const rc = document.getElementById('target-register-count');
+  if (lc) lc.textContent = `(${loginCount})`;
+  if (rc) rc.textContent = `(${regCount})`;
+  const badge = document.getElementById('active-target-badge');
+  if (badge) {
+    const cur = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+    const otherN = builderTarget === 'login' ? regCount : loginCount;
+    badge.textContent = `กำลังแก้: ${cur} · อีกฝั่งมี ${otherN} ช่อง`;
+  }
+  const loginBtn = document.getElementById('target-login-btn');
+  const regBtn = document.getElementById('target-register-btn');
+  if (loginBtn) loginBtn.classList.toggle('active', builderTarget === 'login');
+  if (regBtn) regBtn.classList.toggle('active', builderTarget === 'register');
+}
+
+// ==========================================================================
 // AUTOSAVE (เก็บงานไว้ในเบราว์เซอร์ ไม่ต้องมีหลังบ้าน)
 // ==========================================================================
 const STORE_KEY = 'html-generate-studio-v1';
@@ -458,9 +730,9 @@ function loadState() {
 }
 
 function resetSavedData() {
-  if (!confirm('ล้างข้อมูลที่บันทึกไว้ทั้งหมด และเริ่มจากกระดานว่างใช่หรือไม่? (คืนค่าไม่ได้)')) return;
+  if (!confirm('ล้างงานทั้งหมดในเครื่องนี้ และเริ่มจากกระดานว่างใช่หรือไม่? (มีปุ่มเลิกทำ 1 ครั้ง)')) return;
+  captureUndo('ล้างงานทั้งหมด');
   try { localStorage.removeItem(STORE_KEY); localStorage.removeItem(UI_KEY); } catch (e) {}
-  // เริ่มจากกระดานว่าง (ไม่มี Canvas item) — ถ้าต้องการฟอร์มตัวอย่างกลับ กดปุ่ม "โหลดโครงสร้างฟอร์มมาตรฐาน"
   loginElements = [];
   registerElements = [];
   studioConfig = DEFAULT_CONFIG();
@@ -473,8 +745,10 @@ function resetSavedData() {
   applyConfigToControls();
   syncBgUi();
   syncThemeActive(studioConfig.themePreset, null);
+  updateTargetChrome();
   commitAll();
-  toast('ล้างข้อมูลเดิมแล้ว — กระดานว่าง เริ่มสร้างฟอร์มใหม่ได้เลย');
+  toast('ล้างข้อมูลเดิมแล้ว — กด «เลิกทำ» ถ้าต้องการคืน');
+  tipTiewBot('empty', 'ครูทิว: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู) หรือเพิ่มช่องเองจากแถบซ้าย');
 }
 
 // ==========================================================================
@@ -606,6 +880,7 @@ function applyUiState() {
 // ==========================================================================
 document.addEventListener('DOMContentLoaded', () => {
   injectCardCss();
+  teacherUnlocked = isTeacherUnlocked();
   const restored = loadState();
   loadUiState();
   renderComponentButtons();
@@ -613,12 +888,23 @@ document.addEventListener('DOMContentLoaded', () => {
   renderGradientPresets();
   applyUiState();
   applyConfigToControls();
+  applyTeacherGateUi();
+  updateTargetChrome();
   renderCanvas();
   renderInspector();
   renderStudioPreviewStage();
   updateStudioStyles();
   bindModalEvents();
   bindBackgroundEvents();
+  bindTeacherOtpInputs();
+  initTiewBot();
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const otp = document.getElementById('teacher-otp-modal');
+      if (otp && !otp.hidden) { closeTeacherUnlockModal(); return; }
+      minimizeTiewBot();
+    }
+  });
   if (restored) toast('โหลดงานที่บันทึกไว้ล่าสุดให้แล้ว');
 });
 
@@ -634,17 +920,22 @@ function switchMainStep(step) {
   document.querySelectorAll('.step-panel').forEach((panel, idx) => {
     panel.classList.toggle('active', idx + 1 === step);
   });
-  if (step === 2) renderStudioPreviewStage();
+  if (step === 2) {
+    renderStudioPreviewStage();
+    tipTiewBot('step2', 'ครูทิว: เลือกสีทีละช่องด้านซ้ายได้เลย — ชุดธีมสำเร็จรูปใช้ได้เมื่อครูปลดล็อก');
+  }
 }
 
 function setBuilderTarget(target) {
+  if (target === builderTarget) return;
   builderTarget = target;
-  document.getElementById('target-login-btn').classList.toggle('active', target === 'login');
-  document.getElementById('target-register-btn').classList.toggle('active', target === 'register');
-  document.getElementById('active-target-badge').innerText = `กำลังแก้ไข: ฟอร์ม ${target === 'login' ? 'Login' : 'Register'}`;
   selectedElementId = null;
+  updateTargetChrome();
   renderCanvas();
   renderInspector();
+  const name = target === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+  const other = target === 'login' ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ';
+  toast(`สลับไป${name}แล้ว — งาน${other}ยังอยู่`);
 }
 
 function getActiveList() {
@@ -757,10 +1048,21 @@ function renderCanvas() {
   canvas.innerHTML = '';
 
   if (list.length === 0) {
-    canvas.innerHTML = `<div style="grid-column: span 12; text-align: center; color: var(--text-muted); padding: 40px;">
-      <i class="fa-solid fa-plus-circle" aria-hidden="true" style="font-size: 32px; margin-bottom: 8px;"></i>
-      <p>ยังไม่มีองค์ประกอบในฟอร์ม ${esc(builderTarget)} คลิกเครื่องมือด้านซ้ายเพื่อเพิ่มองค์ประกอบ — หรือกด «โหลดโครงสร้างฟอร์มมาตรฐาน» ถ้าอยากเริ่มจากตัวอย่าง</p>
+    const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+    canvas.innerHTML = `<div class="empty-canvas-state" style="grid-column: span 12;">
+      <i class="fa-solid fa-plus-circle empty-canvas-icon" aria-hidden="true"></i>
+      <p class="empty-canvas-title">ยังไม่มีองค์ประกอบในฟอร์ม${esc(targetName)}</p>
+      <p class="empty-canvas-sub">เริ่มจากแบบตัวอย่าง (ครูปลดล็อก) หรือเพิ่มช่องเองทีละอัน</p>
+      <div class="empty-canvas-actions">
+        <button type="button" class="btn btn-primary" onclick="requestLoadDefaultForm()">
+          <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> เริ่มจากแบบฟอร์มตัวอย่าง
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="focusToolboxAdd()">
+          เพิ่มช่องเอง
+        </button>
+      </div>
     </div>`;
+    tipTiewBot('empty', 'ครูทิว: เริ่มเร็วสุด กด «ใช้แบบฟอร์มตัวอย่าง» ได้เลย (ต้องมีรหัสครู)');
     return;
   }
 
@@ -899,35 +1201,57 @@ function updateItemProp(id, prop, val) {
 }
 
 function clearCanvas() {
-  const which = builderTarget === 'login' ? 'Login' : 'Register';
-  if (!confirm(`ล้างองค์ประกอบทั้งหมดของฟอร์ม ${which} ใช่หรือไม่? (คืนค่าไม่ได้)`)) return;
+  const which = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+  if (!confirm(`ล้างองค์ประกอบทั้งหมดของฟอร์ม${which} ใช่หรือไม่? (มีปุ่มเลิกทำ 1 ครั้ง)`)) return;
+  captureUndo('ล้างกระดาน');
   if (builderTarget === 'login') loginElements = [];
   else registerElements = [];
   selectedElementId = null;
   commitAll();
+  toast('ล้างกระดานแล้ว — กด «เลิกทำ» ได้ถ้าต้องการคืน');
 }
 
-function loadDefaultFormStructure() {
-  if (!confirm('โหลดโครงสร้างฟอร์มมาตรฐานทับงานปัจจุบันของ "ทั้ง Login และ Register" ใช่หรือไม่? (คืนค่าไม่ได้)')) return;
+function loadDefaultFormStructure(skipConfirm) {
+  if (!isTeacherUnlocked()) {
+    openTeacherUnlockModal('template');
+    return;
+  }
+  if (!skipConfirm && !confirm('ใช้แบบฟอร์มตัวอย่างทับงานปัจจุบันของทั้งเข้าสู่ระบบและสมัครสมาชิกใช่หรือไม่? (มีปุ่มเลิกทำ 1 ครั้ง)')) return;
+  captureUndo('ใช้แบบฟอร์มตัวอย่าง');
   loginElements = DEFAULT_LOGIN();
   registerElements = DEFAULT_REGISTER();
   selectedElementId = null;
   commitAll();
-  toast('โหลดโครงสร้างฟอร์มมาตรฐานให้ทั้งสองฝั่งแล้ว');
+  toast('โหลดแบบฟอร์มตัวอย่างให้ทั้งสองฝั่งแล้ว');
+  tipTiewBot('loaded', 'ครูทิว: โครงครบแล้ว — แก้ข้อความด้านขวา หรือไปตกแต่งสีได้เมื่อพร้อม');
+}
+
+function focusToolboxAdd() {
+  const grid = document.getElementById('component-grid');
+  if (!isPanelOpen('toolbox')) togglePanel('toolbox');
+  if (grid) {
+    const first = grid.querySelector('.comp-btn');
+    if (first) first.focus();
+    else grid.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'nearest' });
+  }
+  tipTiewBot('add-self', 'ครูทิว: กดปุ่มองค์ประกอบด้านซ้ายเพื่อเพิ่มช่องทีละอัน');
 }
 
 function forwardToStep2() {
   switchMainStep(2);
-  toast('ส่งโครงสร้างไปขั้นตอนที่ 2 แล้ว — เลือกธีม/สี แล้วดูโค้ดด้านล่างเปลี่ยนตามได้เลย');
+  toast('ไปตกแต่งสีและส่งออกแล้ว');
+  tipTiewBot('forward', 'ครูทิว: โครงครบแล้ว ไปตกแต่งสีได้เมื่อพร้อม');
 }
 
 // เรียกหลังแก้ข้อมูลทุกครั้ง: วาดใหม่ + สร้างโค้ดใหม่ + บันทึก
 function commitAll(opts = {}) {
+  updateTargetChrome();
   renderCanvas();
   if (!opts.keepInspector) renderInspector();
   renderStudioPreviewStage();
   regenerateCode();
   saveState();
+  if (selectedElementId) tipTiewBot('selected', 'ครูทิว: แก้ข้อความด้านขวาได้เลย — เห็นผลบนกระดานทันที');
 }
 
 // ==========================================================================
@@ -1120,10 +1444,10 @@ function updateStudioStyles() {
 //          กด "ตกลง" = สร้างโค้ดใหม่ + บันทึกอัตโนมัติ · กด "ยกเลิก" = คืนค่าสีที่ใช้อยู่ก่อนเริ่มแก้
 // ==========================================================================
 const COLOR_FIELDS = [
-  { id: 'color-accent', key: 'accentColor', label: 'สีเน้นหลัก' },
+  { id: 'color-accent', key: 'accentColor', label: 'ปุ่ม' },
   { id: 'color-card-bg', key: 'cardBgColor', label: 'พื้นหลังการ์ด' },
-  { id: 'color-text', key: 'textColor', label: 'สีข้อความ' },
-  { id: 'color-border', key: 'borderColor', label: 'เส้นขอบอินพุต' },
+  { id: 'color-text', key: 'textColor', label: 'ข้อความ' },
+  { id: 'color-border', key: 'borderColor', label: 'ขอบ' },
 ];
 let pendingColors = null;   // สำเนา studioConfig ตอน "เริ่มแก้สี" ครั้งแรก (ใช้ตอนกดยกเลิก)
 
@@ -1323,13 +1647,15 @@ function syncThemeActive(key, ev) {
 function renderThemePresets() {
   const grid = document.getElementById('theme-presets-grid');
   if (!grid) return;
+  const unlocked = isTeacherUnlocked();
   grid.innerHTML = THEME_KEYS.map((key) => {
     const p = THEME_PRESETS[key];
     const vars = cardVarMap(presetVars(p));
     const varsText = Object.keys(vars).map((k) => `${k}:${vars[k]}`).join(';');
     return `
       <button type="button" class="theme-preset-card" data-theme="${key}" aria-pressed="${studioConfig.themePreset === key}"
-              onclick="applyThemePreset('${key}', event)" title="ใช้ธีม ${esc(p.label)}">
+              ${unlocked ? '' : 'disabled'} aria-disabled="${unlocked ? 'false' : 'true'}"
+              onclick="applyThemePreset('${key}', event)" title="${unlocked ? 'ใช้ธีม ' + esc(p.label) : 'ต้องปลดล็อกด้วยรหัสครู'}">
         <span class="theme-swatch" style="${esc(varsText)};background-image:${p.gradient}" aria-hidden="true">
           <span class="mini-card">
             <span class="mini-aa">Aa</span>
@@ -1341,9 +1667,15 @@ function renderThemePresets() {
         <span class="theme-hint">${esc(p.hint)}</span>
       </button>`;
   }).join('');
+  applyTeacherGateUi();
 }
 
 function applyThemePreset(presetKey, ev) {
+  if (!isTeacherUnlocked()) {
+    openTeacherUnlockModal('theme');
+    tipTiewBot('theme-lock', 'ครูทิว: ชุดธีมสำเร็จรูปต้องใส่รหัสครูก่อน — เลือกสีทีละช่องด้านล่างได้เลย');
+    return;
+  }
   const p = THEME_PRESETS[presetKey];
   if (!p) return;
   studioConfig.themePreset = presetKey;
@@ -2146,11 +2478,11 @@ function setExportMode(mode) {
       : 'ไฟล์เดียวจบ: คัดลอกไปวางในไฟล์ index.html แล้วดับเบิลคลิกเปิดได้เลย (เต็มหน้าจอ)';
   }
   document.getElementById('copy-standalone-btn').innerHTML = embed
-    ? '<i class="fa-solid fa-copy" aria-hidden="true"></i> คัดลอกชิ้นส่วน (แปะในหน้าเดิม)'
-    : '<i class="fa-solid fa-copy" aria-hidden="true"></i> คัดลอกโค้ดทั้งหน้าเว็บ (Full Page Code)';
+    ? '<i class="fa-solid fa-copy" aria-hidden="true"></i> คัดลอกชิ้นส่วน'
+    : '<i class="fa-solid fa-copy" aria-hidden="true"></i> คัดลอกโค้ดทั้งหน้า';
   document.getElementById('download-standalone-btn').innerHTML = embed
-    ? '<i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลดเป็นไฟล์ form-embed.html'
-    : '<i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลดเป็นไฟล์ index.html';
+    ? '<i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลด form-embed.html'
+    : '<i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลดไฟล์';
   regenerateCode();
   toast(embed ? 'เปลี่ยนเป็นโหมดแปะในหน้าเดิมแล้ว — โค้ดด้านล่างพร้อมวางใน <main>' : 'เปลี่ยนเป็นโหมดไฟล์เดียวจบ (ทั้งหน้า) แล้ว');
 }
@@ -2225,4 +2557,5 @@ function downloadStandaloneHTML() {
   toast(exportMode === 'embed'
     ? 'ดาวน์โหลด form-embed.html แล้ว — เปิดดูได้เลย แล้วคัดลอกเนื้อหาไปวางใน <main> ของหน้าเดิม'
     : 'ดาวน์โหลด index.html แล้ว — ดับเบิลคลิกไฟล์เพื่อเปิดบนเบราว์เซอร์ได้เลย (ไม่ต้องต่อเน็ต)');
+  tipTiewBot('export', 'ครูทิว: บันทึกไฟล์แล้ว ดับเบิลคลิก index.html เพื่อเปิด');
 }

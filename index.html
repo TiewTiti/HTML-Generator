@@ -29,14 +29,14 @@
     </div>
 
     <div class="step-navigator" role="tablist" aria-label="ขั้นตอนการทำงาน">
-      <button id="step1-tab-btn" class="step-tab-btn active" role="tab" aria-selected="true" onclick="switchMainStep(1)">
+      <button id="step1-tab-btn" class="step-tab-btn active" role="tab" aria-selected="true" onclick="switchMainStep(1)" title="Visual Builder — สร้างโครง HTML">
         <span class="step-number">1</span>
-        <span class="step-label">Visual Builder (สร้าง HTML)</span>
+        <span class="step-label">สร้างฟอร์ม</span>
       </button>
       <div class="step-divider"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></div>
-      <button id="step2-tab-btn" class="step-tab-btn" role="tab" aria-selected="false" onclick="switchMainStep(2)">
+      <button id="step2-tab-btn" class="step-tab-btn" role="tab" aria-selected="false" onclick="switchMainStep(2)" title="CSS &amp; JS Studio — ตกแต่งและส่งออก">
         <span class="step-number">2</span>
-        <span class="step-label">CSS &amp; JS Studio (ตกแต่ง &amp; Export)</span>
+        <span class="step-label">ตกแต่งและส่งออก</span>
       </button>
     </div>
   </header>
@@ -58,13 +58,13 @@
 
           <div class="sidebar-body" id="panel-toolbox-body">
             <div class="view-target-selector">
-              <span id="target-label" class="selector-label"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> กำหนดเป้าหมายฟอร์ม:</span>
+              <span id="target-label" class="selector-label"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> กำลังแก้ฟอร์ม:</span>
               <div class="target-btn-group" role="group" aria-labelledby="target-label">
-                <button id="target-login-btn" class="target-btn target-btn-login active" onclick="setBuilderTarget('login')" title="แก้ไขฟอร์มฝั่ง Login (สีฟ้า)">
-                  <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> ฝั่ง Login
+                <button id="target-login-btn" class="target-btn target-btn-login active" onclick="setBuilderTarget('login')" title="แก้ไขฟอร์มเข้าสู่ระบบ">
+                  <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> เข้าสู่ระบบ <span class="target-count" id="target-login-count">(0)</span>
                 </button>
-                <button id="target-register-btn" class="target-btn target-btn-register" onclick="setBuilderTarget('register')" title="แก้ไขฟอร์มฝั่ง Register (สีเขียว)">
-                  <i class="fa-solid fa-user-plus" aria-hidden="true"></i> ฝั่ง Register
+                <button id="target-register-btn" class="target-btn target-btn-register" onclick="setBuilderTarget('register')" title="แก้ไขฟอร์มสมัครสมาชิก">
+                  <i class="fa-solid fa-user-plus" aria-hidden="true"></i> สมัครสมาชิก <span class="target-count" id="target-register-count">(0)</span>
                 </button>
               </div>
             </div>
@@ -76,11 +76,18 @@
             </div>
 
             <div class="preset-templates-box">
-              <button class="btn btn-outline-full btn-tone-info" style="background-color:#eff6ff;color:#1d4ed8;" onclick="loadDefaultFormStructure()">
-                <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> โหลดโครงสร้างฟอร์มมาตรฐาน
+              <button type="button" id="load-default-btn" class="btn btn-outline-full btn-tone-info teacher-gated-btn" style="background-color:#eff6ff;color:#1d4ed8;" onclick="requestLoadDefaultForm()">
+                <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> ใช้แบบฟอร์มตัวอย่าง
+                <span class="lock-chip" aria-hidden="true"><i class="fa-solid fa-lock"></i> ครู</span>
+              </button>
+              <button type="button" id="teacher-unlock-btn" class="btn btn-outline-full" onclick="openTeacherUnlockModal()">
+                <i class="fa-solid fa-key" aria-hidden="true"></i> ปลดล็อกของครู
+              </button>
+              <button type="button" id="undo-btn" class="btn btn-outline-full" onclick="undoLastDestructive()" hidden>
+                <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> เลิกทำ
               </button>
               <button class="btn btn-outline-full btn-tone-danger" onclick="resetSavedData()">
-                <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> ล้างข้อมูลที่บันทึกไว้ทั้งหมด
+                <i class="fa-solid fa-trash-can" aria-hidden="true"></i> ล้างงานทั้งหมดในเครื่องนี้
               </button>
               <p class="sidebar-note" id="autosave-note">งานของคุณถูกบันทึกอัตโนมัติในเบราว์เซอร์เครื่องนี้</p>
             </div>
@@ -106,8 +113,8 @@
 
           <div class="canvas-header">
             <div class="canvas-title-group">
-              <h2><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> พื้นที่ออกแบบฟอร์ม (Interactive Canvas)</h2>
-              <span id="active-target-badge" class="badge badge-sky">กำลังแก้ไข: ฟอร์ม Login</span>
+              <h2><i class="fa-solid fa-pen-ruler" aria-hidden="true"></i> พื้นที่ออกแบบฟอร์ม</h2>
+              <span id="active-target-badge" class="badge badge-sky">กำลังแก้: เข้าสู่ระบบ</span>
             </div>
             <div class="header-actions">
               <!-- ปุ่มเปิด/ปิดแถบ อยู่ในแถบหัวเรื่อง → ตำแหน่งคงที่ทั้งตอนเปิดและปิด (แถบซ่อนเป็นค่าเริ่มต้น ทุกขนาดจอ) -->
@@ -151,9 +158,9 @@
 
             <div class="forward-action-card">
               <h3>พร้อมนำไปตกแต่งต่อ?</h3>
-              <p>ส่งโครงสร้าง HTML ที่ออกแบบเรียบร้อยแล้วไปยังขั้นตอนที่ 2</p>
+              <p>ส่งโครงฟอร์มไปเลือกสีและส่งออกไฟล์</p>
               <button class="btn btn-primary btn-lg btn-full" onclick="forwardToStep2()">
-                ส่งไปยังขั้นตอนที่ 2 (CSS &amp; JS Studio) <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                ไปตกแต่งสีและส่งออก <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
               </button>
             </div>
           </div>
@@ -214,18 +221,23 @@
               </div>
             </div>
 
-            <!-- กลุ่ม 2: ชุดธีมสำเร็จรูป -->
-            <div class="control-group">
+            <!-- กลุ่ม 2: ชุดธีมสำเร็จรูป (ปลดล็อกด้วยรหัสครู) -->
+            <div class="control-group" id="theme-control-group">
               <button type="button" class="group-header" id="group-theme-header" aria-expanded="false" aria-controls="group-theme-body"
                       data-open-label="กลุ่มชุดธีมสำเร็จรูป" onclick="toggleGroup('theme', event)">
                 <span class="group-index">2</span>
-                <span class="group-name"><i class="fa-solid fa-swatchbook" aria-hidden="true"></i> ชุดธีมสำเร็จรูป (10 ชุด)</span>
+                <span class="group-name"><i class="fa-solid fa-swatchbook" aria-hidden="true"></i> ชุดธีมสำเร็จรูป <span class="lock-chip" id="theme-lock-chip" aria-hidden="true"><i class="fa-solid fa-lock"></i> ครู</span></span>
                 <i class="fa-solid fa-chevron-down group-chevron" aria-hidden="true"></i>
               </button>
               <div class="group-body" id="group-theme-body" role="group" aria-labelledby="group-theme-header" hidden>
+                <div id="theme-lock-banner" class="teacher-lock-banner" hidden>
+                  <p>ชุดธีมสำเร็จรูปใช้ได้เมื่อครูปลดล็อกแล้ว — นักเรียนเลือกสีทีละช่องด้านล่างได้ตามปกติ</p>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="openTeacherUnlockModal()">
+                    <i class="fa-solid fa-key" aria-hidden="true"></i> ใส่รหัสครู
+                  </button>
+                </div>
                 <p class="control-hint">แต่ละชุดเปลี่ยน <strong>สี • ฟอนต์ • ความมน • ความเบลอ • พื้นหลัง • อนิเมชัน</strong> พร้อมกัน
                   (ตัวอย่างย่อด้านล่างใช้ค่าจริงของธีมนั้น) — ถ้าใส่รูปพื้นหลังไว้ รูปจะยังอยู่ทับไล่สีของธีม</p>
-                <!-- สร้างจาก THEME_PRESETS ใน app.js พร้อมตัวอย่างย่อ (swatch) -->
                 <div class="theme-presets-grid" id="theme-presets-grid" role="group" aria-label="ชุดธีมสำเร็จรูป"></div>
               </div>
             </div>
@@ -239,25 +251,24 @@
                 <i class="fa-solid fa-chevron-down group-chevron" aria-hidden="true"></i>
               </button>
               <div class="group-body" id="group-appearance-body" role="group" aria-labelledby="group-appearance-header" hidden>
-                <p class="control-hint">กลุ่มนี้รวมทุกอย่างที่กำหนด <strong>หน้าตาของการ์ด</strong> ไว้ที่เดียว:
-                   สี 4 ตำแหน่ง · รูปพื้นหลัง (URL / เลือกจากเครื่อง / ลากมาวาง) · พื้นหลังสำเร็จรูป 6 แบบ · ความโปร่งแสง · ความเบลอ</p>
+                <p class="control-hint">เลือกสีทีละช่องตามชิ้นส่วนที่เห็นบนการ์ด · รูปพื้นหลัง · พื้นหลังสำเร็จรูป · ความโปร่งแสง · ความเบลอ</p>
 
                 <div class="color-picker-grid">
                   <div class="picker-item">
-                    <label for="color-accent">สีเน้นหลัก (Accent):</label>
-                    <input type="color" id="color-accent" value="#2563eb" oninput="onColorInput()" onchange="onColorInput()">
+                    <label for="color-accent">ปุ่ม</label>
+                    <input type="color" id="color-accent" value="#2563eb" oninput="onColorInput()" onchange="onColorInput()" title="สีปุ่มกดและแท็บที่เลือก">
                   </div>
                   <div class="picker-item">
-                    <label for="color-card-bg">พื้นหลังการ์ด (Card BG):</label>
+                    <label for="color-card-bg">พื้นหลังการ์ด</label>
                     <input type="color" id="color-card-bg" value="#ffffff" oninput="onColorInput()" onchange="onColorInput()">
                   </div>
                   <div class="picker-item">
-                    <label for="color-text">สีข้อความหลัก (Text):</label>
+                    <label for="color-text">ข้อความ</label>
                     <input type="color" id="color-text" value="#0f172a" oninput="onColorInput()" onchange="onColorInput()">
                   </div>
                   <div class="picker-item">
-                    <label for="color-border">เส้นขอบอินพุต (Border):</label>
-                    <input type="color" id="color-border" value="#cbd5e1" oninput="onColorInput()" onchange="onColorInput()">
+                    <label for="color-border">ขอบ</label>
+                    <input type="color" id="color-border" value="#cbd5e1" oninput="onColorInput()" onchange="onColorInput()" title="เส้นขอบช่องกรอก">
                   </div>
                 </div>
 
@@ -450,15 +461,15 @@
                         aria-expanded="true" aria-controls="panel-code-body" onclick="togglePanel('code', event)">
                   <i class="fa-solid fa-eye-slash" aria-hidden="true"></i> <span class="toggle-text">ซ่อนโค้ด</span>
                 </button>
-                <button id="panel-teach-toggle" class="btn btn-secondary btn-sm panel-toggle-inline" data-label="โหมดสอนอ่านโค้ด"
+                <button id="panel-teach-toggle" class="btn btn-secondary btn-sm panel-toggle-inline" data-label="สอนอ่านโค้ด"
                         aria-expanded="false" aria-controls="panel-teach-body" onclick="togglePanel('teach', event)">
-                  <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> <span class="toggle-text">โหมดสอนอ่านโค้ด</span>
+                  <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> <span class="toggle-text">สอนอ่านโค้ด</span>
                 </button>
                 <button id="copy-standalone-btn" class="btn btn-success btn-md" onclick="copyFullStandaloneHTML()">
-                  <i class="fa-solid fa-copy" aria-hidden="true"></i> คัดลอกโค้ดทั้งหน้าเว็บ (Full Page Code)
+                  <i class="fa-solid fa-copy" aria-hidden="true"></i> คัดลอกโค้ดทั้งหน้า
                 </button>
                 <button id="download-standalone-btn" class="btn btn-sky btn-md" onclick="downloadStandaloneHTML()">
-                  <i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลดเป็นไฟล์ index.html
+                  <i class="fa-solid fa-download" aria-hidden="true"></i> ดาวน์โหลดไฟล์
                 </button>
               </div>
             </div>
@@ -499,13 +510,67 @@
   <div id="preview-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3 id="modal-title"><i class="fa-solid fa-eye" aria-hidden="true"></i> ตัวอย่างการทำงานแบบเต็มจอ (Pop-up Modal Preview)</h3>
+        <h3 id="modal-title"><i class="fa-solid fa-eye" aria-hidden="true"></i> ตัวอย่างเต็มจอ</h3>
         <button class="modal-close-btn" aria-label="ปิดหน้าต่างตัวอย่าง (หรือกด Esc)" onclick="closeModalPreview()"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
       <div class="modal-body" id="modal-preview-stage">
         <!-- สร้างการ์ดใหม่จาก JavaScript ตอนเปิด (ไม่ใช้การ copy DOM → ไม่มี id ซ้ำ) -->
       </div>
     </div>
+  </div>
+
+  <!-- Teacher OTP unlock (classroom gate — client-side only) -->
+  <div id="teacher-otp-modal" class="otp-backdrop" role="dialog" aria-modal="true" aria-labelledby="otp-title" aria-hidden="true" hidden>
+    <div class="otp-card" role="document">
+      <button type="button" class="otp-close" aria-label="ปิด" onclick="closeTeacherUnlockModal()"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      <h2 id="otp-title" class="otp-title">รหัสครู</h2>
+      <p class="otp-hint">ใส่รหัส 6 หลักเพื่อปลดล็อกแบบฟอร์มตัวอย่างและชุดธีม</p>
+      <div class="otp-digits" id="otp-digits" role="group" aria-label="รหัสครู 6 หลัก">
+        <input class="otp-digit" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="หลักที่ 1" data-otp-i="0">
+        <input class="otp-digit" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="หลักที่ 2" data-otp-i="1">
+        <input class="otp-digit" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="หลักที่ 3" data-otp-i="2">
+        <input class="otp-digit" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="หลักที่ 4" data-otp-i="3">
+        <input class="otp-digit" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="หลักที่ 5" data-otp-i="4">
+        <input class="otp-digit" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="หลักที่ 6" data-otp-i="5">
+      </div>
+      <p class="otp-error" id="otp-error" role="alert" hidden>รหัสไม่ถูกต้อง ลองใหม่</p>
+      <button type="button" class="otp-verify-btn" id="otp-verify-btn" onclick="submitTeacherOtp()">ยืนยัน</button>
+    </div>
+  </div>
+
+  <!-- Bot ครูทิว — ผู้ช่วยไม่บล็อกงาน (อวาตาร์ CSS/SVG ไม่ได้อ้างรูปจริง) -->
+  <div id="tiew-bot" class="tiew-bot" aria-live="polite">
+    <div class="tiew-bot-panel" id="tiew-bot-panel" hidden>
+      <div class="tiew-bot-head">
+        <strong>ครูทิว</strong>
+        <div class="tiew-bot-actions">
+          <button type="button" class="tiew-bot-mini" onclick="minimizeTiewBot()" title="ย่อ">ย่อ</button>
+          <button type="button" class="tiew-bot-mini" onclick="hideTiewBot('session')" title="ซ่อนวันนี้">ซ่อน</button>
+          <button type="button" class="tiew-bot-mini" onclick="hideTiewBot('forever')" title="ไม่ต้องแสดงอีก">ปิดถาวร</button>
+        </div>
+      </div>
+      <p class="tiew-bot-msg" id="tiew-bot-msg"></p>
+    </div>
+    <button type="button" class="tiew-bot-avatar" id="tiew-bot-avatar" aria-label="เปิดคำใบ้จากครูทิว" onclick="toggleTiewBotPanel()">
+      <svg viewBox="0 0 64 80" width="56" height="70" aria-hidden="true" focusable="false">
+        <!-- อวาตาร์ CSS/SVG ตาม clothing brief — ไม่ได้อ้างว่าเหมือนรูป bot.jpg -->
+        <ellipse cx="32" cy="76" rx="18" ry="3" fill="rgba(15,23,42,.12)"/>
+        <path d="M22 70 V48 H42 V70" fill="#0f172a"/>
+        <path d="M16 44 H48 V58 H42 V48 H22 V58 H16 Z" fill="#ffffff" stroke="#e2e8f0"/>
+        <rect x="14" y="44" width="8" height="22" rx="3" fill="#ffffff" stroke="#e2e8f0"/>
+        <rect x="42" y="44" width="8" height="22" rx="3" fill="#ffffff" stroke="#e2e8f0"/>
+        <path d="M32 44 L32 62" stroke="#1e3a5f" stroke-width="4" stroke-linecap="round"/>
+        <path d="M32 44 L26 52 L32 50 L38 52 Z" fill="#1e3a5f"/>
+        <circle cx="32" cy="26" r="14" fill="#fcd9b6"/>
+        <ellipse cx="26" cy="26" rx="1.6" ry="2" fill="#0f172a"/>
+        <ellipse cx="38" cy="26" rx="1.6" ry="2" fill="#0f172a"/>
+        <path d="M27 33 Q32 36 37 33" fill="none" stroke="#b45309" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M18 16 Q32 6 46 16" fill="#0f172a"/>
+        <rect x="20" y="70" width="10" height="6" rx="1" fill="#0f172a"/>
+        <rect x="34" y="70" width="10" height="6" rx="1" fill="#0f172a"/>
+      </svg>
+      <span class="tiew-bot-name">ครูทิว</span>
+    </button>
   </div>
 
   <script src="app.js"></script>

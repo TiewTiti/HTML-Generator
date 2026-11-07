@@ -1680,3 +1680,288 @@ body {
   .theme-presets-grid { gap: 6px; }
   .theme-preset-card { min-height: 92px; padding: 6px; }
 }
+
+/* ==========================================================================
+   Teacher OTP · Bot ครูทิว · Empty state · Lock chips · reduced-motion
+   ========================================================================== */
+
+.lock-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #fef3c7;
+  color: #92400e;
+  vertical-align: middle;
+}
+.lock-chip[hidden] { display: none !important; }
+
+.teacher-lock-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px dashed #f59e0b;
+  border-radius: 10px;
+  background: #fffbeb;
+  font-size: 13px;
+  color: #78350f;
+}
+.teacher-lock-banner p { flex: 1 1 180px; margin: 0; }
+
+.theme-presets-grid.is-locked {
+  position: relative;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.theme-presets-grid.is-locked::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 6px,
+    rgba(15, 23, 42, 0.03) 6px,
+    rgba(15, 23, 42, 0.03) 12px
+  );
+}
+
+.target-count {
+  font-weight: 600;
+  opacity: 0.75;
+  font-size: 0.9em;
+}
+
+/* Empty canvas onboarding */
+.empty-canvas-state {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 48px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.empty-canvas-icon { font-size: 36px; margin-bottom: 4px; color: var(--accent-primary); opacity: 0.85; }
+.empty-canvas-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin: 0; }
+.empty-canvas-sub { font-size: 13px; margin: 0 0 8px; max-width: 340px; }
+.empty-canvas-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* ---- Teacher OTP modal (mockup: soft card · 6 boxes · navy verify) ---- */
+.otp-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 240;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.35);
+}
+.otp-backdrop[hidden] { display: none !important; }
+
+.otp-card {
+  position: relative;
+  width: min(400px, 100%);
+  padding: 36px 28px 28px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px -12px rgba(15, 23, 42, 0.28);
+  text-align: center;
+}
+.otp-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 16px;
+}
+.otp-close:hover { background: #f1f5f9; color: #0f172a; }
+.otp-title {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: 0.02em;
+}
+.otp-hint {
+  margin: 0 0 22px;
+  font-size: 13px;
+  color: #64748b;
+}
+.otp-digits {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.otp-digit {
+  width: 44px;
+  height: 52px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #0f172a;
+  border: 1.5px solid #1e3a5f;
+  border-radius: 8px;
+  background: #fff;
+  caret-color: #1e3a5f;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.otp-digit:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.28);
+}
+.otp-digit.is-error {
+  border-color: #e11d48;
+  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.18);
+}
+.otp-error {
+  margin: -6px 0 12px;
+  font-size: 13px;
+  color: #be123c;
+  font-weight: 500;
+}
+.otp-verify-btn {
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #1e3a5f;
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.otp-verify-btn:hover { background: #152a45; }
+.otp-verify-btn:active { transform: translateY(1px); }
+
+/* ---- Bot ครูทิว ---- */
+.tiew-bot {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 180;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
+}
+.tiew-bot[hidden] { display: none !important; }
+.tiew-bot > * { pointer-events: auto; }
+
+.tiew-bot-panel {
+  width: min(280px, calc(100vw - 32px));
+  padding: 12px 12px 10px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+}
+.tiew-bot-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #0f172a;
+}
+.tiew-bot-actions { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.tiew-bot-mini {
+  border: 0;
+  background: #f1f5f9;
+  color: #475569;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 4px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.tiew-bot-mini:hover { background: #e2e8f0; color: #0f172a; }
+.tiew-bot-msg {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #334155;
+}
+
+.tiew-bot-avatar {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 8px 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  font-family: inherit;
+  color: #0f172a;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.tiew-bot-avatar:hover { box-shadow: var(--shadow-lg); }
+.tiew-bot-avatar:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+.tiew-bot-name { font-size: 11px; font-weight: 600; }
+
+.tiew-bot.is-wave:not(.is-calm) .tiew-bot-avatar {
+  animation: tiewWave 0.7s ease 1;
+}
+@keyframes tiewWave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  55% { transform: rotate(5deg); }
+}
+
+@media (max-width: 700px) {
+  .tiew-bot { right: 10px; bottom: 10px; }
+  .otp-digit { width: 40px; height: 48px; font-size: 20px; gap: 6px; }
+  .otp-digits { gap: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-toast,
+  .otp-digit,
+  .otp-verify-btn,
+  .tiew-bot-avatar,
+  .page-back,
+  .form-input,
+  .form-btn,
+  .switcher-tab,
+  .btn,
+  .comp-btn,
+  .theme-preset-card,
+  .target-btn,
+  .step-tab-btn,
+  .ctrl-btn {
+    transition: none !important;
+    animation: none !important;
+  }
+  .tiew-bot.is-wave .tiew-bot-avatar { animation: none !important; }
+}
