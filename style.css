@@ -140,30 +140,35 @@ body {
   min-width: 0;
 }
 
+/* School crest is a tall rectangle (137×200). Never force a square/circle crop. */
 .brand-icon {
   flex: 0 0 auto;
-  width: 40px;
-  height: 40px;
-  border-radius: 0; /* full rectangular mark — no circular crest crop */
+  width: auto;
+  height: 32px;
+  border-radius: 0;
   background: transparent;
   border: 0;
   box-shadow: none;
   padding: 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   overflow: visible;
+  clip-path: none;
 }
 
-.brand-icon img {
+.brand-icon img,
+#brand-logo {
   display: block;
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  max-height: 100%;
+  width: auto;
+  height: 32px;
+  max-height: 32px;
+  max-width: none;
+  aspect-ratio: auto;
   object-fit: contain;
   object-position: center;
   border-radius: 0;
+  clip-path: none;
 }
 
 .brand-info { min-width: 0; }
@@ -2257,7 +2262,14 @@ body.layout-b .canvas-dropzone {
     padding: 10px 12px;
   }
 
-  .brand-icon { width: 32px; height: 26px; border-radius: 0; }
+  .brand-icon,
+  .brand-icon img,
+  #brand-logo {
+    width: auto;
+    height: 26px;
+    max-height: 26px;
+    border-radius: 0;
+  }
   .brand-nav-name { font-size: 12px; }
   .studio-hero { padding: 16px 14px 14px; }
   .studio-hero-sub { font-size: 14px; }
@@ -2925,9 +2937,20 @@ body.layout-b .app-header {
 }
 
 body.layout-b .brand-icon {
-  width: 40px;
-  height: 40px;
+  width: auto;
+  height: 32px;
   border-radius: 0;
+  overflow: visible;
+  clip-path: none;
+}
+body.layout-b .brand-icon img,
+body.layout-b #brand-logo {
+  width: auto;
+  height: 32px;
+  max-height: 32px;
+  border-radius: 0;
+  object-fit: contain;
+  clip-path: none;
 }
 body.layout-b .brand-nav-name {
   font-size: 12px;
