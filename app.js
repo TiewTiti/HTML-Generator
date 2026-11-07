@@ -1059,6 +1059,29 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================================================
 // STEP 1: VISUAL BUILDER
 // ==========================================================================
+function setStudioView(mode) {
+  const view = mode === 'code' ? 'code' : 'preview';
+  const root = document.querySelector('.studio-preview-viewport');
+  if (root) {
+    root.classList.toggle('is-preview', view === 'preview');
+    root.classList.toggle('is-code', view === 'code');
+    root.dataset.view = view;
+  }
+  const previewBtn = document.getElementById('studio-view-preview');
+  const codeBtn = document.getElementById('studio-view-code');
+  if (previewBtn) {
+    previewBtn.classList.toggle('on', view === 'preview');
+    previewBtn.setAttribute('aria-selected', view === 'preview' ? 'true' : 'false');
+  }
+  if (codeBtn) {
+    codeBtn.classList.toggle('on', view === 'code');
+    codeBtn.setAttribute('aria-selected', view === 'code' ? 'true' : 'false');
+  }
+  if (view === 'code' && typeof isPanelOpen === 'function' && !isPanelOpen('code')) {
+    togglePanel('code');
+  }
+}
+
 function switchMainStep(step) {
   activeStep = step;
   document.querySelectorAll('.step-tab-btn').forEach((btn, idx) => {
@@ -1103,6 +1126,7 @@ function setDockMode(mode) {
     tipTiewBot('dock-structure', 'ครูชิโร่: กด «เครื่องมือ» เพื่อเพิ่มช่องบนกระดาน');
   } else if (mode === 'color') {
     switchMainStep(2);
+    setStudioView('preview');
     if (!isPanelOpen('controls')) togglePanel('controls');
     /* Dock «สี» should land with ชุดสี and color slots open, not collapsed */
     uiState.groups.theme = true;
@@ -1111,15 +1135,17 @@ function setDockMode(mode) {
     applyGroupState('theme');
     applyGroupState('appearance');
     const themeHead = document.getElementById('group-theme-header');
-    if (themeHead && themeHead.scrollIntoView) themeHead.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const scroller = document.getElementById('panel-controls-body');
+    if (themeHead && scroller) {
+      const top = themeHead.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop;
+      scroller.scrollTop = Math.max(0, top - 4);
+    }
     tipTiewBot('dock-color', 'ครูชิโร่: เลือกชุดสี หรือปรับสีทีละช่องได้');
   } else if (mode === 'export') {
     switchMainStep(2);
     if (isPanelOpen('controls')) togglePanel('controls');
-    const codePanel = document.querySelector('.code-exporter-panel');
-    if (codePanel && codePanel.scrollIntoView) codePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    if (!isPanelOpen('code')) togglePanel('code');
-    tipTiewBot('dock-export', 'ครูชิโร่: คัดลอกหรือดาวน์โหลด HTML ได้ด้านล่าง');
+    setStudioView('code');
+    tipTiewBot('dock-export', 'ครูชิโร่: คัดลอกหรือดาวน์โหลด HTML ได้จากมุมมองโค้ด');
   } else if (mode === 'login') {
     switchMainStep(1);
     setBuilderTarget('login');
