@@ -1,63 +1,67 @@
 /* ==========================================================================
-   STUDIO CHROME — Apple Store–inspired calm layout
-   (แรงบันดาลใจด้าน whitespace / typography / soft surfaces — ไม่ใช่การโคลนแบรนด์)
+   STUDIO CHROME — Spark Admin–inspired light product UI
+   (soft pastel surfaces / forest+lime accents — not cool-slate Apple luxury)
    สไตล์การ์ดฟอร์มที่ export ยังอยู่ใน CARD_CSS ใน app.js
+   Ref: https://preview.themewagon.com/spark-admin/
    ========================================================================== */
 :root {
-  /* Cool Apple luxury — refined neutrals + restrained sapphire (taste: 90%+ neutral; no violet) */
-  --bg-app: #eceef3;
-  --bg-app-deep: #e4e7ee;
+  /* Spark Admin soft light admin — mint wash, white cards, forest primary, lime spark */
+  --bg-app: #f4f6f5;
+  --bg-app-deep: #e9efef;
   --bg-hero: #ffffff;
   --surface-panel: #ffffff;
-  --surface-subtle: #f7f8fb;
-  --surface-glass: rgba(255, 255, 255, 0.72);
-  --border-color: rgba(15, 23, 42, 0.08);
-  --border-hairline: rgba(15, 23, 42, 0.055);
-  --border-hover: rgba(15, 23, 42, 0.14);
+  --surface-subtle: #f8faf9;
+  --surface-glass: rgba(255, 255, 255, 0.82);
+  --border-color: rgba(11, 19, 15, 0.08);
+  --border-hairline: rgba(11, 19, 15, 0.055);
+  --border-hover: rgba(11, 19, 15, 0.14);
+  --border-soft: #e9efef;
 
-  --text-main: #1a1a1c;
-  --text-muted: #63636a;
-  --text-tertiary: #7c7c84;
+  --text-main: #0b130f;
+  --text-muted: #6c7e75;
+  --text-tertiary: #879a91;
   --text-inverse: #ffffff;
 
-  /* Trust blue, slightly deeper sapphire for luxury (ui-ux-pro-max SaaS cue) */
-  --accent-primary: #0066d6;
-  --accent-hover: #0070e0;
-  --accent-pressed: #0059c2;
-  --accent-light: rgba(0, 102, 214, 0.09);
-  --accent-deep: #004a9f;
-  --accent-tint: #e6eef9;
-  --accent-soft: #c5d8f4;
+  /* Primary fills = forest (Spark Create btn); lime = highlight / active spark */
+  --accent-primary: #072f1f;
+  --accent-hover: #1a3e30;
+  --accent-pressed: #051c12;
+  --accent-light: rgba(34, 197, 94, 0.1);
+  --accent-deep: #051c12;
+  --accent-tint: #dcfce7;
+  --accent-soft: #e1fcd2;
+  --accent-lime: #b4f105;
+  --accent-lime-hover: #c1f824;
+  --accent-lime-soft: rgba(180, 241, 5, 0.18);
 
-  --success-color: #1f7a38;
+  --success-color: #22c55e;
   --sky-color: var(--accent-primary);
-  --danger: #c40016;
+  --danger: #ef4444;
 
   /* Chrome UI: Apple SF first; Noto Sans Thai before Latin-only fallbacks (fixes Thai เพี้ยน) */
   --font-main: -apple-system, BlinkMacSystemFont, "SF Pro TH", "SF Pro Text", "Noto Sans Thai", "Segoe UI", "Helvetica Neue", sans-serif;
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro TH", "SF Pro Display", "SF Pro Text", "Noto Sans Thai", "Segoe UI", "Helvetica Neue", sans-serif;
-  --radius-panel: 28px;
-  --radius-control: 12px;
-  --radius-dock: 22px;
+  --radius-panel: 24px;
+  --radius-control: 14px;
+  --radius-dock: 18px;
 
   --header-height: 48px;
   --hero-pad-y: 52px;
   --dock-clearance: 108px;
 
   --rail-width: 44px;
-  /* Deeper cool ambient elevation (Jakub polish — subtle material, not loud) */
-  --shadow-sm: 0 1px 1px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 2px 10px rgba(15, 23, 42, 0.045), 0 10px 28px rgba(15, 23, 42, 0.06);
-  --shadow-lg: 0 4px 18px rgba(15, 23, 42, 0.05), 0 22px 56px rgba(15, 23, 42, 0.09);
+  /* Soft Spark card elevation (green-ink shadow, not cool slate) */
+  --shadow-sm: 0 2px 8px rgba(11, 19, 15, 0.02);
+  --shadow-md: 0 10px 30px rgba(11, 19, 15, 0.04);
+  --shadow-lg: 0 20px 50px rgba(11, 19, 15, 0.08);
   --shadow-shell:
-    0 1px 0 rgba(255, 255, 255, 0.85) inset,
-    0 2px 6px rgba(15, 23, 42, 0.03),
-    0 16px 40px rgba(15, 23, 42, 0.055),
-    0 36px 80px rgba(30, 58, 110, 0.07);
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 2px 8px rgba(11, 19, 15, 0.02),
+    0 10px 30px rgba(11, 19, 15, 0.04);
   --shadow-dock:
-    0 2px 8px rgba(15, 23, 42, 0.05),
-    0 14px 44px rgba(15, 23, 42, 0.11),
-    0 0 0 0.5px rgba(15, 23, 42, 0.07);
+    0 2px 8px rgba(11, 19, 15, 0.03),
+    0 12px 36px rgba(11, 19, 15, 0.08),
+    0 0 0 1px rgba(11, 19, 15, 0.04);
   --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
@@ -115,13 +119,13 @@ body {
   border: 0;
 }
 
-/* Header — Apple global-nav glass (cool slate wash) */
+/* Header — soft light product chrome (Spark pastel wash) */
 .app-header {
   flex: 0 0 auto;
-  background-color: rgba(244, 246, 250, 0.78);
-  backdrop-filter: saturate(185%) blur(22px);
-  -webkit-backdrop-filter: saturate(185%) blur(22px);
-  border-bottom: 0.5px solid rgba(15, 23, 42, 0.1);
+  background-color: rgba(244, 246, 245, 0.86);
+  backdrop-filter: saturate(140%) blur(18px);
+  -webkit-backdrop-filter: saturate(140%) blur(18px);
+  border-bottom: 1px solid var(--border-soft);
   padding: 8px 28px;
   display: flex;
   justify-content: space-between;
@@ -201,12 +205,12 @@ body {
   border-radius: 0;
   background:
     radial-gradient(ellipse 72% 70% at 50% 38%,
-      rgba(252, 253, 255, 0.97) 0%,
-      rgba(244, 247, 252, 0.9) 42%,
-      rgba(236, 238, 243, 0.48) 72%,
-      rgba(236, 238, 243, 0) 100%);
-  backdrop-filter: blur(24px) saturate(155%);
-  -webkit-backdrop-filter: blur(24px) saturate(155%);
+      rgba(255, 255, 255, 0.97) 0%,
+      rgba(244, 246, 245, 0.92) 42%,
+      rgba(233, 239, 239, 0.45) 72%,
+      rgba(244, 246, 245, 0) 100%);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
   -webkit-mask-image: radial-gradient(ellipse 78% 78% at 50% 40%, #000 35%, transparent 78%);
   mask-image: radial-gradient(ellipse 78% 78% at 50% 40%, #000 35%, transparent 78%);
   pointer-events: none;
@@ -254,7 +258,7 @@ body {
   font-weight: 500;
 }
 .btn-ghost:hover {
-  background: rgba(0, 113, 227, 0.08);
+  background: var(--accent-light);
   color: var(--accent-hover);
 }
 
@@ -833,8 +837,8 @@ body.layout-b .canvas-dropzone {
 }
 #builder-canvas[data-view="wysiwyg"] .canvas-item:hover,
 #builder-canvas[data-view="wysiwyg"] .canvas-item.selected {
-  border-color: rgba(0, 113, 227, 0.35);
-  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.12);
+  border-color: rgba(7, 47, 31, 0.35);
+  box-shadow: 0 0 0 2px var(--accent-lime-soft);
   border-radius: 12px;
 }
 #builder-canvas[data-view="wysiwyg"] .item-order-hint { display: none; }
@@ -867,7 +871,7 @@ body.layout-b .canvas-dropzone {
   padding: 12px 16px;
   border: 0;
   border-radius: 980px;
-  background: var(--accent-primary, #0071e3);
+  background: var(--accent-primary);
   color: #fff;
   font-size: 15px;
   font-weight: 500;
@@ -1176,7 +1180,7 @@ body.layout-b .canvas-dropzone {
   color: var(--accent-primary);
 }
 .btn-outline-full.btn-tone-info:hover {
-  background-color: rgba(0, 113, 227, 0.14);
+  background-color: var(--accent-lime-soft);
   border-color: transparent;
   color: var(--accent-hover);
 }
@@ -2086,13 +2090,13 @@ body.layout-b .canvas-dropzone {
 }
 .lock-chip[hidden] { display: none !important; }
 
-/* Teacher-gated CTAs: soft sapphire fill + lock; sample-form label white when locked */
+/* Teacher-gated CTAs: soft forest fill + lock; sample-form label white when locked */
 .teacher-gated-cta.is-locked,
 .btn.teacher-gated-btn.is-locked {
-  background: #5e9be8 !important;
+  background: #1a3e30 !important;
   color: #ffffff !important;
-  border: 1px solid #4d8dde !important;
-  box-shadow: 0 6px 20px rgba(0, 74, 159, 0.18) !important;
+  border: 1px solid #072f1f !important;
+  box-shadow: var(--shadow-sm) !important;
   cursor: pointer;
   opacity: 1;
   display: inline-flex;
@@ -2101,9 +2105,9 @@ body.layout-b .canvas-dropzone {
 }
 .teacher-gated-cta.is-locked:hover,
 .btn.teacher-gated-btn.is-locked:hover {
-  background: #4d8dde !important;
+  background: #072f1f !important;
   color: #ffffff !important;
-  border-color: #3d7fd4 !important;
+  border-color: #051c12 !important;
 }
 .gated-lock-ico {
   flex: 0 0 auto;
@@ -2116,8 +2120,8 @@ body.layout-b .canvas-dropzone {
 .gated-lock-ico[hidden] { display: none !important; }
 .teacher-gated-cta.is-locked .gated-lock-ico,
 .btn.teacher-gated-btn.is-locked .gated-lock-ico {
-  /* soft-blue family tint on the lock (not flat gray) */
-  color: #d6e9ff;
+  /* lime spark on the lock (Spark accent, not flat gray) */
+  color: var(--accent-lime);
 }
 .teacher-gated-cta.is-locked .gated-cta-label,
 .btn.teacher-gated-btn.is-locked .gated-cta-label {
@@ -2285,8 +2289,8 @@ body.layout-b .canvas-dropzone {
 }
 .otp-digit:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.28);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 4px var(--accent-lime-soft);
 }
 .otp-digit.is-error {
   border-color: #e11d48;
@@ -2312,7 +2316,7 @@ body.layout-b .canvas-dropzone {
   cursor: pointer;
   transition: background-color 0.15s ease, transform 0.15s ease;
 }
-.otp-verify-btn:hover { background: #0077ed; }
+.otp-verify-btn:hover { background: var(--accent-hover); }
 .otp-verify-btn:active { transform: translateY(1px); }
 
 /* ---- Bot ครูชิโร่ ---- */
@@ -2492,20 +2496,20 @@ body.layout-b .canvas-dropzone {
   inset: 0;
   z-index: 2;
   background:
-    /* Cool slate wash — opens mid-viewport around the canvas */
+    /* Soft mint pastel wash — Spark light-admin mood */
     linear-gradient(180deg,
-      rgba(236, 238, 243, 0.98) 0%,
-      rgba(236, 238, 243, 0.95) 10%,
-      rgba(236, 238, 243, 0.84) 20%,
-      rgba(236, 238, 243, 0.46) 32%,
-      rgba(236, 238, 243, 0.24) 46%,
-      rgba(228, 231, 238, 0.24) 56%,
-      rgba(236, 238, 243, 0.54) 74%,
-      rgba(228, 231, 238, 0.96) 100%),
-    radial-gradient(ellipse 100% 42% at 50% -4%, rgba(198, 214, 238, 0.72), transparent 62%),
-    radial-gradient(ellipse 55% 36% at 82% 72%, rgba(180, 200, 228, 0.22), transparent 55%),
-    radial-gradient(ellipse 40% 30% at 12% 88%, rgba(196, 210, 230, 0.2), transparent 60%);
-  backdrop-filter: blur(2.5px) saturate(112%);
+      rgba(244, 246, 245, 0.98) 0%,
+      rgba(244, 246, 245, 0.95) 10%,
+      rgba(244, 246, 245, 0.84) 20%,
+      rgba(244, 246, 245, 0.48) 32%,
+      rgba(244, 246, 245, 0.26) 46%,
+      rgba(233, 239, 239, 0.28) 56%,
+      rgba(244, 246, 245, 0.56) 74%,
+      rgba(233, 239, 239, 0.96) 100%),
+    radial-gradient(ellipse 100% 42% at 50% -4%, rgba(220, 252, 231, 0.55), transparent 62%),
+    radial-gradient(ellipse 55% 36% at 82% 72%, rgba(225, 252, 210, 0.22), transparent 55%),
+    radial-gradient(ellipse 40% 30% at 12% 88%, rgba(233, 239, 239, 0.35), transparent 60%);
+  backdrop-filter: blur(2px) saturate(108%);
 }
 .template-backdrop-rail {
   position: relative;
@@ -2681,10 +2685,10 @@ body.layout-b .app-header {
   position: sticky;
   top: 0;
   z-index: 30;
-  background-color: rgba(244, 246, 250, 0.78);
-  backdrop-filter: saturate(185%) blur(22px);
-  -webkit-backdrop-filter: saturate(185%) blur(22px);
-  border-bottom: 0.5px solid rgba(15, 23, 42, 0.1);
+  background-color: rgba(244, 246, 245, 0.86);
+  backdrop-filter: saturate(140%) blur(18px);
+  -webkit-backdrop-filter: saturate(140%) blur(18px);
+  border-bottom: 1px solid var(--border-soft);
 }
 
 body.layout-b .brand-icon {
@@ -2736,12 +2740,12 @@ body.layout-b .step-panel.active {
 
 body.layout-b .builder-layout,
 body.layout-b .studio-layout {
-  /* Production Apple Store shell — generous board, soft elevation */
+  /* Soft Spark card shell — generous board, gentle elevation */
   min-height: 520px;
   height: auto;
-  border-radius: 28px;
+  border-radius: var(--radius-panel);
   background: #fff;
-  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-soft);
   box-shadow: var(--shadow-shell);
   overflow: hidden;
   position: relative;
@@ -2930,9 +2934,9 @@ body.layout-b .canvas-dropzone {
   border-radius: 0;
   box-shadow: none;
   background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.018) 1px, transparent 1px) 0 0 / 24px 24px,
-    linear-gradient(rgba(0, 0, 0, 0.018) 1px, transparent 1px) 0 0 / 24px 24px,
-    #fafafa;
+    linear-gradient(90deg, rgba(11, 19, 15, 0.035) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(rgba(11, 19, 15, 0.035) 1px, transparent 1px) 0 0 / 24px 24px,
+    #f8faf9;
   padding: 36px 20px 100px;
   display: grid;
   place-items: center;
@@ -2984,14 +2988,14 @@ body.layout-b .canvas-preview-card .canvas-item {
   border-color: rgba(0, 0, 0, 0.06);
   box-shadow: none;
   padding: 14px 12px 12px;
-  background: #fbfbfd;
+  background: var(--surface-subtle);
 }
 
 body.layout-b .canvas-preview-card .canvas-item:hover,
 body.layout-b .canvas-preview-card .canvas-item.selected {
   background: #fff;
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.16);
+  box-shadow: 0 0 0 2px var(--accent-lime-soft);
 }
 
 body.layout-b .empty-canvas-state {
@@ -3004,8 +3008,8 @@ body.layout-b .empty-canvas-icon {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: var(--accent-primary);
-  color: #fff;
+  background: var(--accent-lime);
+  color: var(--accent-deep);
   opacity: 1;
   font-size: 32px;
   font-weight: 300;
@@ -3013,7 +3017,7 @@ body.layout-b .empty-canvas-icon {
   display: grid;
   place-items: center;
   margin: 0 auto 6px;
-  box-shadow: 0 8px 28px rgba(0, 74, 159, 0.32);
+  box-shadow: var(--shadow-md);
 }
 
 body.layout-b .empty-canvas-title {
@@ -3028,7 +3032,7 @@ body.layout-b .empty-canvas-sub {
   font-size: 13px;
   max-width: 240px;
   margin: 0;
-  color: #6e6e73;
+  color: var(--text-muted);
   line-height: 1.4;
 }
 
@@ -3058,7 +3062,7 @@ body.layout-b .empty-canvas-actions .btn-secondary {
 body.layout-b .empty-canvas-state .template-lock-hint {
   margin-top: 2px;
   font-size: 12px;
-  color: #86868b;
+  color: var(--text-tertiary);
 }
 
 /* Soft Figma chip buttons on the canvas bar */
@@ -3161,14 +3165,14 @@ body.layout-b .gated-cta-label {
 }
 .dock-btn:hover { background: rgba(0, 0, 0, 0.04); }
 .dock-btn.on {
-  background: var(--accent-tint);
+  background: var(--accent-lime-soft);
   color: var(--accent-deep);
 }
 .dock-ico {
   width: 30px;
   height: 30px;
-  border-radius: 9px;
-  background: rgba(0, 0, 0, 0.04);
+  border-radius: 10px;
+  background: rgba(11, 19, 15, 0.04);
   color: var(--text-main);
   display: grid;
   place-items: center;
@@ -3176,7 +3180,7 @@ body.layout-b .gated-cta-label {
 }
 .dock-ico svg { display: block; }
 .dock-btn.on .dock-ico {
-  background: var(--accent-soft);
+  background: var(--accent-lime);
   color: var(--accent-deep);
 }
 .dock-label { line-height: 1.1; }
