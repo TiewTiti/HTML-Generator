@@ -757,49 +757,49 @@ body.layout-b .canvas-dropzone {
   overscroll-behavior: contain;
 }
 
-/* Canvas chrome: zoom + view mode (functional controls only) */
+/* Canvas chrome: zoom + view — quiet trailing controls (density lock) */
 .canvas-chrome {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-right: 2px;
+  margin-left: 4px;
 }
 .canvas-zoom {
   display: inline-flex;
   align-items: stretch;
-  border: 0.5px solid rgba(0, 0, 0, 0.12);
-  border-radius: 10px;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 980px;
   overflow: hidden;
-  background: #fff;
+  background: transparent;
 }
 .zoom-btn,
 .view-mode-btn {
-  min-width: 36px;
-  min-height: 32px;
-  padding: 0 10px;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0 8px;
   border: 0;
   background: transparent;
-  color: var(--text-main);
+  color: #6e6e73;
   font-family: var(--font-main);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
   letter-spacing: 0;
   cursor: pointer;
   touch-action: manipulation;
   line-height: 1;
 }
-.zoom-btn + .zoom-btn { border-left: 0.5px solid rgba(0, 0, 0, 0.1); }
+.zoom-btn + .zoom-btn { border-left: 0.5px solid rgba(0, 0, 0, 0.06); }
 .zoom-btn:hover:not(:disabled),
-.view-mode-btn:hover { background: rgba(0, 0, 0, 0.04); }
+.view-mode-btn:hover { background: rgba(0, 0, 0, 0.04); color: var(--text-main); }
 .zoom-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-.zoom-btn-label { min-width: 52px; font-variant-numeric: tabular-nums; font-weight: 500; }
+.zoom-btn-label { min-width: 44px; font-variant-numeric: tabular-nums; font-weight: 500; }
 .view-mode-btn {
-  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
   border-radius: 980px;
-  background: #fff;
+  background: transparent;
   font-weight: 500;
-  font-size: 12px;
-  padding: 0 12px;
+  font-size: 11px;
+  padding: 0 10px;
 }
 .view-mode-btn[aria-pressed="true"] {
   background: #e8f1ff;
@@ -2724,12 +2724,12 @@ body.layout-b .step-panel.active {
 
 body.layout-b .builder-layout,
 body.layout-b .studio-layout {
-  /* Production Apple Store shell — layered elevation + hairline */
-  min-height: 480px;
+  /* Production Apple Store shell — generous board, soft elevation */
+  min-height: 520px;
   height: auto;
   border-radius: 28px;
   background: #fff;
-  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
   box-shadow: var(--shadow-shell);
   overflow: hidden;
   position: relative;
@@ -2872,12 +2872,12 @@ body.layout-b .studio-layout.controls-hidden > .studio-controls-sidebar {
 body.layout-b .canvas-header,
 body.layout-b .preview-toolbar {
   flex: 0 0 auto;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: saturate(160%) blur(12px);
-  -webkit-backdrop-filter: saturate(160%) blur(12px);
-  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
-  padding: 14px 20px;
+  background: #fff;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.06);
+  padding: 16px 22px;
   margin: 0;
+  gap: 12px;
+  align-items: center;
 }
 
 body.layout-b .canvas-header h2,
@@ -2897,19 +2897,31 @@ body.layout-b .badge {
   font-weight: 500;
 }
 
-/* Figma canvas-area: grid board, form card centered (no nested white shell) */
+body.layout-b .header-actions {
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Quiet deferred zoom chrome — don't compete with primary canvas actions */
+body.layout-b .canvas-chrome {
+  margin-left: 6px;
+  padding-left: 8px;
+  border-left: 0.5px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Figma canvas-area: quiet grid, generous board, centered empty/preview */
 body.layout-b .canvas-dropzone {
   flex: 1 1 auto;
-  min-height: 360px;
+  min-height: 420px;
   margin: 0;
   border: 0;
   border-radius: 0;
   box-shadow: none;
   background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px) 0 0 / 24px 24px,
-    linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgba(0, 0, 0, 0.018) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(rgba(0, 0, 0, 0.018) 1px, transparent 1px) 0 0 / 24px 24px,
     #fafafa;
-  padding: 28px 16px 96px;
+  padding: 36px 20px 100px;
   display: grid;
   place-items: center;
   align-content: center;
@@ -2971,35 +2983,70 @@ body.layout-b .canvas-preview-card .canvas-item.selected {
 }
 
 body.layout-b .empty-canvas-state {
-  max-width: 280px;
-  padding: 12px 8px 20px;
-  gap: 10px;
+  max-width: 300px;
+  padding: 28px 16px 32px;
+  gap: 12px;
 }
 
 body.layout-b .empty-canvas-icon {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: #0071e3;
   color: #fff;
   opacity: 1;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 300;
+  line-height: 1;
   display: grid;
   place-items: center;
-  margin: 0 auto 4px;
+  margin: 0 auto 6px;
+  box-shadow: 0 8px 24px rgba(0, 113, 227, 0.28);
 }
 
 body.layout-b .empty-canvas-title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.35;
+  max-width: 16em;
 }
 
 body.layout-b .empty-canvas-sub {
   font-size: 13px;
-  max-width: 260px;
-  margin: 0 0 4px;
+  max-width: 240px;
+  margin: 0;
   color: #6e6e73;
+  line-height: 1.4;
+}
+
+body.layout-b .empty-canvas-actions {
+  flex-direction: column;
+  align-items: stretch;
+  width: min(220px, 100%);
+  gap: 8px;
+  margin-top: 4px;
+}
+
+body.layout-b .empty-canvas-actions .btn {
+  width: 100%;
+  border-radius: 980px;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 16px;
+}
+
+body.layout-b .empty-canvas-actions .btn-secondary {
+  background: #f5f5f7;
+  border-color: transparent;
+  color: var(--text-main);
+}
+
+body.layout-b .empty-canvas-state .template-lock-hint {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #86868b;
 }
 
 /* Soft Figma chip buttons on the canvas bar */
@@ -3199,19 +3246,22 @@ body.layout-b .tiew-bot {
   body.layout-b .builder-layout > .canvas-viewport { min-height: 380px; }
   body.layout-b .canvas-header,
   body.layout-b .preview-toolbar {
-    padding: 10px 12px;
+    padding: 12px 14px;
     flex-wrap: wrap;
-    align-items: flex-start;
+    align-items: center;
   }
   body.layout-b .header-actions {
     width: 100%;
     justify-content: flex-start;
     gap: 8px;
+    margin-left: 0;
   }
   body.layout-b .canvas-chrome {
-    width: 100%;
-    justify-content: space-between;
-    margin: 0 0 4px;
+    width: auto;
+    margin-left: auto;
+    padding-left: 0;
+    border-left: 0;
+    justify-content: flex-end;
   }
   body.layout-b .canvas-dropzone {
     min-height: 220px;

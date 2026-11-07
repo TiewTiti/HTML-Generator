@@ -375,6 +375,15 @@
               <span id="active-target-badge" class="badge badge-sky">เข้าสู่ระบบ · 0 ช่อง</span>
             </div>
             <div class="header-actions">
+              <!-- Primary row matches approved density: เครื่องมือ / คุณสมบัติ / ล้าง -->
+              <button type="button" id="panel-toolbox-toggle" class="btn btn-secondary btn-sm panel-open-btn" data-label="เครื่องมือ"
+                      aria-expanded="false" aria-controls="panel-toolbox-body"
+                      onclick="togglePanel('toolbox', event)">เครื่องมือ</button>
+              <button type="button" id="panel-inspector-toggle" class="btn btn-secondary btn-sm panel-open-btn" data-label="คุณสมบัติ"
+                      aria-expanded="false" aria-controls="panel-inspector-body"
+                      onclick="togglePanel('inspector', event)">คุณสมบัติ</button>
+              <button type="button" class="btn btn-sm btn-clear-danger" onclick="clearCanvas()">ล้าง</button>
+              <!-- Deferred UX kept, demoted to quiet trailing chrome -->
               <div class="canvas-chrome" role="toolbar" aria-label="ซูมและมุมมองกระดาน">
                 <div class="canvas-zoom" role="group" aria-label="ซูม">
                   <button type="button" class="zoom-btn" id="canvas-zoom-out" onclick="nudgeCanvasZoom(-1)" aria-label="ซูมออก" title="ซูมออก">−</button>
@@ -383,13 +392,6 @@
                 </div>
                 <button type="button" class="view-mode-btn" id="canvas-view-mode" onclick="toggleCanvasViewMode()" aria-pressed="false" title="สลับโครง / หน้าตาจริง">โครง</button>
               </div>
-              <button type="button" id="panel-toolbox-toggle" class="btn btn-secondary btn-sm panel-open-btn" data-label="เครื่องมือ"
-                      aria-expanded="false" aria-controls="panel-toolbox-body"
-                      onclick="togglePanel('toolbox', event)">เครื่องมือ</button>
-              <button type="button" id="panel-inspector-toggle" class="btn btn-secondary btn-sm panel-open-btn" data-label="คุณสมบัติ"
-                      aria-expanded="false" aria-controls="panel-inspector-body"
-                      onclick="togglePanel('inspector', event)">คุณสมบัติ</button>
-              <button type="button" class="btn btn-sm btn-clear-danger" onclick="clearCanvas()">ล้าง</button>
             </div>
           </div>
 
