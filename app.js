@@ -1423,7 +1423,14 @@ function renderCanvas() {
   if (list.length === 0) {
     const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
     stage.innerHTML = `<div class="empty-canvas-state">
-      <span class="empty-canvas-icon" aria-hidden="true">+</span>
+      <span class="empty-canvas-mark" aria-hidden="true">
+        <svg width="76" height="58" viewBox="0 0 76 58" fill="none">
+          <rect x="1.2" y="1.2" width="73.6" height="55.6" rx="12" stroke="#b7d4c6" stroke-width="1.4"/>
+          <rect x="16" y="14" width="24" height="4" rx="2" fill="#c5ddd0"/>
+          <rect x="16" y="24" width="44" height="8" rx="4" stroke="#9ec4b4" stroke-width="1.2"/>
+          <rect x="16" y="38" width="44" height="8" rx="4" fill="#3b82f6"/>
+        </svg>
+      </span>
       <p class="empty-canvas-title">ยังไม่มีช่องในฟอร์ม${esc(targetName)}</p>
       <p class="empty-canvas-sub">เริ่มจากแบบตัวอย่าง หรือเพิ่มช่องเอง</p>
       <div class="empty-canvas-actions">
