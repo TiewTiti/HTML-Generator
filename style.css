@@ -3036,21 +3036,25 @@ body.layout-b .studio-layout {
   gap: 0;
 }
 
-/* Canvas-first: side panels overlay as drawers when open */
+/* Panels sit in the row and the canvas shrinks. Nothing covers the board. */
 body.layout-b .builder-layout {
-  grid-template-columns: 1fr;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: stretch;
+  grid-template-columns: none;
+  min-width: 0;
 }
 body.layout-b .builder-layout.inspector-hidden:not(.toolbox-hidden),
 body.layout-b .builder-layout.toolbox-hidden:not(.inspector-hidden),
 body.layout-b .builder-layout.toolbox-hidden.inspector-hidden {
-  grid-template-columns: 1fr;
+  grid-template-columns: none;
 }
 
 body.layout-b .builder-layout > .canvas-viewport {
-  grid-column: 1;
+  order: 1;
   flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
   min-height: 480px;
   display: flex;
   flex-direction: column;
@@ -3062,107 +3066,92 @@ body.layout-b .builder-layout > .canvas-viewport {
 
 body.layout-b .builder-layout > .toolbox-sidebar,
 body.layout-b .builder-layout > .inspector-sidebar {
-  display: flex !important; /* override legacy display:none while animating off-canvas */
+  display: flex !important;
   flex-direction: column;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  z-index: 24;
-  width: min(300px, 86vw);
+  position: relative;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  z-index: 1;
+  flex: 0 0 300px;
+  width: 300px;
   max-width: 300px;
   margin: 0;
-  box-shadow: var(--shadow-lg);
+  box-shadow: none;
   background: #fff;
   border: 0;
-  transition: transform 0.32s var(--ease-apple), opacity 0.24s var(--ease-apple);
-  will-change: transform;
+  border-radius: 0;
+  transform: none;
+  opacity: 1;
+  align-self: stretch;
+  min-height: 0;
+  overflow: hidden;
 }
 
 body.layout-b .builder-layout > .toolbox-sidebar {
-  left: 0;
-  border-right: 0.5px solid rgba(0, 0, 0, 0.08);
-  border-radius: 0 18px 18px 0;
-  transform: translateX(0);
+  order: 0;
+  border-right: 1px solid #d3e6db;
 }
 body.layout-b .builder-layout > .inspector-sidebar {
-  right: 0;
-  border-left: 0.5px solid rgba(0, 0, 0, 0.08);
-  border-radius: 18px 0 0 18px;
-  transform: translateX(0);
+  order: 2;
+  border-left: 1px solid #d3e6db;
 }
 
-body.layout-b .builder-layout.toolbox-hidden > .toolbox-sidebar {
-  transform: translateX(-104%);
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
-}
+body.layout-b .builder-layout.toolbox-hidden > .toolbox-sidebar,
 body.layout-b .builder-layout.inspector-hidden > .inspector-sidebar {
-  transform: translateX(104%);
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
+  display: none !important;
 }
 
-/* Drawer scrim — tap outside to close */
+/* No dim layer over the page when a panel is open */
 .drawer-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 22;
-  border: 0;
-  padding: 0;
-  margin: 0;
-  /* Light dim only — do not blur the page behind the drawer */
-  background: rgba(15, 23, 42, 0.12);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  cursor: pointer;
-  opacity: 1;
-  transition: opacity 0.28s var(--ease-apple);
-}
-.drawer-scrim[hidden] { display: none !important; }
-body.layout-b.drawer-open .builder-layout,
-body.layout-b.drawer-open .studio-layout {
-  /* Raise shell above scrim (22) so absolute drawers stay tappable; dock stays at 40 */
-  isolation: isolate;
-  z-index: 23;
-  position: relative;
+  display: none !important;
 }
 
 body.layout-b .rail-btn { display: none !important; }
 
 body.layout-b .studio-layout {
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  grid-template-columns: none;
+  min-width: 0;
 }
 body.layout-b .studio-layout.controls-hidden {
-  grid-template-columns: 1fr;
+  grid-template-columns: none;
 }
 body.layout-b .studio-layout > .studio-preview-viewport {
-  grid-column: 1;
+  order: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   min-height: 420px;
 }
 body.layout-b .studio-layout > .studio-controls-sidebar {
   display: flex !important;
   flex-direction: column;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 24;
-  width: min(320px, 90vw);
+  position: relative;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  order: 0;
+  z-index: 1;
+  flex: 0 0 320px;
+  width: 320px;
+  max-width: 320px;
   margin: 0;
-  box-shadow: var(--shadow-lg);
+  box-shadow: none;
   background: #fff;
-  border-right: 0.5px solid rgba(0, 0, 0, 0.08);
-  border-radius: 0 18px 18px 0;
-  transition: transform 0.32s var(--ease-apple), opacity 0.24s var(--ease-apple);
-  transform: translateX(0);
+  border: 0;
+  border-right: 1px solid #d3e6db;
+  border-radius: 0;
+  transform: none;
+  align-self: stretch;
+  min-height: 0;
+  overflow: hidden;
 }
 body.layout-b .studio-layout.controls-hidden > .studio-controls-sidebar {
-  transform: translateX(-104%);
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
+  display: none !important;
 }
 
 body.layout-b .canvas-header,
@@ -3515,19 +3504,33 @@ body.layout-b .tiew-bot {
     padding: 12px;
     border-radius: 16px;
   }
-  /* Mobile drawers: full-height sheets under nav (Figma handoff overlay behavior) */
+  /* Narrow screens: panel still sits beside the canvas and shrinks it */
+  body.layout-b .builder-layout,
+  body.layout-b .studio-layout {
+    flex-direction: row;
+  }
   body.layout-b .builder-layout > .toolbox-sidebar,
   body.layout-b .builder-layout > .inspector-sidebar,
   body.layout-b .studio-layout > .studio-controls-sidebar {
-    position: fixed;
-    top: var(--header-height, 44px);
-    bottom: 0;
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    flex: 0 0 46%;
+    width: 46%;
+    max-width: 46%;
     max-height: none;
-    z-index: 34; /* above scrim (22) and shell; under dock (40) */
-    /* Override ≤1100px overflow:visible so sticky header + body scroll work */
+    z-index: 1;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column;
+    transform: none;
+  }
+  body.layout-b .builder-layout.toolbox-hidden > .toolbox-sidebar,
+  body.layout-b .builder-layout.inspector-hidden > .inspector-sidebar,
+  body.layout-b .studio-layout.controls-hidden > .studio-controls-sidebar {
+    display: none !important;
   }
   body.layout-b .builder-layout > .toolbox-sidebar .sidebar-body,
   body.layout-b .builder-layout > .inspector-sidebar .sidebar-body,
@@ -4130,15 +4133,18 @@ body.layout-b .empty-canvas-actions .btn-secondary {
   font-weight: 500;
 }
 
-/* Side sheets: more air, flatter, mint paper */
+/* Side sheets sit in the row: mint paper, canvas keeps the rest */
 body.layout-b .builder-layout > .toolbox-sidebar,
 body.layout-b .builder-layout > .inspector-sidebar,
 body.layout-b .studio-layout > .studio-controls-sidebar {
-  width: min(332px, 88vw);
-  max-width: 332px;
+  position: relative;
+  flex: 0 0 300px;
+  width: 300px;
+  max-width: 300px;
   background: #f3faf6;
   box-shadow: none;
   border-color: #d3e6db;
+  transform: none;
 }
 body.layout-b .toolbox-sidebar,
 body.layout-b .studio-controls-sidebar,
@@ -4225,8 +4231,9 @@ body.layout-b .forward-action-card p {
   color: #5c7368;
 }
 
-.drawer-scrim {
-  background: rgba(26, 46, 39, 0.08);
+body.layout-b .drawer-scrim,
+#drawer-scrim {
+  display: none !important;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -4350,6 +4357,19 @@ body.layout-b .export-mode-btn.active {
 .tutorial-body { line-height: 1.55; }
 
 @media (max-width: 700px) {
+  body.layout-b .builder-layout > .toolbox-sidebar,
+  body.layout-b .builder-layout > .inspector-sidebar,
+  body.layout-b .studio-layout > .studio-controls-sidebar {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    flex: 0 0 46%;
+    width: 46%;
+    max-width: 46%;
+    transform: none;
+  }
   body.layout-b .app-header {
     height: 52px;
     min-height: 52px;

@@ -920,7 +920,7 @@ function setAllGroups(open) {
   toast(open ? 'ขยายทุกกลุ่มแล้ว' : 'ย่อทุกกลุ่มแล้ว — กดหัวข้อกลุ่มเพื่อเปิดทีละอัน');
 }
 
-// ย่อ/ขยายแถบด้านข้าง (และกล่องโค้ด) — layout B: one drawer at a time + scrim
+// ย่อ/ขยายแถบด้านข้าง — แถบอยู่ข้างกระดาน ไม่มีม่านทับกระดาน
 function togglePanel(panel, e) {
   const wasOpen = isPanelOpen(panel);
   uiState.panels[panel] = !wasOpen;
@@ -958,18 +958,11 @@ function closeDrawerPanels() {
 function syncDrawerScrim() {
   const open = isPanelOpen('toolbox') || isPanelOpen('inspector') || isPanelOpen('controls');
   document.body.classList.toggle('drawer-open', !!open);
-  let scrim = document.getElementById('drawer-scrim');
-  if (!scrim) {
-    scrim = document.createElement('button');
-    scrim.type = 'button';
-    scrim.id = 'drawer-scrim';
-    scrim.className = 'drawer-scrim';
-    scrim.setAttribute('aria-label', 'ปิดแถบด้านข้าง');
-    scrim.addEventListener('click', () => { closeDrawerPanels(); });
-    document.body.appendChild(scrim);
+  const scrim = document.getElementById('drawer-scrim');
+  if (scrim) {
+    scrim.hidden = true;
+    scrim.setAttribute('aria-hidden', 'true');
   }
-  scrim.hidden = !open;
-  scrim.setAttribute('aria-hidden', open ? 'false' : 'true');
 }
 
 function applyPanelState(key) {
