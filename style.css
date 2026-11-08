@@ -5,21 +5,21 @@
    Ref surfaces: https://preview.themewagon.com/spark-admin/
    ========================================================================== */
 :root {
-  /* Soft light admin ground (mint-ish) + soft blue accent system */
-  --bg-app: #f4f6f5;
-  --bg-app-deep: #e9efef;
-  --bg-hero: #ffffff;
+  /* Quiet linen desk: warm mint ground, ink green type, soft blue accent */
+  --bg-app: #e7f3ec;
+  --bg-app-deep: #d7eadf;
+  --bg-hero: #fbfefc;
   --surface-panel: #ffffff;
-  --surface-subtle: #f7f9fb;
-  --surface-glass: rgba(255, 255, 255, 0.84);
-  --border-color: rgba(15, 23, 42, 0.08);
-  --border-hairline: rgba(15, 23, 42, 0.055);
-  --border-hover: rgba(15, 23, 42, 0.14);
-  --border-soft: #e8eef3;
+  --surface-subtle: #f3f8f5;
+  --surface-glass: rgba(251, 254, 252, 0.92);
+  --border-color: rgba(28, 62, 48, 0.08);
+  --border-hairline: rgba(28, 62, 48, 0.06);
+  --border-hover: rgba(28, 62, 48, 0.16);
+  --border-soft: #d5e6dc;
 
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --text-tertiary: #94a3b8;
+  --text-main: #1a2e27;
+  --text-muted: #4e675c;
+  --text-tertiary: #7d968a;
   --text-inverse: #ffffff;
 
   /* Soft blue family — friendly product accent (not rejected cool-slate sapphire lux) */
@@ -47,23 +47,17 @@
   --btn-radius: 18px;
   --btn-fs: 13px;
 
-  --header-height: 48px;
+  --header-height: 56px;
   --hero-pad-y: 52px;
-  --dock-clearance: 108px;
+  --dock-clearance: 104px;
 
   --rail-width: 44px;
-  /* Soft admin card elevation */
-  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.03);
-  --shadow-md: 0 10px 28px rgba(15, 23, 42, 0.05);
-  --shadow-lg: 0 18px 44px rgba(15, 23, 42, 0.07);
-  --shadow-shell:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 2px 8px rgba(15, 23, 42, 0.03),
-    0 10px 28px rgba(15, 23, 42, 0.05);
-  --shadow-dock:
-    0 2px 8px rgba(15, 23, 42, 0.04),
-    0 12px 36px rgba(15, 23, 42, 0.08),
-    0 0 0 1px rgba(15, 23, 42, 0.05);
+  /* Flat linen — depth comes from paper wells, not drop shadows */
+  --shadow-sm: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-shell: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  --shadow-dock: none;
   --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
@@ -2777,19 +2771,17 @@ body.layout-b .canvas-dropzone {
   inset: 0;
   z-index: 2;
   background:
-    /* Soft mint pastel wash — Spark light-admin + soft blue accent mist */
+    /* Quieter linen wash — template cards stay, but further back */
     linear-gradient(180deg,
-      rgba(244, 246, 245, 0.97) 0%,
-      rgba(244, 246, 245, 0.92) 12%,
-      rgba(236, 242, 240, 0.72) 28%,
-      rgba(233, 239, 239, 0.42) 44%,
-      rgba(236, 242, 240, 0.38) 58%,
-      rgba(244, 246, 245, 0.62) 78%,
-      rgba(233, 239, 239, 0.96) 100%),
-    radial-gradient(ellipse 90% 40% at 50% -6%, rgba(191, 219, 254, 0.38), transparent 64%),
-    radial-gradient(ellipse 48% 34% at 86% 70%, rgba(167, 243, 208, 0.16), transparent 58%),
-    radial-gradient(ellipse 42% 30% at 10% 86%, rgba(219, 234, 254, 0.22), transparent 60%);
-  backdrop-filter: blur(1.5px) saturate(112%);
+      rgba(231, 243, 236, 0.98) 0%,
+      rgba(231, 243, 236, 0.94) 14%,
+      rgba(220, 236, 226, 0.82) 32%,
+      rgba(214, 232, 222, 0.62) 48%,
+      rgba(220, 236, 226, 0.7) 64%,
+      rgba(231, 243, 236, 0.9) 82%,
+      rgba(215, 234, 223, 0.98) 100%),
+    radial-gradient(ellipse 80% 36% at 50% -8%, rgba(191, 219, 254, 0.22), transparent 70%);
+  backdrop-filter: blur(2px) saturate(108%);
 }
 .template-backdrop-rail {
   position: relative;
@@ -3044,21 +3036,25 @@ body.layout-b .studio-layout {
   gap: 0;
 }
 
-/* Canvas-first: side panels overlay as drawers when open */
+/* Panels sit in the row and the canvas shrinks. Nothing covers the board. */
 body.layout-b .builder-layout {
-  grid-template-columns: 1fr;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: stretch;
+  grid-template-columns: none;
+  min-width: 0;
 }
 body.layout-b .builder-layout.inspector-hidden:not(.toolbox-hidden),
 body.layout-b .builder-layout.toolbox-hidden:not(.inspector-hidden),
 body.layout-b .builder-layout.toolbox-hidden.inspector-hidden {
-  grid-template-columns: 1fr;
+  grid-template-columns: none;
 }
 
 body.layout-b .builder-layout > .canvas-viewport {
-  grid-column: 1;
+  order: 1;
   flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
   min-height: 480px;
   display: flex;
   flex-direction: column;
@@ -3070,107 +3066,92 @@ body.layout-b .builder-layout > .canvas-viewport {
 
 body.layout-b .builder-layout > .toolbox-sidebar,
 body.layout-b .builder-layout > .inspector-sidebar {
-  display: flex !important; /* override legacy display:none while animating off-canvas */
+  display: flex !important;
   flex-direction: column;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  z-index: 24;
-  width: min(300px, 86vw);
+  position: relative;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  z-index: 1;
+  flex: 0 0 300px;
+  width: 300px;
   max-width: 300px;
   margin: 0;
-  box-shadow: var(--shadow-lg);
+  box-shadow: none;
   background: #fff;
   border: 0;
-  transition: transform 0.32s var(--ease-apple), opacity 0.24s var(--ease-apple);
-  will-change: transform;
+  border-radius: 0;
+  transform: none;
+  opacity: 1;
+  align-self: stretch;
+  min-height: 0;
+  overflow: hidden;
 }
 
 body.layout-b .builder-layout > .toolbox-sidebar {
-  left: 0;
-  border-right: 0.5px solid rgba(0, 0, 0, 0.08);
-  border-radius: 0 18px 18px 0;
-  transform: translateX(0);
+  order: 0;
+  border-right: 1px solid #d3e6db;
 }
 body.layout-b .builder-layout > .inspector-sidebar {
-  right: 0;
-  border-left: 0.5px solid rgba(0, 0, 0, 0.08);
-  border-radius: 18px 0 0 18px;
-  transform: translateX(0);
+  order: 2;
+  border-left: 1px solid #d3e6db;
 }
 
-body.layout-b .builder-layout.toolbox-hidden > .toolbox-sidebar {
-  transform: translateX(-104%);
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
-}
+body.layout-b .builder-layout.toolbox-hidden > .toolbox-sidebar,
 body.layout-b .builder-layout.inspector-hidden > .inspector-sidebar {
-  transform: translateX(104%);
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
+  display: none !important;
 }
 
-/* Drawer scrim — tap outside to close */
+/* No dim layer over the page when a panel is open */
 .drawer-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 22;
-  border: 0;
-  padding: 0;
-  margin: 0;
-  /* Light dim only — do not blur the page behind the drawer */
-  background: rgba(15, 23, 42, 0.12);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  cursor: pointer;
-  opacity: 1;
-  transition: opacity 0.28s var(--ease-apple);
-}
-.drawer-scrim[hidden] { display: none !important; }
-body.layout-b.drawer-open .builder-layout,
-body.layout-b.drawer-open .studio-layout {
-  /* Raise shell above scrim (22) so absolute drawers stay tappable; dock stays at 40 */
-  isolation: isolate;
-  z-index: 23;
-  position: relative;
+  display: none !important;
 }
 
 body.layout-b .rail-btn { display: none !important; }
 
 body.layout-b .studio-layout {
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  grid-template-columns: none;
+  min-width: 0;
 }
 body.layout-b .studio-layout.controls-hidden {
-  grid-template-columns: 1fr;
+  grid-template-columns: none;
 }
 body.layout-b .studio-layout > .studio-preview-viewport {
-  grid-column: 1;
+  order: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   min-height: 420px;
 }
 body.layout-b .studio-layout > .studio-controls-sidebar {
   display: flex !important;
   flex-direction: column;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 24;
-  width: min(320px, 90vw);
+  position: relative;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  order: 0;
+  z-index: 1;
+  flex: 0 0 320px;
+  width: 320px;
+  max-width: 320px;
   margin: 0;
-  box-shadow: var(--shadow-lg);
+  box-shadow: none;
   background: #fff;
-  border-right: 0.5px solid rgba(0, 0, 0, 0.08);
-  border-radius: 0 18px 18px 0;
-  transition: transform 0.32s var(--ease-apple), opacity 0.24s var(--ease-apple);
-  transform: translateX(0);
+  border: 0;
+  border-right: 1px solid #d3e6db;
+  border-radius: 0;
+  transform: none;
+  align-self: stretch;
+  min-height: 0;
+  overflow: hidden;
 }
 body.layout-b .studio-layout.controls-hidden > .studio-controls-sidebar {
-  transform: translateX(-104%);
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
+  display: none !important;
 }
 
 body.layout-b .canvas-header,
@@ -3523,19 +3504,33 @@ body.layout-b .tiew-bot {
     padding: 12px;
     border-radius: 16px;
   }
-  /* Mobile drawers: full-height sheets under nav (Figma handoff overlay behavior) */
+  /* Narrow screens: panel still sits beside the canvas and shrinks it */
+  body.layout-b .builder-layout,
+  body.layout-b .studio-layout {
+    flex-direction: row;
+  }
   body.layout-b .builder-layout > .toolbox-sidebar,
   body.layout-b .builder-layout > .inspector-sidebar,
   body.layout-b .studio-layout > .studio-controls-sidebar {
-    position: fixed;
-    top: var(--header-height, 44px);
-    bottom: 0;
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    flex: 0 0 46%;
+    width: 46%;
+    max-width: 46%;
     max-height: none;
-    z-index: 34; /* above scrim (22) and shell; under dock (40) */
-    /* Override ≤1100px overflow:visible so sticky header + body scroll work */
+    z-index: 1;
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column;
+    transform: none;
+  }
+  body.layout-b .builder-layout.toolbox-hidden > .toolbox-sidebar,
+  body.layout-b .builder-layout.inspector-hidden > .inspector-sidebar,
+  body.layout-b .studio-layout.controls-hidden > .studio-controls-sidebar {
+    display: none !important;
   }
   body.layout-b .builder-layout > .toolbox-sidebar .sidebar-body,
   body.layout-b .builder-layout > .inspector-sidebar .sidebar-body,
@@ -3914,3 +3909,488 @@ body.layout-b .studio-controls-sidebar .sidebar-body {
   border: 0;
 }
 .canvas-title-group #hero-load-default-btn { flex: 0 0 auto; }
+
+/* ==========================================================================
+   Quiet linen — calmer spacing, type, panel chrome, canvas frame, dock
+   Structure stays: header + canvas, dock, side panels. No icon rail.
+   ========================================================================== */
+html:has(body.layout-b) { background-color: #e7f3ec; }
+
+body.layout-b .app-header {
+  height: 56px;
+  min-height: 56px;
+  padding: 0 28px;
+  background: rgba(231, 243, 236, 0.94);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 1px solid #d3e6db;
+}
+body.layout-b .brand-nav-name {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+body.layout-b .brand-nav-line {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: #5c7368;
+  margin-top: 1px;
+}
+body.layout-b .header-meta {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: #7d968a;
+}
+body.layout-b .brand-icon,
+body.layout-b .brand-icon img,
+body.layout-b #brand-logo {
+  border-radius: 0;
+  clip-path: none;
+}
+
+body.layout-b .app-container {
+  max-width: 1120px;
+  padding: 18px 28px var(--dock-clearance);
+}
+
+body.layout-b .builder-layout,
+body.layout-b .studio-layout {
+  min-height: 560px;
+  border-radius: 28px;
+  background: #fbfefc;
+  border: 1px solid #d3e6db;
+  box-shadow: none;
+}
+
+body.layout-b .canvas-header,
+body.layout-b .preview-toolbar {
+  background: transparent;
+  border-bottom: 0;
+  padding: 18px 4px 12px;
+  gap: 14px;
+  color: var(--text-main);
+}
+body.layout-b .canvas-header h2,
+body.layout-b .preview-toolbar h2 {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.3;
+  color: #1a2e27;
+}
+body.layout-b .canvas-title-group { gap: 10px 12px; }
+body.layout-b .badge {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  padding: 4px 10px;
+  border-radius: 18px;
+  background: transparent;
+  color: #3d5c4e;
+  border: 1px solid #cfe0d6;
+}
+body.layout-b .header-actions { gap: 8px; }
+
+body.layout-b .btn-secondary,
+body.layout-b .canvas-header .panel-open-btn[aria-expanded="false"],
+body.layout-b .preview-toolbar .panel-open-btn[aria-expanded="false"] {
+  background: #fff;
+  color: #1a2e27;
+  border: 1px solid #d3e6db;
+  border-radius: 18px;
+  height: 36px;
+  min-height: 36px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0 14px;
+  box-shadow: none;
+}
+body.layout-b .btn-secondary:hover,
+body.layout-b .canvas-header .panel-open-btn[aria-expanded="false"]:hover {
+  background: #f3f8f5;
+  color: #1a2e27;
+}
+body.layout-b .canvas-header .panel-open-btn[aria-expanded="true"],
+body.layout-b .preview-toolbar .panel-open-btn[aria-expanded="true"] {
+  background: #e7f0fe;
+  color: #1d4ed8;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  height: 36px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: none;
+}
+body.layout-b .canvas-chrome {
+  margin-left: 10px;
+  padding-left: 12px;
+  border-left: 1px solid #e1eee6;
+}
+body.layout-b .canvas-zoom,
+body.layout-b .view-mode-btn {
+  border-color: #d3e6db;
+  background: #fff;
+  border-radius: 18px;
+}
+body.layout-b .zoom-btn,
+body.layout-b .view-mode-btn {
+  color: #4e675c;
+  font-weight: 500;
+  height: 36px;
+  min-height: 36px;
+}
+
+/* Canvas is a paper well — no dotted grid */
+body.layout-b .builder-layout > .canvas-viewport {
+  padding: 0 16px 16px;
+  gap: 0;
+  min-height: 520px;
+}
+body.layout-b .canvas-dropzone {
+  flex: 1 1 auto;
+  min-height: 440px;
+  margin: 0;
+  border: 1px solid #e1eee6;
+  border-radius: 22px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  background: #f4f8f5;
+  padding: 64px 28px 88px;
+}
+body.layout-b .canvas-preview-card {
+  width: min(540px, 94%);
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 26px 28px;
+  border: 1px solid #e4efe8;
+  box-shadow: none;
+  gap: 14px 12px;
+}
+body.layout-b .canvas-preview-title {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+body.layout-b .canvas-preview-hint {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #5c7368;
+  margin: -4px 0 6px;
+}
+body.layout-b .canvas-preview-card .canvas-item {
+  background: #f7fbf8;
+  border-color: #e1eee6;
+  border-radius: 14px;
+  box-shadow: none;
+  padding: 16px 14px 14px;
+}
+
+body.layout-b .empty-canvas-state {
+  max-width: 320px;
+  padding: 8px 12px 12px;
+  gap: 8px;
+}
+body.layout-b .empty-canvas-mark {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 58px;
+  margin: 0 auto 10px;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+body.layout-b .empty-canvas-mark svg { display: block; }
+body.layout-b .empty-canvas-title {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.4;
+  color: #1a2e27;
+  max-width: 18em;
+}
+body.layout-b .empty-canvas-sub {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.55;
+  max-width: 260px;
+  margin: 0 0 6px;
+  color: #5c7368;
+}
+body.layout-b .empty-canvas-actions {
+  width: min(240px, 100%);
+  gap: 10px;
+  margin-top: 8px;
+}
+body.layout-b .empty-canvas-actions .btn-secondary {
+  background: #fff;
+  border: 1px solid #d3e6db;
+  color: #1a2e27;
+  font-weight: 500;
+}
+
+/* Side sheets sit in the row: mint paper, canvas keeps the rest */
+body.layout-b .builder-layout > .toolbox-sidebar,
+body.layout-b .builder-layout > .inspector-sidebar,
+body.layout-b .studio-layout > .studio-controls-sidebar {
+  position: relative;
+  flex: 0 0 300px;
+  width: 300px;
+  max-width: 300px;
+  background: #f3faf6;
+  box-shadow: none;
+  border-color: #d3e6db;
+  transform: none;
+}
+body.layout-b .toolbox-sidebar,
+body.layout-b .studio-controls-sidebar,
+body.layout-b .inspector-sidebar {
+  background: #f3faf6;
+}
+body.layout-b .toolbox-sidebar .sidebar-header,
+body.layout-b .studio-controls-sidebar .sidebar-header,
+body.layout-b .inspector-sidebar .sidebar-header {
+  padding: 22px 20px 6px;
+  background: transparent;
+}
+body.layout-b .toolbox-sidebar .sidebar-header h2,
+body.layout-b .studio-controls-sidebar .sidebar-header h2,
+body.layout-b .inspector-sidebar .sidebar-header h2 {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+body.layout-b .toolbox-sidebar .sidebar-header p,
+body.layout-b .studio-controls-sidebar .sidebar-header p,
+body.layout-b .inspector-sidebar .sidebar-header p {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: #5c7368;
+}
+body.layout-b .toolbox-sidebar .sidebar-body,
+body.layout-b .studio-controls-sidebar .sidebar-body,
+body.layout-b .inspector-sidebar .sidebar-body {
+  padding: 10px 18px 28px;
+  gap: 18px;
+}
+body.layout-b .tool-section-label,
+body.layout-b .toolbox-sidebar .category-title,
+body.layout-b .toolbox-sidebar .selector-label,
+body.layout-b .studio-controls-sidebar .group-tools-label {
+  margin: 4px 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #6d877b;
+}
+body.layout-b .toolbox-sidebar .component-grid { gap: 8px; }
+body.layout-b .toolbox-sidebar .comp-btn {
+  min-height: 44px;
+  height: auto;
+  padding: 0 14px;
+  font-weight: 500;
+  border-color: #e3efe8;
+  background: #fff;
+}
+body.layout-b .toolbox-sidebar .target-btn,
+body.layout-b .toolbox-sidebar .target-btn.target-btn-login,
+body.layout-b .toolbox-sidebar .target-btn.target-btn-register,
+body.layout-b .studio-controls-sidebar .group-header {
+  font-weight: 500;
+}
+body.layout-b .studio-controls-sidebar .group-header {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #e3efe8;
+}
+body.layout-b .studio-controls-sidebar .picker-item,
+body.layout-b .studio-controls-sidebar .input-field-unit,
+body.layout-b .studio-controls-sidebar .select-field-unit {
+  font-weight: 500;
+  border-color: #e3efe8;
+  min-height: 44px;
+}
+body.layout-b .studio-controls-sidebar .theme-presets-grid { gap: 10px; }
+body.layout-b .forward-action-card { padding: 12px 0 0; }
+body.layout-b .forward-action-card h3 {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+body.layout-b .forward-action-card p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #5c7368;
+}
+
+body.layout-b .drawer-scrim,
+#drawer-scrim {
+  display: none !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Preview and code sit in the same paper frame */
+body.layout-b .studio-preview-viewport {
+  background: transparent;
+  color: var(--text-main);
+  padding: 0 16px 16px;
+  gap: 0;
+  scrollbar-color: #c5ddd0 transparent;
+}
+body.layout-b .preview-toolbar { color: var(--text-main); }
+body.layout-b .preview-stage-container {
+  min-height: 460px;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid #e1eee6;
+}
+body.layout-b .studio-view-switch {
+  background: #eef6f1;
+  border: 1px solid #d3e6db;
+  padding: 3px;
+  gap: 2px;
+}
+body.layout-b .studio-view-btn {
+  font-weight: 500;
+  color: #4e675c;
+  background: transparent;
+}
+body.layout-b .studio-view-btn.on {
+  background: #fff;
+  color: #1d4ed8;
+  box-shadow: none;
+}
+body.layout-b .studio-preview-viewport.is-code .code-exporter-panel {
+  background: #f7fbf8;
+  color: #1a2e27;
+  border: 1px solid #e1eee6;
+  border-radius: 22px;
+  padding: 22px 22px 18px;
+}
+body.layout-b .studio-preview-viewport.is-code .exporter-title h3 {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #1a2e27;
+}
+body.layout-b .studio-preview-viewport.is-code .exporter-title p {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #5c7368;
+}
+body.layout-b .studio-preview-viewport.is-code .code-editor-box textarea {
+  height: clamp(360px, 56vh, 640px);
+  background: #163028;
+  color: #e7f6ee;
+  border: 0;
+  border-radius: 16px;
+  padding: 18px 18px 20px;
+  line-height: 1.55;
+  font-size: 12.5px;
+}
+body.layout-b .export-mode-btn {
+  font-weight: 500;
+  border-radius: 18px;
+}
+body.layout-b .export-mode-btn.active {
+  background: #e7f0fe;
+  color: #1d4ed8;
+  font-weight: 500;
+}
+
+/* Dock: mint tray, white chip for the current item */
+.dock-wrap { bottom: 18px; }
+.dock {
+  gap: 2px;
+  padding: 5px;
+  border-radius: 24px;
+  background: #e4f2ea;
+  border: 1px solid #cfe3d6;
+  box-shadow: none;
+}
+.dock-btn {
+  height: 36px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 18px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #3e564a;
+  gap: 6px;
+}
+.dock-btn:hover { background: rgba(255, 255, 255, 0.55); color: #1a2e27; }
+.dock-btn.on {
+  background: #fff;
+  color: #1d4ed8;
+}
+.dock-btn .dock-ico { opacity: 0.72; }
+.dock-btn.on .dock-ico {
+  background: transparent;
+  color: #3b82f6;
+  opacity: 1;
+}
+.dock-sep {
+  width: 1px;
+  height: 16px;
+  margin: 0 6px;
+  background: #c5dccd;
+}
+
+.tutorial-card {
+  border: 1px solid #d3e6db;
+  border-radius: 18px;
+  box-shadow: none;
+  padding: 16px 16px 14px;
+  background: #fbfefc;
+}
+.tutorial-title { font-weight: 500; letter-spacing: 0; }
+.tutorial-body { line-height: 1.55; }
+
+@media (max-width: 700px) {
+  body.layout-b .builder-layout > .toolbox-sidebar,
+  body.layout-b .builder-layout > .inspector-sidebar,
+  body.layout-b .studio-layout > .studio-controls-sidebar {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    flex: 0 0 46%;
+    width: 46%;
+    max-width: 46%;
+    transform: none;
+  }
+  body.layout-b .app-header {
+    height: 52px;
+    min-height: 52px;
+    padding: 0 14px;
+  }
+  body.layout-b .app-container { padding: 10px 12px var(--dock-clearance); }
+  body.layout-b .builder-layout,
+  body.layout-b .studio-layout { border-radius: 22px; min-height: 420px; }
+  body.layout-b .canvas-header,
+  body.layout-b .preview-toolbar { padding: 14px 2px 8px; }
+  body.layout-b .canvas-header h2 { font-size: 16px; }
+  body.layout-b .builder-layout > .canvas-viewport { padding: 0 10px 12px; min-height: 380px; }
+  body.layout-b .canvas-dropzone { padding: 28px 12px 88px; min-height: 280px; border-radius: 18px; }
+  body.layout-b .canvas-chrome { border-left: 0; margin-left: 0; padding-left: 0; }
+  .dock { padding: 4px; gap: 0; border-radius: 22px; }
+  .dock-btn { padding: 0 6px; gap: 3px; }
+  .dock-sep { margin: 0 2px; }
+  .dock-wrap { bottom: 10px; }
+}
+
+@media (min-width: 701px) and (max-width: 1024px) {
+  body.layout-b .app-container { padding: 14px 16px var(--dock-clearance); }
+  body.layout-b .canvas-dropzone { padding: 40px 16px 96px; }
+}
