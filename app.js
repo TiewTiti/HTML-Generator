@@ -1116,7 +1116,8 @@ function setDockMode(mode) {
   dockMode = mode || 'structure';
   if (mode === 'structure') {
     switchMainStep(1);
-    tipTiewBot('dock-structure', 'ครูชิโร่: กด «เครื่องมือ» เพื่อเพิ่มช่องบนกระดาน');
+    if (!isPanelOpen('toolbox')) togglePanel('toolbox');
+    tipTiewBot('dock-structure', 'ครูชิโร่: กดปุ่มด้านซ้ายเพื่อเพิ่มช่อง');
   } else if (mode === 'color') {
     switchMainStep(2);
     setStudioView('preview');

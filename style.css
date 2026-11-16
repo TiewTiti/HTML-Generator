@@ -2932,8 +2932,10 @@ body.layout-b .canvas-dropzone {
    LAYOUT B — hero + canvas-dominant + thin bottom dock
    ========================================================================== */
 body.layout-b {
-  overflow: auto;
-  height: auto;
+  /* Workspace stays one screen. Panels and the board scroll inside it. */
+  overflow: hidden;
+  height: 100vh;
+  max-height: 100vh;
   min-height: 100vh;
   position: relative;
   isolation: isolate;
@@ -3018,13 +3020,18 @@ html:has(body.layout-b) {
 }
 
 body.layout-b .step-panel.active {
-  overflow: visible;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 body.layout-b .builder-layout,
 body.layout-b .studio-layout {
   /* Soft Spark card shell — generous board, gentle elevation */
-  min-height: 520px;
+  flex: 1 1 auto;
+  min-height: 0;
   height: auto;
   border-radius: var(--radius-panel);
   background: #fff;
@@ -3055,7 +3062,7 @@ body.layout-b .builder-layout > .canvas-viewport {
   flex: 1 1 auto;
   min-width: 0;
   width: auto;
-  min-height: 480px;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -3124,7 +3131,7 @@ body.layout-b .studio-layout > .studio-preview-viewport {
   order: 1;
   flex: 1 1 auto;
   min-width: 0;
-  min-height: 420px;
+  min-height: 0;
 }
 body.layout-b .studio-layout > .studio-controls-sidebar {
   display: flex !important;
@@ -3954,11 +3961,13 @@ body.layout-b #brand-logo {
 body.layout-b .app-container {
   max-width: 1120px;
   padding: 18px 28px var(--dock-clearance);
+  min-height: 0;
+  overflow: hidden;
 }
 
 body.layout-b .builder-layout,
 body.layout-b .studio-layout {
-  min-height: 560px;
+  min-height: 0;
   border-radius: 28px;
   background: #fbfefc;
   border: 1px solid #d3e6db;
@@ -4047,11 +4056,11 @@ body.layout-b .view-mode-btn {
 body.layout-b .builder-layout > .canvas-viewport {
   padding: 0 16px 16px;
   gap: 0;
-  min-height: 520px;
+  min-height: 0;
 }
 body.layout-b .canvas-dropzone {
   flex: 1 1 auto;
-  min-height: 440px;
+  min-height: 0;
   margin: 0;
   border: 1px solid #e1eee6;
   border-radius: 22px;
@@ -4248,9 +4257,10 @@ body.layout-b .studio-preview-viewport {
 }
 body.layout-b .preview-toolbar { color: var(--text-main); }
 body.layout-b .preview-stage-container {
-  min-height: 460px;
+  min-height: 0;
+  flex: 1 1 auto;
   border-radius: 22px;
-  overflow: hidden;
+  overflow: auto;
   border: 1px solid #e1eee6;
 }
 body.layout-b .studio-view-switch {
