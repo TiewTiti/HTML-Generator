@@ -1,55 +1,43 @@
 import { esc } from './model.js';
 
-function rule(p) {
-  const s = p.style;
-  const bg = p.tag === 'button' ? s.bg : s.bg;
-  return [
-    `left:${p.x}px`,
-    `top:${p.y}px`,
-    `width:${p.w}px`,
-    `height:${p.h}px`,
-    `background:${bg}`,
-    `color:${s.color}`,
-    `border:1.5px solid ${s.border}`,
-    `border-radius:${s.radius}px`,
-    `font-size:${s.fontSize}px`,
-  ].join(';');
-}
-
-function pieceHtml(p, indent) {
+function pieceHtml(p) {
   const id = esc(p.id);
-  const style = rule(p);
-  const pad = indent || '    ';
-  if (p.tag === 'p') return `${pad}<p class="piece" id="${id}" style="${style}">${esc(p.text)}</p>`;
-  if (p.tag === 'a') return `${pad}<a class="piece" id="${id}" href="${esc(p.href || '#')}" style="${style}">${esc(p.text)}</a>`;
-  if (p.tag === 'button') return `${pad}<button class="piece" id="${id}" type="submit" style="${style}">${esc(p.text)}</button>`;
+  if (p.tag === 'p') return `    <p id="${id}">${esc(p.text)}</p>`;
+  if (p.tag === 'a') return `    <a id="${id}" href="${esc(p.href || '#')}">${esc(p.text)}</a>`;
+  if (p.tag === 'button') return `    <button id="${id}" type="submit">${esc(p.text)}</button>`;
   if (p.tag === 'img') {
     const src = p.src ? ` src="${esc(p.src)}"` : '';
-    return `${pad}<img class="piece" id="${id}" alt=""${src} style="${style};object-fit:cover">`;
+    return `    <img id="${id}" alt=""${src}>`;
   }
   if (p.tag === 'input') {
     const type = p.inputType === 'password' || p.inputType === 'email' ? p.inputType : 'text';
-    return `${pad}<input class="piece" id="${id}" type="${type}" placeholder="${esc(p.text)}" style="${style}">`;
+    return `    <input id="${id}" type="${type}" placeholder="${esc(p.text)}">`;
   }
-  return `${pad}<div class="piece" id="${id}" style="${style}"></div>`;
-}
-
-function plateHtml(frame, pieces) {
-  const kids = pieces.filter((item) => item.host === frame.id).map((item) => pieceHtml(item, '      ')).join('\n');
-  return `    <div class="piece plate" id="${esc(frame.id)}" style="${rule(frame)}">\n${kids}\n    </div>`;
+  return `    <div id="${id}">${esc(p.text)}</div>`;
 }
 
 export function htmlSource(pieces) {
-  const body = pieces
-    .filter((item) => !item.host)
-    .map((item) => (item.tag === 'div' && item.cols ? plateHtml(item, pieces) : pieceHtml(item)))
-    .join('\n');
-  return `<form class="sheet">\n${body}\n</form>`;
+  return `<form class="sheet">\n${pieces.map(pieceHtml).join('\n')}\n</form>`;
+}
+
+function pieceRule(p) {
+  const s = p.style;
+  const lines = [
+    `#${p.id} {`,
+    `  background: ${s.bg};`,
+    `  color: ${s.color};`,
+    `  border: 1.5px solid ${s.border};`,
+    `  border-radius: ${s.radius}px;`,
+    `  font-size: ${s.fontSize}px;`,
+  ];
+  if (p.tag === 'img' && p.src) lines.push('  width: 120px;', '  height: 88px;', '  object-fit: cover;');
+  lines.push('}');
+  return lines.join('\n');
 }
 
 export function cssSource(page, pieces) {
   const image = page.image ? `url("${page.image.replace(/"/g, '%22')}")` : 'none';
-  const lines = [
+  return [
     'body {',
     '  margin: 0;',
     '  min-height: 100vh;',
@@ -60,23 +48,21 @@ export function cssSource(page, pieces) {
     "  font-family: Sarabun, 'Noto Sans Thai', sans-serif;",
     '}',
     '.sheet {',
-    '  position: relative;',
-    '  width: min(1140px, 100%);',
-    '  min-height: 780px;',
-    '  margin: 0 auto;',
+    '  display: flex;',
+    '  flex-direction: column;',
+    '  gap: 12px;',
+    '  width: min(420px, calc(100% - 32px));',
+    '  margin: 48px auto;',
+    '  padding: 8px 0 24px;',
     '}',
-    '.piece {',
-    '  position: absolute;',
+    '.sheet > * {',
     '  box-sizing: border-box;',
-    '}',
-    'button.piece, input.piece {',
+    '  margin: 0;',
+    '  padding: 14px 16px;',
     '  font-family: inherit;',
     '}',
-  ];
-  pieces.forEach((p) => {
-    if (p.tag === 'p') lines.push(`#${p.id} { font-size: ${p.style.fontSize}px; }`);
-  });
-  return lines.join('\n');
+    pieces.map(pieceRule).join('\n'),
+  ].join('\n');
 }
 
 export function fullDocument(state) {
@@ -93,7 +79,7 @@ export function fullDocument(state) {
 ${css}
 .switch { display: flex; gap: 8px; justify-content: center; padding: 16px; }
 .switch button { height: 36px; padding: 0 16px; border-radius: 18px; border: 1px solid #d5dde6; background: #fff; cursor: pointer; }
-.switch button.on { background: #1a73e8; color: #fff; border-color: #1a73e8; }
+.switch button.on { background: #3b82f6; color: #fff; border-color: #3b82f6; }
 .pane { display: none; }
 .pane.on { display: block; }
   </style>

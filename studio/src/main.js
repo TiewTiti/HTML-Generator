@@ -1,8 +1,7 @@
 import './style.css';
 import {
-  PLATE_PAD, STUD, TAGS, TEACHER_CODE, activePieces, childBox, esc, firstSlot,
-  frameSize, isTeacherUnlocked, loadState, makePiece, saveState, selectedPiece,
-  setTeacherUnlocked, slotFits, spanFor,
+  TAGS, TEACHER_CODE, activePieces, esc, isTeacherUnlocked, loadState, makePiece,
+  saveState, selectedPiece, setTeacherUnlocked,
 } from './model.js';
 import { applyBrand, templateList } from './templates.js';
 import { cssSource, fullDocument, htmlSource } from './export.js';
@@ -74,63 +73,39 @@ function toolbar() {
   </div>`;
 }
 
-function brickStyle(p) {
+function blockBody(p) {
   const s = p.style;
-  return `left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px;background:${s.bg};color:${s.color};border:1.5px solid ${s.border};border-radius:${s.radius}px;font-size:${s.fontSize}px`;
-}
-
-function brickInner(p) {
-  const cap = `<span class="tag-cap">&lt;${p.tag}&gt;</span>`;
+  const nub = `<span class="nub" style="background:${s.bg};border-color:${s.border}"></span>`;
   if (p.tag === 'input') {
     const type = p.inputType === 'password' || p.inputType === 'email' ? p.inputType : 'text';
-    return `${cap}<input tabindex="-1" readonly type="${type}" placeholder="${esc(p.text)}" style="width:100%;border:0;background:transparent;color:inherit;font:inherit;pointer-events:none">`;
+    return `<span class="vex-tag">&lt;input&gt;</span><span class="vex-text">${esc(p.text)}</span><span class="vex-kind">${type}</span>${nub}`;
   }
   if (p.tag === 'img') {
-    const inner = p.src
-      ? `<img src="${esc(p.src)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;pointer-events:none">`
-      : `<span style="pointer-events:none">รูป</span>`;
-    return `${cap}${inner}`;
+    const face = p.src
+      ? `<img src="${esc(p.src)}" alt="" class="vex-img">`
+      : `<span class="vex-text">รูป</span>`;
+    return `<span class="vex-tag">&lt;img&gt;</span>${face}${nub}`;
   }
-  if (p.tag === 'div') return cap;
-  return `${cap}${esc(p.text)}`;
-}
-
-function pieceView(p, list) {
-  if (p.host) return '';
-  const on = state.selectedId === p.id ? ' is-on' : '';
-  if (p.tag === 'div' && p.cols) return plateView(p, list, on);
-  const align = p.tag === 'button' || p.tag === 'img' ? 'center' : 'flex-start';
-  return `<div class="piece${on}" data-piece="${p.id}" style="${brickStyle(p)};display:flex;align-items:center;justify-content:${align};padding:0 12px">${brickInner(p)}</div>`;
-}
-
-function plateView(frame, list, on) {
-  const studs = [];
-  for (let row = 0; row < frame.rows; row += 1) {
-    for (let col = 0; col < frame.cols; col += 1) {
-      const left = PLATE_PAD + col * STUD + (STUD - 14) / 2;
-      const top = PLATE_PAD + row * STUD + (STUD - 14) / 2;
-      studs.push(`<button type="button" class="stud" data-stud="${frame.id}:${col}:${row}" style="left:${left}px;top:${top}px" aria-label="จุด ${col + 1}-${row + 1}"></button>`);
-    }
-  }
-  const kids = list.filter((item) => item.host === frame.id).map((child) => {
-    const selected = state.selectedId === child.id ? ' is-on' : '';
-    const align = child.tag === 'button' || child.tag === 'img' ? 'center' : 'flex-start';
-    return `<div class="piece child${selected}" data-piece="${child.id}" style="${brickStyle(child)};display:flex;align-items:center;justify-content:${align};padding:0 8px">${brickInner(child)}</div>`;
-  }).join('');
-  return `<div class="piece plate${on}" data-piece="${frame.id}" style="${brickStyle(frame)}">${studs.join('')}${kids}</div>`;
+  return `<span class="vex-tag">&lt;${p.tag}&gt;</span><span class="vex-text">${esc(p.text)}</span>${nub}`;
 }
 
 function paper() {
   const list = activePieces(state);
   const image = state.page.image ? `url("${state.page.image}")` : 'none';
-  const empty = list.length
-    ? ''
-    : `<p class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-[22px] font-medium text-[#2c4a63]">กด &lt;div&gt; เพื่อวางแผ่น แล้วประกบชิ้นบนจุด</p>`;
+  const blocks = list.map((p) => {
+    const on = state.selectedId === p.id ? ' is-on' : '';
+    const s = p.style;
+    return `<article class="vex vex-${p.tag}${on}" data-piece="${p.id}" style="background:${s.bg};color:${s.color};border-color:${s.border};border-radius:${s.radius}px;font-size:${s.fontSize}px">${blockBody(p)}</article>`;
+  }).join('');
+  const end = list.length
+    ? `<p class="stack-note">ลากบล็อกเพื่อสลับที่ บล็อกจะต่อกันเอง</p>`
+    : `<p class="stack-empty">กดชิ้นด้านบน<br>มันจะมาต่อกันให้</p>`;
   return `
   <section class="relative min-w-0 flex-1 overflow-auto" style="background-color:${state.page.bg};background-image:${image};background-size:cover;background-position:center">
-    <div class="board relative mx-auto min-h-full w-full max-w-[1140px]">
-      ${empty}
-      ${list.map((item) => pieceView(item, list)).join('')}
+    <div class="stack-wrap">
+      <div class="stack" data-stack>
+        ${blocks}${end}
+      </div>
     </div>
   </section>`;
 }
@@ -162,7 +137,7 @@ function htmlPanel() {
   const sample = piece ? piece.text : '';
   return `
   <p class="px-4 pt-4 text-[15px] font-semibold">แท็ก</p>
-  <p class="px-4 pt-1 text-xs text-[#5c6570]">วางแผ่นก่อน แล้วกดชิ้นเพื่อประกบบนจุด</p>
+  <p class="px-4 pt-1 text-xs text-[#5c6570]">กดแล้วบล็อกจะต่อท้ายให้</p>
   <div class="mx-4 mt-3 flex h-9 items-center rounded-lg border border-[#e6e8ec] px-3 text-[13px]">พื้นฐาน</div>
   <div class="grid grid-cols-3 gap-3.5 px-4 pt-4">
     ${TAGS.map(tagButton).join('')}
@@ -369,70 +344,24 @@ function render() {
   app.innerHTML = `<div class="h-full">${screen}${dialog()}${toast()}</div>`;
 }
 
-function targetFrame() {
+function addTag(tag) {
   const list = activePieces(state);
-  const selected = selectedPiece(state);
-  if (selected && selected.tag === 'div' && selected.cols) return selected;
-  if (selected && selected.host) return list.find((item) => item.id === selected.host) || null;
-  const frames = list.filter((item) => item.tag === 'div' && item.cols && !item.host);
-  return frames[frames.length - 1] || null;
-}
-
-function rememberBox(piece) {
-  const box = childBox(piece);
-  piece.x = box.x;
-  piece.y = box.y;
-  piece.w = box.w;
-  piece.h = box.h;
-}
-
-function growFrame(frame, piece, list) {
-  let spot = firstSlot(frame, piece, list);
-  let guard = 0;
-  while (!spot && guard < 8) {
-    frame.rows += 2;
-    frame.h = frameSize(frame).h;
-    spot = firstSlot(frame, piece, list);
-    guard += 1;
-  }
-  return spot;
-}
-
-function lockOn(piece, frame, col, row) {
-  piece.host = frame.id;
-  piece.col = col;
-  piece.row = row;
-  piece.span = piece.span || spanFor(piece.tag);
-  rememberBox(piece);
-}
-
-function addTag(tag, stud) {
-  const list = activePieces(state);
-  state.pickedTag = tag;
-  state.step = 'html';
-  if (tag === 'div') {
-    const frame = makePiece('div', list.filter((item) => item.tag === 'div').length, state.form, 'text');
-    frame.x = 160 + list.filter((item) => item.tag === 'div').length * 28;
-    list.push(frame);
-    state.selectedId = frame.id;
-    persist();
-    render();
-    return;
-  }
-  const frame = targetFrame() || (() => {
-    const made = makePiece('div', 0, state.form, 'text');
-    list.push(made);
-    return made;
-  })();
   const piece = makePiece(tag, list.length, state.form, state.inputKind);
-  if (stud && !slotFits(frame, piece, stud.col, stud.row, list)) return;
-  const spot = stud || growFrame(frame, piece, list);
-  if (!spot) return;
-  lockOn(piece, frame, spot.col, spot.row);
   list.push(piece);
   state.selectedId = piece.id;
+  state.pickedTag = tag;
+  state.step = 'html';
   persist();
   render();
+}
+
+function reorderPiece(id, index) {
+  const list = activePieces(state);
+  const from = list.findIndex((item) => item.id === id);
+  if (from < 0) return;
+  const [item] = list.splice(from, 1);
+  const dest = Math.max(0, Math.min(index, list.length));
+  list.splice(dest, 0, item);
 }
 
 function readOtp() {
@@ -466,23 +395,6 @@ function onClick(event) {
       persist();
       render();
     }
-    return;
-  }
-  const stud = event.target.closest('[data-stud]');
-  if (stud) {
-    const [frameId, col, row] = stud.dataset.stud.split(':');
-    const frame = activePieces(state).find((item) => item.id === frameId);
-    const selected = selectedPiece(state);
-    if (frame && selected && selected.host && selected.tag !== 'div') {
-      const spot = { col: Number(col), row: Number(row) };
-      if (slotFits(frame, selected, spot.col, spot.row, activePieces(state))) {
-        lockOn(selected, frame, spot.col, spot.row);
-        persist();
-        render();
-        return;
-      }
-    }
-    addTag(state.pickedTag === 'div' ? 'p' : state.pickedTag, { col: Number(col), row: Number(row) });
     return;
   }
   const add = event.target.closest('[data-add]');
@@ -614,12 +526,10 @@ function onInput(event) {
     persist();
     const node = app.querySelector(`[data-piece="${piece.id}"]`);
     if (!node) return;
-    if (piece.tag === 'input') {
-      const field = node.querySelector('input');
-      if (field) field.placeholder = piece.text;
-    } else if (piece.tag !== 'div' && piece.tag !== 'img') {
-    node.innerHTML = `<span class="tag-cap">&lt;${piece.tag}&gt;</span>${esc(piece.text)}`;
-    }
+    const label = node.querySelector('.vex-text');
+    if (label) label.textContent = piece.text;
+    const kind = node.querySelector('.vex-kind');
+    if (kind && piece.tag === 'input') kind.textContent = piece.inputType;
     return;
   }
   const color = event.target.closest('[data-color]');
@@ -681,7 +591,12 @@ function paintPiece(piece) {
   node.style.border = `1.5px solid ${s.border}`;
   node.style.borderRadius = s.radius + 'px';
   node.style.fontSize = s.fontSize + 'px';
-  node.style.height = piece.h + 'px';
+  node.style.borderRadius = s.radius + 'px';
+  const nub = node.querySelector('.nub');
+  if (nub) {
+    nub.style.background = s.bg;
+    nub.style.borderColor = s.border;
+  }
 }
 
 function readFile(file, done) {
@@ -715,85 +630,57 @@ function onChange(event) {
 
 let drag = null;
 let dragMoved = false;
-function onPointerDown(event) {
-  if (event.button !== 0 || event.target.closest('[data-stud]')) return;
-  const pieceEl = event.target.closest('[data-piece]');
-  if (!pieceEl) return;
-  const piece = activePieces(state).find((item) => item.id === pieceEl.dataset.piece);
-  if (!piece) return;
-  if (piece.host) {
-    drag = { id: piece.id, kind: 'child', col: piece.col, row: piece.row, host: piece.host };
-  } else {
-    const board = pieceEl.closest('.board');
-    if (!board) return;
-    const rect = board.getBoundingClientRect();
-    drag = {
-      id: piece.id,
-      kind: 'board',
-      ox: event.clientX - rect.left - piece.x,
-      oy: event.clientY - rect.top - piece.y,
-    };
+
+function snapIndex(clientY, ignoreId) {
+  const nodes = [...app.querySelectorAll('.vex')].filter((el) => el.dataset.piece !== ignoreId);
+  for (let i = 0; i < nodes.length; i += 1) {
+    const rect = nodes[i].getBoundingClientRect();
+    if (clientY < rect.top + rect.height / 2) return i;
   }
-  dragMoved = false;
-  pieceEl.setPointerCapture(event.pointerId);
+  return nodes.length;
 }
 
-function markStud(frame, col, row) {
-  app.querySelectorAll('.stud.is-hot').forEach((el) => el.classList.remove('is-hot'));
-  const stud = frame && app.querySelector(`[data-stud="${frame.id}:${col}:${row}"]`);
-  if (stud) stud.classList.add('is-hot');
+function showSnap(index) {
+  const stack = app.querySelector('[data-stack]');
+  if (!stack) return;
+  let line = stack.querySelector('.snap-line');
+  if (!line) {
+    line = document.createElement('div');
+    line.className = 'snap-line';
+  }
+  const nodes = [...stack.querySelectorAll('.vex')].filter((el) => el.dataset.piece !== drag.id);
+  const before = nodes[index] || stack.querySelector('.stack-note') || stack.querySelector('.stack-empty');
+  if (before) stack.insertBefore(line, before);
+  else stack.appendChild(line);
+}
+
+function onPointerDown(event) {
+  if (event.button !== 0) return;
+  const pieceEl = event.target.closest('.vex');
+  if (!pieceEl) return;
+  drag = { id: pieceEl.dataset.piece, index: snapIndex(event.clientY, pieceEl.dataset.piece) };
+  dragMoved = false;
+  pieceEl.classList.add('is-dragging');
+  pieceEl.setPointerCapture(event.pointerId);
 }
 
 function onPointerMove(event) {
   if (!drag) return;
-  const piece = activePieces(state).find((item) => item.id === drag.id);
-  const node = app.querySelector(`[data-piece="${drag.id}"]`);
-  if (!piece || !node) return;
-  if (drag.kind === 'board') {
-    const board = node.closest('.board');
-    if (!board) return;
-    const rect = board.getBoundingClientRect();
-    piece.x = Math.max(8, Math.round(event.clientX - rect.left - drag.ox));
-    piece.y = Math.max(24, Math.round(event.clientY - rect.top - drag.oy));
-    node.style.left = piece.x + 'px';
-    node.style.top = piece.y + 'px';
-    dragMoved = true;
-    return;
-  }
-  const plates = [...app.querySelectorAll('.plate')];
-  const plate = plates.find((el) => {
-    const rect = el.getBoundingClientRect();
-    return event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
-  }) || app.querySelector(`[data-piece="${drag.host}"]`);
-  if (!plate) return;
-  const frame = activePieces(state).find((item) => item.id === plate.dataset.piece);
-  if (!frame) return;
-  const rect = plate.getBoundingClientRect();
-  const span = piece.span || spanFor(piece.tag);
-  let col = Math.round((event.clientX - rect.left - PLATE_PAD) / STUD);
-  let row = Math.round((event.clientY - rect.top - PLATE_PAD) / STUD);
-  col = Math.max(0, Math.min(frame.cols - span.c, col));
-  row = Math.max(0, Math.min(frame.rows - span.r, row));
-  if (!slotFits(frame, piece, col, row, activePieces(state))) {
-    markStud(frame, drag.col, drag.row);
-    return;
-  }
-  lockOn(piece, frame, col, row);
-  if (node.parentElement !== plate) plate.appendChild(node);
-  node.style.left = piece.x + 'px';
-  node.style.top = piece.y + 'px';
-  markStud(frame, col, row);
-  drag.col = col;
-  drag.row = row;
-  drag.host = frame.id;
+  const index = snapIndex(event.clientY, drag.id);
+  if (index !== drag.index) dragMoved = true;
+  drag.index = index;
+  showSnap(index);
   dragMoved = true;
 }
 
 function onPointerUp() {
   if (!drag) return;
-  if (dragMoved) persist();
+  if (dragMoved) reorderPiece(drag.id, drag.index);
+  const id = drag.id;
   drag = null;
-  app.querySelectorAll('.stud.is-hot').forEach((el) => el.classList.remove('is-hot'));
+  state.selectedId = id;
+  persist();
+  render();
 }
 
 function onKeyDown(event) {

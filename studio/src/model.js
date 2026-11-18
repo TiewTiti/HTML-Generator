@@ -1,8 +1,6 @@
 export const TEACHER_CODE = '759212';
 
-const STORE = 'login-studio-next-v2';
-export const STUD = 36;
-export const PLATE_PAD = 18;
+const STORE = 'login-studio-next-v3';
 const UNLOCK = 'login-studio-next-teacher';
 
 export const TAGS = ['div', 'p', 'a', 'input', 'button', 'img'];
@@ -16,22 +14,12 @@ export function esc(value) {
 }
 
 export function defaultStyle(tag) {
-  if (tag === 'button') {
-    return { bg: '#1a73e8', border: '#1a73e8', color: '#ffffff', radius: 8, fontSize: 16 };
-  }
-  if (tag === 'p') {
-    return { bg: 'transparent', border: 'transparent', color: '#1c2430', radius: 0, fontSize: 28 };
-  }
-  if (tag === 'a') {
-    return { bg: 'transparent', border: 'transparent', color: '#1a73e8', radius: 0, fontSize: 16 };
-  }
-  if (tag === 'div') {
-    return { bg: '#ffffff', border: '#d5dde6', color: '#1c2430', radius: 12, fontSize: 16 };
-  }
-  if (tag === 'img') {
-    return { bg: '#f3f5f8', border: '#c9d0da', color: '#5c6570', radius: 8, fontSize: 14 };
-  }
-  return { bg: '#ffffff', border: '#c9d0da', color: '#1c2430', radius: 8, fontSize: 16 };
+  if (tag === 'button') return { bg: '#3b82f6', border: '#2563eb', color: '#ffffff', radius: 18, fontSize: 16 };
+  if (tag === 'p') return { bg: '#eff6ff', border: '#93c5fd', color: '#1e3a8a', radius: 18, fontSize: 22 };
+  if (tag === 'a') return { bg: '#f5f3ff', border: '#c4b5fd', color: '#5b21b6', radius: 18, fontSize: 16 };
+  if (tag === 'div') return { bg: '#fff7ed', border: '#fdba74', color: '#9a3412', radius: 22, fontSize: 16 };
+  if (tag === 'img') return { bg: '#fdf2f8', border: '#f9a8d4', color: '#9d174d', radius: 18, fontSize: 14 };
+  return { bg: '#f0fdf4', border: '#86efac', color: '#14532d', radius: 18, fontSize: 16 };
 }
 
 function defaultText(tag, form, inputType) {
@@ -45,59 +33,6 @@ function defaultText(tag, form, inputType) {
     return 'กรอกข้อความ';
   }
   return '';
-}
-
-export function spanFor(tag) {
-  if (tag === 'img') return { c: 3, r: 3 };
-  if (tag === 'a') return { c: 5, r: 1 };
-  if (tag === 'p') return { c: 8, r: 2 };
-  return { c: 8, r: 2 };
-}
-
-export function frameSize(frame) {
-  return {
-    w: PLATE_PAD * 2 + frame.cols * STUD,
-    h: PLATE_PAD * 2 + frame.rows * STUD,
-  };
-}
-
-export function childBox(piece) {
-  const span = piece.span || spanFor(piece.tag);
-  return {
-    x: PLATE_PAD + piece.col * STUD + 3,
-    y: PLATE_PAD + piece.row * STUD + 3,
-    w: span.c * STUD - 6,
-    h: span.r * STUD - 6,
-  };
-}
-
-function covers(piece, col, row) {
-  const span = piece.span || spanFor(piece.tag);
-  return col >= piece.col && col < piece.col + span.c && row >= piece.row && row < piece.row + span.r;
-}
-
-export function slotFits(frame, piece, col, row, others) {
-  const span = piece.span || spanFor(piece.tag);
-  if (col < 0 || row < 0 || col + span.c > frame.cols || row + span.r > frame.rows) return false;
-  return !others.some((item) => {
-    if (!item.host || item.host !== frame.id || item.id === piece.id) return false;
-    for (let r = row; r < row + span.r; r += 1) {
-      for (let c = col; c < col + span.c; c += 1) {
-        if (covers(item, c, r)) return true;
-      }
-    }
-    return false;
-  });
-}
-
-export function firstSlot(frame, piece, others) {
-  const span = piece.span || spanFor(piece.tag);
-  for (let row = 0; row <= frame.rows - span.r; row += 1) {
-    for (let col = 0; col <= frame.cols - span.c; col += 1) {
-      if (slotFits(frame, piece, col, row, others)) return { col, row };
-    }
-  }
-  return null;
 }
 
 export function makePiece(tag, index, form, inputType) {
@@ -114,20 +49,9 @@ export function makePiece(tag, index, form, inputType) {
     href: '#',
     src: '',
     host: '',
-    col: 0,
-    row: 0,
-    span: spanFor(tag),
     style: defaultStyle(tag),
   };
-  if (tag === 'div') {
-    piece.cols = 10;
-    piece.rows = 8;
-    piece.x = 180;
-    piece.y = 28;
-    const size = frameSize(piece);
-    piece.w = size.w;
-    piece.h = size.h;
-  }
+  if (tag === 'div') piece.text = 'กล่อง';
   return piece;
 }
 

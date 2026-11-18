@@ -16,36 +16,93 @@ button, input, textarea { font-family: inherit; }
   text-security: disc;
   caret-color: #1a73e8;
 }
-.piece {
-  position: absolute;
-  box-sizing: border-box;
+.stack-wrap {
+  display: flex;
+  justify-content: center;
+  min-height: 100%;
+  padding: 42px 20px 72px;
 }
-.piece.is-on {
-  outline: 2px solid #1a73e8;
-  outline-offset: 2px;
+.stack {
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
-.plate { position: absolute; overflow: hidden; }
-.stud {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border: 0;
-  border-radius: 999px;
-  padding: 0;
-  background: #d5dde6;
-  box-shadow: inset 0 -2px 0 rgba(23, 36, 61, 0.12);
+.vex {
+  position: relative;
   z-index: 1;
+  margin-top: 8px;
+  padding: 16px 18px 22px;
+  border: 1.5px solid #d5dde6;
+  box-shadow: 0 6px 0 rgba(23, 36, 61, 0.05);
+  cursor: grab;
+  user-select: none;
 }
-.stud:hover, .stud.is-hot { background: #1a73e8; }
-.piece.child { z-index: 2; }
-.tag-cap {
+.vex:first-child { margin-top: 0; }
+.vex.is-on {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35), 0 6px 0 rgba(23, 36, 61, 0.05);
+}
+.vex.is-dragging { opacity: 0.45; }
+.vex-tag {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+.vex-text { display: block; font-weight: 600; line-height: 1.4; }
+.vex-kind {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-weight: 700;
+}
+.vex-img {
+  display: block;
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+.nub {
   position: absolute;
-  top: -16px;
-  left: 8px;
-  font-size: 11px;
-  line-height: 14px;
-  color: #5c6570;
-  pointer-events: none;
+  left: 28px;
+  bottom: -9px;
+  width: 54px;
+  height: 16px;
+  border: 1.5px solid;
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  z-index: 2;
+}
+.snap-line {
+  height: 14px;
+  margin: 4px 18px;
+  border-radius: 999px;
+  background: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
+}
+.stack-empty, .stack-note {
+  margin: 0;
+  text-align: center;
+  color: #2c4a63;
+}
+.stack-empty {
+  padding: 54px 16px;
+  border: 2px dashed #93c5fd;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.72);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.stack-note {
+  margin-top: 22px;
+  font-size: 13px;
 }
 @media (max-width: 900px) {
   .entry-split { flex-direction: column; }
