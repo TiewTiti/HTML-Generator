@@ -1,6 +1,8 @@
 export const TEACHER_CODE = '759212';
 
-const STORE = 'login-studio-next-v1';
+const STORE = 'login-studio-next-v2';
+export const STUD = 36;
+export const PLATE_PAD = 18;
 const UNLOCK = 'login-studio-next-teacher';
 
 export const TAGS = ['div', 'p', 'a', 'input', 'button', 'img'];
@@ -45,23 +47,88 @@ function defaultText(tag, form, inputType) {
   return '';
 }
 
+export function spanFor(tag) {
+  if (tag === 'img') return { c: 3, r: 3 };
+  if (tag === 'a') return { c: 5, r: 1 };
+  if (tag === 'p') return { c: 8, r: 2 };
+  return { c: 8, r: 2 };
+}
+
+export function frameSize(frame) {
+  return {
+    w: PLATE_PAD * 2 + frame.cols * STUD,
+    h: PLATE_PAD * 2 + frame.rows * STUD,
+  };
+}
+
+export function childBox(piece) {
+  const span = piece.span || spanFor(piece.tag);
+  return {
+    x: PLATE_PAD + piece.col * STUD + 3,
+    y: PLATE_PAD + piece.row * STUD + 3,
+    w: span.c * STUD - 6,
+    h: span.r * STUD - 6,
+  };
+}
+
+function covers(piece, col, row) {
+  const span = piece.span || spanFor(piece.tag);
+  return col >= piece.col && col < piece.col + span.c && row >= piece.row && row < piece.row + span.r;
+}
+
+export function slotFits(frame, piece, col, row, others) {
+  const span = piece.span || spanFor(piece.tag);
+  if (col < 0 || row < 0 || col + span.c > frame.cols || row + span.r > frame.rows) return false;
+  return !others.some((item) => {
+    if (!item.host || item.host !== frame.id || item.id === piece.id) return false;
+    for (let r = row; r < row + span.r; r += 1) {
+      for (let c = col; c < col + span.c; c += 1) {
+        if (covers(item, c, r)) return true;
+      }
+    }
+    return false;
+  });
+}
+
+export function firstSlot(frame, piece, others) {
+  const span = piece.span || spanFor(piece.tag);
+  for (let row = 0; row <= frame.rows - span.r; row += 1) {
+    for (let col = 0; col <= frame.cols - span.c; col += 1) {
+      if (slotFits(frame, piece, col, row, others)) return { col, row };
+    }
+  }
+  return null;
+}
+
 export function makePiece(tag, index, form, inputType) {
   const kind = tag === 'input' ? (inputType || 'text') : 'text';
-  const y = 36 + index * 76;
-  const h = tag === 'p' || tag === 'a' ? 40 : tag === 'div' ? 120 : tag === 'img' ? 140 : 52;
-  return {
+  const piece = {
     id: 'el-' + (seq++),
     tag,
-    x: 330,
-    y,
-    w: tag === 'a' ? 220 : 440,
-    h,
+    x: 200,
+    y: 36 + index * 24,
+    w: 220,
+    h: 40,
     text: defaultText(tag, form, kind),
     inputType: kind,
     href: '#',
     src: '',
+    host: '',
+    col: 0,
+    row: 0,
+    span: spanFor(tag),
     style: defaultStyle(tag),
   };
+  if (tag === 'div') {
+    piece.cols = 10;
+    piece.rows = 8;
+    piece.x = 180;
+    piece.y = 28;
+    const size = frameSize(piece);
+    piece.w = size.w;
+    piece.h = size.h;
+  }
+  return piece;
 }
 
 export function blankState() {

@@ -1,4 +1,4 @@
-import { defaultStyle } from './model.js';
+import { childBox, frameSize, spanFor } from './model.js';
 
 const BRANDS = [
   { id: 'google', name: 'Google', mark: 'G', accent: '#1a73e8', page: '#ffffff', card: '#ffffff', text: '#202124', radius: 4 },
@@ -13,10 +13,17 @@ const BRANDS = [
   { id: 'youtube', name: 'YouTube', mark: 'Yt', accent: '#ff0000', page: '#f9f9f9', card: '#ffffff', text: '#0f0f0f', radius: 8 },
 ];
 
-function piece(id, tag, x, y, w, h, text, style, extra) {
-  return Object.assign({
-    id, tag, x, y, w, h, text, href: '#', src: '', inputType: 'text', style,
+function brick(id, tag, host, col, row, text, style, extra) {
+  const piece = Object.assign({
+    id, tag, host, col, row, span: spanFor(tag), text, href: '#', src: '', inputType: 'text', style,
+    x: 0, y: 0, w: 0, h: 0,
   }, extra || {});
+  const box = childBox(piece);
+  piece.x = box.x;
+  piece.y = box.y;
+  piece.w = box.w;
+  piece.h = box.h;
+  return piece;
 }
 
 export function templateList() {
@@ -32,23 +39,29 @@ export function piecesFor(brand, form) {
   const fieldBg = brand.page === '#121212' || brand.page === '#141414' ? '#222222' : '#ffffff';
   const fieldText = brand.page === '#121212' || brand.page === '#141414' ? '#ffffff' : '#1c2430';
   const id = brand.id + '-' + form;
+  const frame = {
+    id: id + '-card', tag: 'div', host: '', col: 0, row: 0, cols: 10, rows: 10,
+    text: '', href: '#', src: '', inputType: 'text', x: 220, y: 36, w: 0, h: 0,
+    style: { bg: lightCard, border: '#d5dde6', color: onCard, radius: 16, fontSize: 16 },
+  };
+  const size = frameSize(frame);
+  frame.w = size.w;
+  frame.h = size.h;
   return [
-    piece(id + '-card', 'div', 300, 70, 540, 480, '', {
-      bg: lightCard, border: 'transparent', color: onCard, radius: 16, fontSize: 16,
-    }),
-    piece(id + '-title', 'p', 340, 110, 460, 48, title, {
+    frame,
+    brick(id + '-title', 'p', frame.id, 1, 0, title, {
       bg: 'transparent', border: 'transparent', color: onCard, radius: 0, fontSize: 28,
     }),
-    piece(id + '-email', 'input', 340, 180, 460, 52, 'name@school.ac.th', {
+    brick(id + '-email', 'input', frame.id, 1, 2, 'name@school.ac.th', {
       bg: fieldBg, border: '#d5dde6', color: fieldText, radius: brand.radius, fontSize: 16,
     }, { inputType: 'email' }),
-    piece(id + '-pass', 'input', 340, 248, 460, 52, '••••••••', {
+    brick(id + '-pass', 'input', frame.id, 1, 4, '••••••••', {
       bg: fieldBg, border: '#d5dde6', color: fieldText, radius: brand.radius, fontSize: 16,
     }, { inputType: 'password' }),
-    piece(id + '-go', 'button', 340, 328, 460, 48, button, {
+    brick(id + '-go', 'button', frame.id, 1, 6, button, {
       bg: brand.accent, border: brand.accent, color: '#ffffff', radius: brand.radius, fontSize: 16,
     }),
-    piece(id + '-link', 'a', 340, 400, 220, 32, link, {
+    brick(id + '-link', 'a', frame.id, 1, 8, link, {
       bg: 'transparent', border: 'transparent', color: brand.accent, radius: 0, fontSize: 15,
     }),
   ];
@@ -60,5 +73,3 @@ export function applyBrand(brand, form) {
     page: { bg: brand.page, image: '' },
   };
 }
-
-export { defaultStyle };

@@ -16,25 +16,34 @@ function rule(p) {
   ].join(';');
 }
 
-function pieceHtml(p) {
+function pieceHtml(p, indent) {
   const id = esc(p.id);
   const style = rule(p);
-  if (p.tag === 'p') return `    <p class="piece" id="${id}" style="${style}">${esc(p.text)}</p>`;
-  if (p.tag === 'a') return `    <a class="piece" id="${id}" href="${esc(p.href || '#')}" style="${style}">${esc(p.text)}</a>`;
-  if (p.tag === 'button') return `    <button class="piece" id="${id}" type="submit" style="${style}">${esc(p.text)}</button>`;
+  const pad = indent || '    ';
+  if (p.tag === 'p') return `${pad}<p class="piece" id="${id}" style="${style}">${esc(p.text)}</p>`;
+  if (p.tag === 'a') return `${pad}<a class="piece" id="${id}" href="${esc(p.href || '#')}" style="${style}">${esc(p.text)}</a>`;
+  if (p.tag === 'button') return `${pad}<button class="piece" id="${id}" type="submit" style="${style}">${esc(p.text)}</button>`;
   if (p.tag === 'img') {
     const src = p.src ? ` src="${esc(p.src)}"` : '';
-    return `    <img class="piece" id="${id}" alt=""${src} style="${style};object-fit:cover">`;
+    return `${pad}<img class="piece" id="${id}" alt=""${src} style="${style};object-fit:cover">`;
   }
   if (p.tag === 'input') {
     const type = p.inputType === 'password' || p.inputType === 'email' ? p.inputType : 'text';
-    return `    <input class="piece" id="${id}" type="${type}" placeholder="${esc(p.text)}" style="${style}">`;
+    return `${pad}<input class="piece" id="${id}" type="${type}" placeholder="${esc(p.text)}" style="${style}">`;
   }
-  return `    <div class="piece" id="${id}" style="${style}"></div>`;
+  return `${pad}<div class="piece" id="${id}" style="${style}"></div>`;
+}
+
+function plateHtml(frame, pieces) {
+  const kids = pieces.filter((item) => item.host === frame.id).map((item) => pieceHtml(item, '      ')).join('\n');
+  return `    <div class="piece plate" id="${esc(frame.id)}" style="${rule(frame)}">\n${kids}\n    </div>`;
 }
 
 export function htmlSource(pieces) {
-  const body = pieces.map(pieceHtml).join('\n');
+  const body = pieces
+    .filter((item) => !item.host)
+    .map((item) => (item.tag === 'div' && item.cols ? plateHtml(item, pieces) : pieceHtml(item)))
+    .join('\n');
   return `<form class="sheet">\n${body}\n</form>`;
 }
 
