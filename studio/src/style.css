@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@plugin "@iconify/tailwind4";
+
+html, body, #app {
+  height: 100%;
+  margin: 0;
+}
+body {
+  font-family: "Sarabun", "Noto Sans Thai", sans-serif;
+  color: #1c2430;
+  background: #f3f5f8;
+}
+button, input, textarea { font-family: inherit; }
+.otp-box {
+  -webkit-text-security: disc;
+  text-security: disc;
+  caret-color: #1a73e8;
+}
+.piece {
+  position: absolute;
+  box-sizing: border-box;
+}
+.piece.is-on {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
+}
+.tag-cap {
+  position: absolute;
+  top: -16px;
+  left: 8px;
+  font-size: 11px;
+  line-height: 14px;
+  color: #5c6570;
+  pointer-events: none;
+}
+@media (max-width: 900px) {
+  .entry-split { flex-direction: column; }
+  .entry-split h1 { font-size: 48px !important; }
+  header nav { position: static !important; width: auto !important; margin-left: 12px; }
+  header img[src$="caret.svg"] { display: none; }
+  .work-row { flex-direction: column; }
+  .side-panel { width: 100%; height: auto; }
+}
