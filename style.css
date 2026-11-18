@@ -6,40 +6,38 @@
    ========================================================================== */
 :root {
   /* Soft light admin ground (mint-ish) + soft blue accent system */
-  --bg-app: #f4f6f5;
-  --bg-app-deep: #e9efef;
-  --bg-hero: #ffffff;
+  --bg-app: #f4f7f5;
+  --bg-app-deep: #e7eef0;
+  --bg-hero: #f4f7f5;
   --surface-panel: #ffffff;
-  --surface-subtle: #f7f9fb;
-  --surface-glass: rgba(255, 255, 255, 0.84);
-  --border-color: rgba(15, 23, 42, 0.08);
-  --border-hairline: rgba(15, 23, 42, 0.055);
-  --border-hover: rgba(15, 23, 42, 0.14);
-  --border-soft: #e8eef3;
+  --surface-subtle: #f4f8fc;
+  --surface-glass: #ffffff;
+  --border-color: #d3e0f0;
+  --border-hairline: #d3e0f0;
+  --border-hover: #8fb4de;
+  --border-soft: #d3e0f0;
 
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --text-tertiary: #94a3b8;
+  --text-main: #10233f;
+  --text-muted: #3e5674;
+  --text-tertiary: #3e5674;
   --text-inverse: #ffffff;
 
-  /* Soft blue family — friendly product accent (not rejected cool-slate sapphire lux) */
-  --accent-primary: #3b82f6;
-  --accent-hover: #2563eb;
-  --accent-pressed: #1d4ed8;
-  --accent-light: rgba(59, 130, 246, 0.12);
-  --accent-deep: #1e40af;
-  --accent-tint: #eff6ff;
-  --accent-soft: #dbeafe;
-  --accent-spark: #60a5fa;
-  --accent-spark-soft: rgba(59, 130, 246, 0.18);
+  --accent-primary: #1b4f86;
+  --accent-hover: #163f6c;
+  --accent-pressed: #062e5c;
+  --accent-light: #e7f0fa;
+  --accent-deep: #1b4f86;
+  --accent-tint: #f4f8fc;
+  --accent-soft: #d6e6f8;
+  --accent-spark: #1b4f86;
+  --accent-spark-soft: #e7f0fa;
 
-  --success-color: #22c55e;
+  --success-color: #1b4f86;
   --sky-color: var(--accent-primary);
-  --danger: #ef4444;
+  --danger: #9f1239;
 
-  /* Chrome UI: Apple SF first; Noto Sans Thai before Latin-only fallbacks (fixes Thai เพี้ยน) */
-  --font-main: -apple-system, BlinkMacSystemFont, "SF Pro TH", "SF Pro Text", "Noto Sans Thai", "Segoe UI", "Helvetica Neue", sans-serif;
-  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro TH", "SF Pro Display", "SF Pro Text", "Noto Sans Thai", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-main: "Sarabun", "Noto Sans Thai", sans-serif;
+  --font-display: "Chakra Petch", "Sarabun", sans-serif;
   --radius-panel: 24px;
   --radius-control: 14px;
   --radius-dock: 18px;
@@ -760,10 +758,16 @@ body {
   }
 }
 body.layout-b .canvas-zoom-stage {
-  display: grid;
-  place-items: center;
-  grid-template-columns: 1fr;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  width: 100%;
   gap: 0;
+}
+body.layout-b .canvas-preview-card,
+body.layout-b .empty-canvas-state {
+  margin-inline: auto;
 }
 body.layout-b .canvas-dropzone {
   /* Keep zoomed stage inside the board; allow pan/scroll instead of clipping shell */
@@ -1182,8 +1186,8 @@ body.layout-b .canvas-dropzone {
 
 .canvas-item.drop-before { box-shadow: 0 -3px 0 0 var(--sky-color), var(--shadow-sm); }
 .canvas-item.drop-after { box-shadow: 0 3px 0 0 var(--sky-color), var(--shadow-sm); }
-.canvas-item.drop-side-left { box-shadow: inset 3px 0 0 0 var(--accent-primary), var(--shadow-sm); }
-.canvas-item.drop-side-right { box-shadow: inset -3px 0 0 0 var(--accent-primary), var(--shadow-sm); }
+.canvas-item.drop-side-left,
+.canvas-item.drop-side-right { outline: 2px solid var(--accent-primary); outline-offset: -2px; box-shadow: var(--shadow-sm); }
 
 /* จอสัมผัส: เป้าแตะใหญ่ขึ้น — โชว์ควบคุมเฉพาะชิ้นที่เลือก */
 @media (hover: none), (pointer: coarse) {
@@ -1576,7 +1580,7 @@ body.layout-b .canvas-dropzone {
   gap: 3px;
   padding: 5px 6px;
   background-color: var(--card-bg);
-  border: 1px solid var(--card-edge);
+  border: 0;
   border-radius: calc(var(--card-radius) * 0.6);
   -webkit-backdrop-filter: blur(calc(var(--card-blur) * 0.35));
   backdrop-filter: blur(calc(var(--card-blur) * 0.35));
@@ -2391,8 +2395,9 @@ body.layout-b .canvas-dropzone {
 
 .target-count {
   font-weight: 600;
-  opacity: 0.75;
-  font-size: 0.9em;
+  opacity: 1;
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
 /* Empty canvas onboarding */
@@ -3508,4 +3513,295 @@ body.layout-b .tiew-bot {
     min-height: 420px;
     padding: 24px 16px 110px;
   }
+}
+
+/* รีโมเดลห้องเรียน: พื้นขาว น้ำเงินนำทาง ฟอนต์ป้ายด่าน */
+::selection { background: #d6e6f8; color: #10233f; }
+
+h1, h2, h3, h4,
+.brand-nav-name,
+.btn,
+.dock-btn,
+.group-name,
+.css-delivery-btn {
+  font-family: var(--font-display);
+  letter-spacing: 0;
+}
+
+body.layout-b .app-header {
+  background: #ffffff;
+  background-color: #ffffff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  height: 72px;
+  min-height: 72px;
+  border-bottom: 1px solid #d3e0f0;
+}
+
+body.layout-b .brand-icon {
+  width: 36px;
+  height: 52px;
+  border-radius: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  overflow: hidden;
+}
+body.layout-b .brand-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transform: none;
+}
+body.layout-b .brand-nav-name {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.brand-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.brand-nav-name {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.header-meta {
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: #1b4f86;
+  border: 1.5px solid #1b4f86;
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+.template-backdrop { display: none !important; }
+
+.studio-hero,
+body.layout-b .studio-hero {
+  padding: 18px 28px 14px;
+  text-align: left;
+}
+
+.studio-hero::before,
+body.layout-b .studio-hero::before { display: none; }
+
+.studio-hero-title {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-shadow: none;
+  line-height: 1.2;
+}
+
+.studio-hero-sub {
+  margin: 0 0 14px;
+  max-width: 40em;
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: left;
+  color: #3e5674;
+}
+
+.hero-cta { justify-content: flex-start; }
+.gated-lock-ico { display: none; }
+
+body.layout-b .btn { min-height: 44px; }
+body.layout-b .btn-primary,
+body.layout-b .btn-sky,
+body.layout-b .btn-success,
+body.layout-b .hero-cta .btn-primary,
+body.layout-b .hero-cta .btn-ghost {
+  border-radius: 8px;
+}
+body.layout-b .btn-primary,
+body.layout-b .btn-sky,
+body.layout-b .btn-success,
+body.layout-b .hero-cta .btn-primary {
+  background-color: #1b4f86;
+  color: #ffffff;
+}
+.btn-primary:hover,
+.btn-sky:hover,
+.btn-success:hover { background-color: #083e7a; }
+
+body.layout-b .dock {
+  background: #ffffff;
+  border: 1px solid #d3e0f0;
+  box-shadow: 0 10px 24px rgba(16, 35, 63, 0.08);
+  backdrop-filter: none;
+}
+
+.dock-ico { display: none; }
+body.layout-b .dock-btn {
+  flex-direction: row;
+  min-height: 44px;
+  min-width: 44px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+body.layout-b .dock-btn.on {
+  background: #1b4f86;
+  color: #ffffff;
+}
+
+.theme-swatch {
+  border: 2px solid #243b5a;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+}
+.theme-preset-card:disabled {
+  cursor: not-allowed;
+  background: #f4f7fb;
+}
+.theme-preset-card:disabled:hover { border-color: #d3e0f0; }
+.theme-hint { font-size: 12px; }
+
+body.layout-b .code-exporter-panel {
+  background: #ffffff;
+  color: #10233f;
+  border: 1px solid #d3e0f0;
+}
+.exporter-title h3 {
+  color: #10233f;
+  font-size: 22px;
+}
+.exporter-title p { color: #3e5674; }
+
+.split-export {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.split-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid #d3e0f0;
+  border-radius: 12px;
+  background: #f4f8fc;
+}
+.split-card h4 {
+  margin: 0;
+  font-size: 18px;
+  color: #10233f;
+}
+.split-card p {
+  margin: 0;
+  font-family: var(--font-main);
+  font-size: 14px;
+  line-height: 1.5;
+  color: #3e5674;
+}
+.css-delivery { display: flex; flex-wrap: wrap; gap: 8px; }
+.css-delivery-btn {
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1.5px solid #1b4f86;
+  background: #ffffff;
+  color: #1b4f86;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.css-delivery-btn.active {
+  background: #1b4f86;
+  color: #ffffff;
+}
+.css-link-note { font-size: 13px !important; }
+
+.step-path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+.step-arrow {
+  color: #5c6570;
+  font-size: 18px;
+  line-height: 1;
+}
+.step-path button {
+  position: relative;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #1b4f86;
+  background: #ffffff;
+  color: #1b4f86;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+.step-path button[aria-current="step"]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  transform: translateX(-50%);
+  border-width: 7px 6px 0;
+  border-style: solid;
+  border-color: #1b4f86 transparent transparent;
+}
+body.layout-b .step-path button[aria-current="step"],
+body.layout-b .dock-btn.on,
+body.layout-b .dock-btn.on .dock-label {
+  background: #1b4f86;
+  color: #ffffff;
+}
+.form-switch {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  border-radius: 999px;
+  background: #e7eef0;
+  border: 1px solid #d5e0dc;
+}
+.form-switch-btn {
+  min-height: 32px;
+  padding: 4px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #2c4a63;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.form-switch-btn.on {
+  background: #1b4f86;
+  color: #ffffff;
+}
+.toolbar-left,
+.canvas-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hero-cta { flex-wrap: wrap; align-items: center; gap: 10px; }
+.hero-lock-hint { flex-basis: 100%; margin: 0; }
+.studio-hero-title { font-size: 28px; }
+
+@media (max-width: 800px) {
+  .split-export { grid-template-columns: 1fr; }
+  .studio-hero-title { font-size: 24px; }
+  body.layout-b .brand-nav-name { font-size: 13px; }
 }

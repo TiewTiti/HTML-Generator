@@ -126,6 +126,13 @@ const CARD_CSS = `
   transition: filter .2s ease;
 }
 .form-btn:hover{ filter: brightness(.93); }
+.form-btn-outline{
+  margin-top: 12px;
+  background-color: transparent;
+  color: var(--card-accent, #2563eb);
+  border: 1px solid var(--card-accent, #2563eb);
+}
+.form-btn-outline:hover{ filter: none; background-color: var(--card-accent-soft, rgba(37,99,235,.12)); }
 .form-check{ display: flex; align-items: center; gap: 8px; font-size: 13px; }
 .form-divider{ border: 0; border-top: 1px solid var(--card-border, #cbd5e1); margin: 2px 0; }
 
@@ -210,7 +217,7 @@ const DEFAULT_CONFIG = () => ({
   // พื้นหลัง: ถ้าไม่มีรูป (ทั้ง URL และรูปที่ฝังจากเครื่อง) จะใช้ไล่สีนี้
   bgImageUrl: '',
   bgImageData: '',
-  bgGradient: 'linear-gradient(135deg, #1d4ed8, #0f172a)',
+  bgGradient: 'linear-gradient(180deg, #f4f7f5, #e7eef0)',
   cardOpacity: 95,
   cardBlur: 16,
   cardRadius: 16,
@@ -705,6 +712,11 @@ function updateTargetChrome() {
   const regBtn = document.getElementById('target-register-btn');
   if (loginBtn) loginBtn.classList.toggle('active', builderTarget === 'login');
   if (regBtn) regBtn.classList.toggle('active', builderTarget === 'register');
+  document.querySelectorAll('.form-switch-btn').forEach((btn) => {
+    const on = btn.dataset.target === builderTarget;
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
   syncDockHighlight();
 }
 
@@ -1029,6 +1041,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindTeacherOtpInputs();
   initTiewBot();
   syncDockHighlight();
+  paintStep();
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       const otp = document.getElementById('teacher-otp-modal');
@@ -1054,9 +1067,10 @@ function switchMainStep(step) {
   });
   if (step === 2) {
     renderStudioPreviewStage();
-    tipTiewBot('step2', 'ครูชิโร่: เลือกสีทีละช่องได้ — ชุดธีมใช้ได้เมื่อครูปลดล็อก');
+    tipTiewBot('step2', 'ครูชิโร่: เลือกเว็บต้นแบบได้เมื่อครูปลดล็อก แต่งสีเองได้เลย');
   }
   syncDockHighlight();
+  paintStep();
 }
 
 function syncDockHighlight() {
@@ -1091,14 +1105,16 @@ function setDockMode(mode) {
     // scroll color panel into view lightly
     const controls = document.querySelector('.studio-controls-sidebar');
     if (controls && controls.scrollIntoView) controls.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    tipTiewBot('dock-color', 'ครูชิโร่: เลือกสีทีละช่องได้');
+    tipTiewBot('dock-color', 'ครูชิโร่: เลือกเว็บที่อยากให้หน้าตาคล้าย หรือแต่งสีเอง');
+    const themeBody = document.getElementById('group-theme-body');
+    if (themeBody && themeBody.hidden) toggleGroup('theme');
   } else if (mode === 'export') {
     switchMainStep(2);
     if (isPanelOpen('controls')) togglePanel('controls');
     const codePanel = document.querySelector('.code-exporter-panel');
     if (codePanel && codePanel.scrollIntoView) codePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (!isPanelOpen('code')) togglePanel('code');
-    tipTiewBot('dock-export', 'ครูชิโร่: คัดลอกหรือดาวน์โหลด HTML ได้ด้านล่าง');
+    tipTiewBot('dock-export', 'ครูชิโร่: คัดลอก HTML กับ CSS แยกกัน แล้วนำไปวางในโปรเจกต์');
   } else if (mode === 'login') {
     switchMainStep(1);
     setBuilderTarget('login');
@@ -1109,18 +1125,54 @@ function setDockMode(mode) {
     openTeacherUnlockModal();
   }
   syncDockHighlight();
+  paintStep();
+}
+
+function paintStep() {
+  const mode = dockMode === 'export' ? 'export' : dockMode === 'color' ? 'color' : 'structure';
+  const copy = {
+    structure: ['วางช่องบนกระดาน', 'กระดานว่างไว้ให้ทำเอง สลับเข้าสู่ระบบกับสมัครบนหน้านี้ แล้วสีของทั้งสองหน้าจะอยู่ในไฟล์เดียวกัน', 'ต่อไป CSS'],
+    color: ['เลือกเว็บที่อยากให้หน้าตาคล้าย', 'แต่ละใบคือการตกแต่งแบบเว็บนั้น ทั้งสี รูปทรง และการขยับ แต่งสีเองได้ตลอด', 'ต่อไป code'],
+    export: ['แยกโครงกับสีออกไปใช้', 'คัดลอกโครง HTML แล้วเลือกใส่สีในหน้าเดียวกัน หรือแยกเป็น file.css', '']
+  };
+  const row = copy[mode];
+  const title = document.getElementById('step-now-title');
+  const sub = document.getElementById('step-now-sub');
+  const next = document.getElementById('step-next-btn');
+  if (title) title.textContent = row[0];
+  if (sub) sub.textContent = row[1];
+  if (next) {
+    next.hidden = !row[2];
+    next.textContent = row[2] || 'ต่อไป';
+  }
+  document.querySelectorAll('[data-step1-only]').forEach((el) => {
+    el.hidden = mode !== 'structure';
+  });
+  document.querySelectorAll('.step-path button').forEach((btn) => {
+    if (btn.dataset.step === mode) btn.setAttribute('aria-current', 'step');
+    else btn.removeAttribute('aria-current');
+  });
+}
+
+function goNextStep() {
+  if (dockMode === 'color') setDockMode('export');
+  else if (dockMode !== 'export') setDockMode('color');
 }
 
 function setBuilderTarget(target) {
-  if (target === builderTarget) return;
+  if (target !== 'login' && target !== 'register') return;
+  if (target === builderTarget && previewView === target) return;
   builderTarget = target;
+  previewView = target;
   selectedElementId = null;
   updateTargetChrome();
   renderCanvas();
   renderInspector();
-  const name = target === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-  const other = target === 'login' ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ';
-  toast(`สลับไป${name}แล้ว — งาน${other}ยังอยู่`);
+  const card = document.getElementById('preview-card-wrapper');
+  if (card) switchPreviewPane(card, target);
+  const name = target === 'login' ? 'เข้าสู่ระบบ' : 'สมัคร';
+  const other = target === 'login' ? 'สมัคร' : 'เข้าสู่ระบบ';
+  toast(`สลับไป${name}แล้ว — งาน${other}ยังอยู่ และส่งออกในไฟล์เดียวกัน`);
 }
 
 function getActiveList() {
@@ -1378,8 +1430,8 @@ function renderCanvas() {
     const targetName = builderTarget === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
     stage.innerHTML = `<div class="empty-canvas-state">
       <span class="empty-canvas-icon" aria-hidden="true">+</span>
-      <p class="empty-canvas-title">ยังไม่มีช่องในฟอร์ม${esc(targetName)}</p>
-      <p class="empty-canvas-sub">เริ่มจากแบบตัวอย่าง หรือเพิ่มช่องเอง</p>
+      <p class="empty-canvas-title">หน้า${esc(targetName)}ยังว่าง</p>
+      <p class="empty-canvas-sub">เพิ่มช่องเองจากแถบเครื่องมือ แล้วสลับไปทำอีกหน้าบนกระดานนี้</p>
       <div class="empty-canvas-actions">
         <button type="button" class="btn btn-primary teacher-gated-btn teacher-gated-cta${isTeacherUnlocked() ? '' : ' is-locked'}"
                 onclick="requestLoadDefaultForm()" aria-disabled="${isTeacherUnlocked() ? 'false' : 'true'}">
@@ -1717,7 +1769,8 @@ function buildAuthMarkup(opts = {}) {
   const pane = (view, list) => `
       <form class="auth-form auth-view-pane ${previewView === view ? 'active' : ''}" role="tabpanel" data-pane="${view}">
         <div class="pane-content">${renderFormFields(list, scope)}
-        </div>
+        </div>${view === 'login' ? `
+        <button type="button" class="form-btn form-btn-outline to-register" data-view="register">ไปหน้าสมัคร</button>` : ''}
       </form>`;
 
   return `${tabs}
@@ -1775,7 +1828,7 @@ function renderFormFields(list, scope = '') {
 // ผูกปุ่มสลับหน้าให้ "การ์ดหนึ่งใบ" (ใช้ได้ทั้งหน้าตัวอย่างและ modal โดยไม่ชนกัน)
 function bindCard(card) {
   card.addEventListener('click', (e) => {
-    const tab = e.target.closest('.switcher-tab');
+    const tab = e.target.closest('.switcher-tab, .to-register');
     if (tab) switchPreviewPane(card, tab.dataset.view);
   });
   // ในหน้าตัวอย่างไม่ให้ฟอร์มส่งข้อมูลจริง (ไม่มีหลังบ้าน) แต่ยังโชว์ผลการตรวจ required
@@ -1984,84 +2037,84 @@ function fontChoice(stack) {
 // ==========================================================================
 const THEME_PRESETS = {
   corporate: {
-    label: 'Corporate Slate', hint: 'ทางการ เรียบ เทา-น้ำเงิน',
-    accent: '#2563eb', cardBg: '#ffffff', text: '#0f172a', border: '#cbd5e1',
-    edge: 'rgba(255,255,255,.5)', shadow: '0 20px 25px -5px rgba(15,23,42,.3)',
-    inputBg: '#ffffff', muted: '#64748b', switcherBg: 'rgba(15,23,42,.06)',
-    radius: 16, blur: 16, opacity: 95, font: 'Prompt', switcherStyle: 'tabs', transitionFx: 'slide',
-    gradient: 'linear-gradient(135deg, #1d4ed8, #0f172a)'
+    label: 'Google', hint: 'ตกแต่งคล้ายเว็บ Google ขาว ปุ่มน้ำเงิน มุมน้อย',
+    accent: '#1a73e8', cardBg: '#ffffff', text: '#202124', border: '#dadce0',
+    edge: 'rgba(32,33,36,.08)', shadow: '0 1px 2px rgba(60,64,67,.3), 0 1px 3px rgba(60,64,67,.15)',
+    inputBg: '#ffffff', muted: '#5f6368', switcherBg: '#f1f3f4',
+    radius: 8, blur: 0, opacity: 100, font: 'Inter', switcherStyle: 'minimal', transitionFx: 'fade',
+    gradient: 'linear-gradient(180deg, #ffffff, #f8f9fa)'
   },
   minimal: {
-    label: 'Minimal Clean', hint: 'ขาวสะอาด มนน้อย ไม่เบลอ',
-    accent: '#18181b', cardBg: '#ffffff', text: '#09090b', border: '#e4e4e7',
-    edge: 'rgba(9,9,11,.12)', shadow: '0 2px 10px rgba(9,9,11,.08)',
-    inputBg: '#fafafa', muted: '#71717a', switcherBg: 'transparent',
-    radius: 4, blur: 0, opacity: 100, font: 'system', switcherStyle: 'minimal', transitionFx: 'fade',
-    gradient: 'linear-gradient(135deg, #f4f4f5, #d4d4d8)'
+    label: 'Apple', hint: 'ตกแต่งคล้ายเว็บ Apple ขาว ตัวใหญ่ ช่องว่างเยอะ',
+    accent: '#0071e3', cardBg: '#ffffff', text: '#1d1d1f', border: '#d2d2d7',
+    edge: 'rgba(29,29,31,.08)', shadow: '0 8px 24px rgba(0,0,0,.06)',
+    inputBg: '#fbfbfd', muted: '#6e6e73', switcherBg: 'transparent',
+    radius: 18, blur: 0, opacity: 100, font: 'system', switcherStyle: 'minimal', transitionFx: 'fade',
+    gradient: 'linear-gradient(180deg, #f5f5f7, #ffffff)'
   },
   resort: {
-    label: 'Resort Sky', hint: 'ฟ้าทะเล การ์ดมนมาก โปร่งแสง',
-    accent: '#0284c7', cardBg: '#ffffff', text: '#0c4a6e', border: '#7dd3fc',
-    edge: 'rgba(255,255,255,.65)', shadow: '0 24px 40px -12px rgba(2,132,199,.45)',
-    inputBg: '#f0f9ff', muted: '#0369a1', switcherBg: 'rgba(2,132,199,.1)',
-    radius: 26, blur: 18, opacity: 88, font: 'Prompt', switcherStyle: 'pill', transitionFx: 'slide',
-    gradient: 'linear-gradient(160deg, #38bdf8, #0369a1 60%, #082f49)'
+    label: 'Airbnb', hint: 'ตกแต่งคล้ายเว็บ Airbnb ขาว ปุ่มชมพูอมแดง มุมโค้ง',
+    accent: '#ff385c', cardBg: '#ffffff', text: '#222222', border: '#b0b0b0',
+    edge: 'rgba(255,56,92,.2)', shadow: '0 6px 16px rgba(0,0,0,.08)',
+    inputBg: '#ffffff', muted: '#717171', switcherBg: '#f7f7f7',
+    radius: 14, blur: 0, opacity: 100, font: 'Prompt', switcherStyle: 'pill', transitionFx: 'slide',
+    gradient: 'linear-gradient(180deg, #ffffff, #ffffff)'
   },
   tech: {
-    label: 'Tech Indigo', hint: 'ครามนีออน ฟอนต์ Inter พลิกการ์ด',
-    accent: '#4f46e5', cardBg: '#ffffff', text: '#1e1b4b', border: '#c7d2fe',
-    edge: 'rgba(199,210,254,.55)', shadow: '0 26px 44px -14px rgba(79,70,229,.5)',
-    inputBg: '#f5f3ff', muted: '#6366f1', switcherBg: 'rgba(79,70,229,.12)',
-    radius: 12, blur: 22, opacity: 88, font: 'Inter', switcherStyle: 'sliding', transitionFx: 'flip',
-    gradient: 'linear-gradient(135deg, #312e81, #0f172a)'
+    label: 'Microsoft', hint: 'ตกแต่งคล้ายเว็บ Microsoft ขาว น้ำเงิน มุมเหลี่ยม',
+    accent: '#0067b8', cardBg: '#ffffff', text: '#1b1b1b', border: '#8a8886',
+    edge: 'rgba(15,108,189,.18)', shadow: '0 2px 8px rgba(0,0,0,.08)',
+    inputBg: '#ffffff', muted: '#616161', switcherBg: '#f5f5f5',
+    radius: 4, blur: 0, opacity: 100, font: 'Inter', switcherStyle: 'tabs', transitionFx: 'fade',
+    gradient: 'linear-gradient(180deg, #f2f2f2, #ffffff)'
   },
   pastel: {
-    label: 'Soft Pastel', hint: 'พาสเทลชมพู นุ่ม ปุ่มแคปซูล',
-    accent: '#ec4899', cardBg: '#fff5f9', text: '#831843', border: '#fbcfe8',
-    edge: 'rgba(236,72,153,.25)', shadow: '0 18px 30px -12px rgba(236,72,153,.4)',
-    inputBg: '#ffffff', muted: '#a21caf', switcherBg: 'rgba(236,72,153,.1)',
-    radius: 20, blur: 10, opacity: 96, font: 'Prompt', switcherStyle: 'pill', transitionFx: 'bounce',
-    gradient: 'linear-gradient(135deg, #fda4af, #fbcfe8 45%, #c7d2fe)'
+    label: 'Instagram', hint: 'ตกแต่งคล้ายหน้าเข้าสู่ระบบ Instagram พื้นอ่อน ขอบเทา ปุ่มฟ้า',
+    accent: '#0095f6', cardBg: '#ffffff', text: '#262626', border: '#dbdbdb',
+    edge: 'rgba(225,48,108,.25)', shadow: '0 8px 24px rgba(225,48,108,.16)',
+    inputBg: '#fafafa', muted: '#8e8e8e', switcherBg: '#fafafa',
+    radius: 12, blur: 0, opacity: 100, font: 'Prompt', switcherStyle: 'pill', transitionFx: 'slide',
+    gradient: 'linear-gradient(180deg, #fafafa, #ffffff)'
   },
   slate: {
-    label: 'Deep Slate', hint: 'เทาเข้มจริงจัง แท็บมินิมอล จางนุ่ม',
-    accent: '#0f172a', cardBg: '#f8fafc', text: '#0f172a', border: '#94a3b8',
-    edge: 'rgba(15,23,42,.22)', shadow: '0 14px 28px -14px rgba(2,6,23,.6)',
-    inputBg: '#ffffff', muted: '#475569', switcherBg: 'rgba(15,23,42,.08)',
-    radius: 8, blur: 8, opacity: 98, font: 'Inter', switcherStyle: 'minimal', transitionFx: 'fade',
-    gradient: 'linear-gradient(135deg, #334155, #020617)'
+    label: 'GitHub', hint: 'ตกแต่งคล้ายหน้าเข้าสู่ระบบ GitHub พื้นอ่อน ขอบเทา ปุ่มเขียว',
+    accent: '#1f883d', cardBg: '#ffffff', text: '#1f2328', border: '#d0d7de',
+    edge: 'rgba(208,215,222,.95)', shadow: '0 1px 3px rgba(31,35,40,.08)',
+    inputBg: '#ffffff', muted: '#59636e', switcherBg: '#f6f8fa',
+    radius: 6, blur: 0, opacity: 100, font: 'Inter', switcherStyle: 'minimal', transitionFx: 'fade',
+    gradient: 'linear-gradient(180deg, #f6f8fa, #ffffff)'
   },
   retro: {
-    label: 'Warm Cream', hint: 'ครีมอุ่น ฟอนต์ Kanit คมเหลี่ยม',
-    accent: '#d97706', cardBg: '#fffbeb', text: '#78350f', border: '#d6b98c',
-    edge: 'rgba(120,53,15,.35)', shadow: '8px 8px 0 rgba(120,53,15,.18)',
-    inputBg: '#fffdf5', muted: '#92400e', switcherBg: 'rgba(217,119,6,.14)',
-    radius: 4, blur: 0, opacity: 100, font: 'Kanit', switcherStyle: 'tabs', transitionFx: 'slide',
-    gradient: 'linear-gradient(135deg, #fef3c7, #f59e0b 55%, #b45309)'
+    label: 'Notion', hint: 'ตกแต่งคล้ายเว็บ Notion กระดาษอุ่น ตัวเข้ม มุมน้อย',
+    accent: '#37352f', cardBg: '#ffffff', text: '#37352f', border: '#e6e4e0',
+    edge: 'rgba(55,53,47,.12)', shadow: '0 1px 2px rgba(55,53,47,.08)',
+    inputBg: '#f7f6f3', muted: '#787774', switcherBg: '#f7f6f3',
+    radius: 4, blur: 0, opacity: 100, font: 'Sarabun', switcherStyle: 'tabs', transitionFx: 'fade',
+    gradient: 'linear-gradient(180deg, #ffffff, #f7f6f3)'
   },
   eco: {
-    label: 'Eco Emerald', hint: 'เขียวธรรมชาติ Sarabun ค่อยจาง',
-    accent: '#059669', cardBg: '#ffffff', text: '#064e3b', border: '#6ee7b7',
-    edge: 'rgba(5,150,105,.25)', shadow: '0 18px 32px -14px rgba(5,150,105,.45)',
-    inputBg: '#f0fdf4', muted: '#047857', switcherBg: 'rgba(5,150,105,.1)',
-    radius: 14, blur: 6, opacity: 97, font: 'Sarabun', switcherStyle: 'pill', transitionFx: 'fade',
-    gradient: 'linear-gradient(135deg, #34d399, #059669 55%, #064e3b)'
+    label: 'Spotify', hint: 'ตกแต่งคล้ายเว็บ Spotify พื้นดำ ปุ่มเขียว',
+    accent: '#1db954', cardBg: '#181818', text: '#ffffff', border: '#727272',
+    edge: 'rgba(29,185,84,.35)', shadow: '0 8px 24px rgba(0,0,0,.28)',
+    inputBg: '#121212', muted: '#b3b3b3', switcherBg: '#181818',
+    radius: 8, blur: 0, opacity: 100, font: 'Inter', switcherStyle: 'pill', transitionFx: 'fade',
+    gradient: 'linear-gradient(180deg, #1e1e1e, #121212)'
   },
   glassdark: {
-    label: 'Dark Glass', hint: 'การ์ดเข้ม เบลอจัด เงาลึก',
-    accent: '#38bdf8', cardBg: '#0b1220', text: '#e2e8f0', border: 'rgba(148,163,184,.45)',
-    edge: 'rgba(255,255,255,.18)', shadow: '0 30px 60px -20px rgba(0,0,0,.75)',
-    inputBg: 'rgba(15,23,42,.55)', muted: '#94a3b8', switcherBg: 'rgba(255,255,255,.09)',
-    radius: 22, blur: 28, opacity: 45, font: 'Prompt', switcherStyle: 'pill', transitionFx: 'zoom',
-    gradient: 'linear-gradient(135deg, #0f172a, #1e293b 50%, #020617)'
+    label: 'Netflix', hint: 'ตกแต่งคล้ายเว็บ Netflix พื้นดำ ปุ่มแดง ตัวขาว',
+    accent: '#e50914', cardBg: '#181818', text: '#ffffff', border: '#808080',
+    edge: 'rgba(229,9,20,.28)', shadow: '0 12px 28px rgba(0,0,0,.35)',
+    inputBg: '#333333', muted: '#b3b3b3', switcherBg: '#222222',
+    radius: 4, blur: 0, opacity: 100, font: 'Prompt', switcherStyle: 'minimal', transitionFx: 'fade',
+    gradient: 'linear-gradient(180deg, #2a2a2a, #141414)'
   },
   sunset: {
-    label: 'Sunset Glow', hint: 'ส้มตะวันตกดิน Kanit เงานุ่ม',
-    accent: '#f97316', cardBg: '#fff7ed', text: '#7c2d12', border: '#fdba74',
-    edge: 'rgba(249,115,22,.3)', shadow: '0 26px 50px -18px rgba(249,115,22,.55)',
-    inputBg: '#ffffff', muted: '#c2410c', switcherBg: 'rgba(249,115,22,.12)',
-    radius: 28, blur: 12, opacity: 94, font: 'Kanit', switcherStyle: 'sliding', transitionFx: 'zoom',
-    gradient: 'linear-gradient(135deg, #fb7185, #f97316 50%, #7c2d12)'
+    label: 'YouTube', hint: 'ตกแต่งคล้ายเว็บ YouTube ขาว ปุ่มแดง มุมมน',
+    accent: '#ff0000', cardBg: '#ffffff', text: '#0f0f0f', border: '#cccccc',
+    edge: 'rgba(255,0,0,.18)', shadow: '0 4px 16px rgba(0,0,0,.08)',
+    inputBg: '#ffffff', muted: '#606060', switcherBg: '#f2f2f2',
+    radius: 12, blur: 0, opacity: 100, font: 'Kanit', switcherStyle: 'sliding', transitionFx: 'slide',
+    gradient: 'linear-gradient(180deg, #ffffff, #f9f9f9)'
   }
 };
 const THEME_KEYS = Object.keys(THEME_PRESETS);
@@ -2089,7 +2142,7 @@ function renderThemePresets() {
     return `
       <button type="button" class="theme-preset-card" data-theme="${key}" aria-pressed="${studioConfig.themePreset === key}"
               ${unlocked ? '' : 'disabled'} aria-disabled="${unlocked ? 'false' : 'true'}"
-              onclick="applyThemePreset('${key}', event)" title="${unlocked ? 'ใช้ธีม ' + esc(p.label) : 'ต้องปลดล็อกด้วยรหัสครู'}">
+              onclick="applyThemePreset('${key}', event)" title="${unlocked ? 'ใช้หน้าตาแบบเว็บ ' + esc(p.label) : 'ต้องปลดล็อกด้วยรหัสครู'}">
         <span class="theme-swatch" style="${esc(varsText)};background-image:${p.gradient}" aria-hidden="true">
           <span class="mini-card">
             <span class="mini-aa">Aa</span>
@@ -2098,7 +2151,7 @@ function renderThemePresets() {
           </span>
         </span>
         <span class="theme-name">${esc(p.label)}</span>
-        <span class="theme-hint">${esc(p.hint)}</span>
+        <span class="theme-hint">${esc(unlocked ? p.hint : p.hint + ' กดไม่ได้')}</span>
       </button>`;
   }).join('');
   applyTeacherGateUi();
@@ -2624,19 +2677,23 @@ var root  = (document.currentScript && document.currentScript.closest('.auth-emb
 var tabs  = root.querySelectorAll('.switcher-tab');
 var panes = root.querySelectorAll('.auth-view-pane');
 
+function showPane(view) {
+  tabs.forEach(function (t) {
+    var on = t.dataset.view === view;
+    t.classList.toggle('active', on);
+    t.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  panes.forEach(function (pane) {
+    pane.classList.toggle('active', pane.dataset.pane === view);
+  });
+}
 tabs.forEach(function (tab) {
   tab.addEventListener('click', function () {
-    tabs.forEach(function (t) {
-      t.classList.remove('active');
-      t.setAttribute('aria-selected', 'false');
-    });
-    tab.classList.add('active');
-    tab.setAttribute('aria-selected', 'true');
-
-    panes.forEach(function (pane) {
-      pane.classList.toggle('active', pane.dataset.pane === tab.dataset.view);
-    });
+    showPane(tab.dataset.view);
   });
+});
+root.querySelectorAll('.to-register').forEach(function (btn) {
+  btn.addEventListener('click', function () { showPane('register'); });
 });
 
 // ===== 2) ไม่มีหลังบ้าน: กดปุ่มแล้วแสดงข้อความตัวอย่าง =====
@@ -2978,6 +3035,69 @@ function copyFullStandaloneHTML() {
 }
 
 // ดาวน์โหลดเป็นไฟล์ index.html ได้เลย (สะดวกเวลาสอน/ส่งงาน)
+let cssDelivery = 'internal';
+
+function setCssDelivery(mode) {
+  cssDelivery = mode === 'file' ? 'file' : 'internal';
+  document.querySelectorAll('.css-delivery-btn').forEach((b) => {
+    const on = b.dataset.css === cssDelivery;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  const dl = document.getElementById('download-css-btn');
+  const note = document.getElementById('css-link-note');
+  if (dl) dl.hidden = cssDelivery !== 'file';
+  if (note) note.hidden = cssDelivery !== 'file';
+}
+
+function exportSlices() {
+  const parts = buildCodeParts('full');
+  if (!parts.form) {
+    const code = buildStandaloneHTML('full');
+    return { html: code, css: '' };
+  }
+  return {
+    html: parts.form.trim(),
+    css: [parts.background, parts.vars, parts.card, parts.media].filter(Boolean).join('\n').trim()
+  };
+}
+
+function copyText(text, okMsg) {
+  const fail = () => toast('คัดลอกไม่ได้ คลิกในกล่องโค้ดแล้วกด Ctrl+C หรือ Cmd+C');
+  if (!text) { fail(); return; }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => toast(okMsg)).catch(fail);
+  } else {
+    fail();
+  }
+}
+
+function copyHtmlStructure() {
+  copyText(exportSlices().html, 'คัดลอกโครง HTML แล้ว เอาไปวางในโปรเจกต์ได้เลย');
+}
+
+function copyCssBundle() {
+  const css = exportSlices().css;
+  if (cssDelivery === 'internal') {
+    copyText('<style>\n' + css + '\n</style>', 'คัดลอก CSS แล้ว วางในหน้าเดียวกันได้');
+  } else {
+    copyText(css, 'คัดลอก CSS แล้ว บันทึกเป็น file.css แล้วลิงก์กลับมาที่โครง');
+  }
+}
+
+function downloadCssFile() {
+  const css = exportSlices().css;
+  const blob = new Blob([css], { type: 'text/css;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'file.css';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  toast('ดาวน์โหลด file.css แล้ว ใส่ลิงก์ href="file.css" ในโครง HTML');
+}
+
 function downloadStandaloneHTML() {
   const code = regenerateCode();
   const blob = new Blob([code], { type: 'text/html;charset=utf-8' });
