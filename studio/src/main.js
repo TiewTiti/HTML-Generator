@@ -38,26 +38,27 @@ function brandMark() {
 
 function nav() {
   const loginOn = state.form === 'login';
-  const caretLeft = state.step === 'html' ? '605px' : state.step === 'css' ? '711px' : '817px';
   return `
-  <header class="relative flex h-14 shrink-0 items-center border-b border-[#e6e8ec] bg-white px-4">
-    ${brandMark()}
-    <div class="ml-3 flex h-[50px] items-center rounded-[25px] border border-[#e6e8ec] bg-white px-4 text-sm font-semibold">Design : Login &amp; Register</div>
-    <nav class="absolute left-[570px] top-1.5 flex h-11 w-[300px] items-center" aria-label="ลำดับงาน">
-      <button type="button" data-step="html" class="ml-2 h-8 w-[72px] rounded-2xl border text-sm ${stepClass('html')}">HTML</button>
-      <span class="mx-1 text-[#5c6570]">→</span>
-      <button type="button" data-step="css" class="h-8 w-[72px] rounded-2xl border text-sm ${stepClass('css')}">CSS</button>
-      <span class="mx-1 text-[#5c6570]">→</span>
-      <button type="button" data-step="code" class="h-8 w-[72px] rounded-2xl border text-sm ${stepClass('code')}">code</button>
-    </nav>
-    <img src="/icons/caret.svg" width="16" height="9" alt="" class="pointer-events-none absolute top-[45px]" style="left:${caretLeft}">
-    <button type="button" data-action="ask-done" class="ml-auto h-8 rounded-lg bg-[#1f9d55] px-4 text-[13px] font-semibold text-white">เสร็จสิ้น</button>
-    <div class="flex items-center gap-3">
-      <div class="flex h-8 w-[208px] items-center rounded-2xl border border-[#d5dde6] bg-[#f3f5f8] p-px">
-        <button type="button" data-form="login" class="h-7 flex-1 rounded-[14px] text-sm ${loginOn ? 'bg-[#1a73e8] text-white' : 'bg-white text-[#3c4450]'}">เข้าสู่ระบบ</button>
-        <button type="button" data-form="register" class="h-7 w-[84px] rounded-[14px] text-sm ${loginOn ? 'bg-white text-[#3c4450]' : 'bg-[#1a73e8] text-white'}">สมัคร</button>
+  <header class="studio-head">
+    <div class="studio-head-row">
+      ${brandMark()}
+      <div class="flex h-10 items-center rounded-[20px] border border-[#e6e8ec] bg-white px-3 text-sm font-semibold">Design : Login &amp; Register</div>
+      <button type="button" data-action="door" class="h-8 rounded-lg border border-[#d5dde6] px-3 text-sm font-semibold">ทางเข้า</button>
+      <div class="flex h-8 items-center rounded-2xl border border-[#d5dde6] bg-[#f3f5f8] p-px">
+        <button type="button" data-form="login" class="h-7 rounded-[14px] px-3 text-sm ${loginOn ? 'bg-[#1a73e8] text-white' : 'bg-white text-[#3c4450]'}">เข้าสู่ระบบ</button>
+        <button type="button" data-form="register" class="h-7 rounded-[14px] px-3 text-sm ${loginOn ? 'bg-white text-[#3c4450]' : 'bg-[#1a73e8] text-white'}">สมัคร</button>
       </div>
-      <div class="grid size-9 place-items-center rounded-[18px] bg-[#1a73e8] text-sm font-semibold text-white" aria-hidden="true">น</div>
+      <div class="grid size-9 place-items-center rounded-[18px] bg-[#1a73e8] text-sm font-semibold text-white" aria-hidden="true">${state.role === 'teacher' ? 'ค' : 'น'}</div>
+    </div>
+    <div class="studio-head-row">
+      <nav class="flex items-center" aria-label="ลำดับงาน">
+        <button type="button" data-step="html" class="h-8 rounded-2xl border px-3 text-sm ${stepClass('html')}">HTML</button>
+        <span class="mx-1 text-[#5c6570]">→</span>
+        <button type="button" data-step="css" class="h-8 rounded-2xl border px-3 text-sm ${stepClass('css')}">CSS</button>
+        <span class="mx-1 text-[#5c6570]">→</span>
+        <button type="button" data-step="code" class="h-8 rounded-2xl border px-3 text-sm ${stepClass('code')}">code</button>
+      </nav>
+      <button type="button" data-action="ask-done" class="h-8 rounded-lg bg-[#1f9d55] px-4 text-[13px] font-semibold text-white">เสร็จสิ้น</button>
     </div>
   </header>`;
 }
@@ -128,12 +129,14 @@ function htmlPanel() {
   const piece = selectedPiece(state);
   const list = activePieces(state);
   const index = piece ? list.findIndex((item) => item.id === piece.id) : -1;
-  const move = piece ? `
+  const move = `
     <p class="px-4 pt-4 text-sm font-bold">สลับที่</p>
+    <p class="px-4 pt-1 text-xs text-[#5c6570]">${piece ? 'กดขึ้นหรือลง' : 'เลือกชิ้นก่อน'}</p>
     <div class="flex gap-2 px-4 pt-2">
-      <button type="button" data-move="-1" class="h-10 flex-1 rounded-lg border border-[#d5dde6] text-sm font-semibold" ${index <= 0 ? 'disabled' : ''}>ขึ้น</button>
-      <button type="button" data-move="1" class="h-10 flex-1 rounded-lg border border-[#d5dde6] text-sm font-semibold" ${index < 0 || index >= list.length - 1 ? 'disabled' : ''}>ลง</button>
-    </div>` : '';
+      <button type="button" data-move="-1" class="h-10 flex-1 rounded-lg border border-[#d5dde6] text-sm font-semibold" ${!piece || index <= 0 ? 'disabled' : ''}>ขึ้น</button>
+      <button type="button" data-move="1" class="h-10 flex-1 rounded-lg border border-[#d5dde6] text-sm font-semibold" ${!piece || index < 0 || index >= list.length - 1 ? 'disabled' : ''}>ลง</button>
+    </div>
+    <button type="button" data-action="ask-drop" class="mx-4 mt-3 h-10 w-[268px] rounded-lg border border-[#9f1239] text-sm text-[#9f1239]" ${piece ? '' : 'disabled'}>ลบชิ้นนี้</button>`;
   const kinds = piece && piece.tag === 'input' ? `
     <p class="px-4 pt-4 text-sm font-bold">ชนิดช่อง</p>
     <div class="flex gap-2 px-4 pt-2">${kindButton('text', 'ข้อความ')}${kindButton('email', 'อีเมล')}${kindButton('password', 'รหัส')}</div>` : '';
@@ -233,7 +236,7 @@ function codeBody() {
   const css = cssSource(state.page, pieces);
   return `
   <section class="min-w-0 flex-1 overflow-auto bg-[#f3f5f8] px-10 py-8">
-    <p class="mb-6 text-center text-sm text-[#5c6570]">กด code ด้านบนเพื่อมาหน้านี้</p>
+    <p class="mb-6 text-center text-sm text-[#5c6570]">คัดลอกหรือดาวน์โหลดโค้ดจากหน้านี้</p>
     <div class="mx-auto grid max-w-[1160px] gap-8 lg:grid-cols-2">
       ${codeCard('โครง HTML', html, 'html')}
       ${codeCard('สี CSS', css, 'css')}
@@ -302,10 +305,11 @@ function otpScreen() {
 function dialog() {
   if (!state.dialog) return '';
   const clear = state.dialog === 'clear';
-  const title = clear ? 'ลบกระดานนี้ใช่ไหม' : 'เสร็จขั้นนี้แล้วใช่ไหม';
-  const body = clear ? 'กดลบกระดาน ถ้าต้องการเริ่มวางใหม่' : 'กดไปต่อ แล้วเปิดหน้าคัดลอกโค้ด';
-  const yes = clear ? 'ลบกระดาน' : 'ไปต่อ';
-  const yesClass = clear ? 'bg-[#9f1239] text-white' : 'bg-[#1f9d55] text-white';
+  const piece = state.dialog === 'piece';
+  const title = clear ? 'ลบกระดานนี้ใช่ไหม' : piece ? 'ลบชิ้นนี้ใช่ไหม' : 'เสร็จขั้นนี้แล้วใช่ไหม';
+  const body = clear ? 'กดลบกระดาน ถ้าต้องการเริ่มวางใหม่' : piece ? 'ชิ้นอื่นยังอยู่' : 'กดไปต่อ แล้วเปิดหน้าคัดลอกโค้ด';
+  const yes = clear ? 'ลบกระดาน' : piece ? 'ลบชิ้นนี้' : 'ไปต่อ';
+  const yesClass = clear || piece ? 'bg-[#9f1239] text-white' : 'bg-[#1f9d55] text-white';
   return `
   <div class="fixed inset-0 z-40 grid place-items-center bg-[#17243d]/35">
     <div class="relative w-[min(520px,92vw)] rounded-2xl bg-white px-9 pb-8 pt-16 text-center shadow-xl">
@@ -316,11 +320,11 @@ function dialog() {
       <h2 class="text-2xl font-semibold">${title}</h2>
       <p class="mt-3 text-sm text-[#5c6570]">${body}</p>
       <div class="mt-6 flex justify-center gap-5">
-        ${clear
-          ? `<button type="button" data-action="dialog-no" class="h-14 w-[210px] rounded-lg border border-[#d5dde6]">ยกเลิก</button>
-             <button type="button" data-action="dialog-yes" class="h-14 w-[210px] rounded-lg ${yesClass}">${yes}</button>`
-          : `<button type="button" data-action="dialog-yes" class="h-14 w-[210px] rounded-lg ${yesClass}">${yes}</button>
-             <button type="button" data-action="dialog-no" class="h-14 w-[210px] rounded-lg border border-[#d5dde6]">ยกเลิก</button>`}
+        ${clear || piece
+          ? `<button type="button" data-action="dialog-no" class="h-14 w-[210px] max-w-[40%] rounded-lg border border-[#d5dde6]">ยกเลิก</button>
+             <button type="button" data-action="dialog-yes" class="h-14 w-[210px] max-w-[40%] rounded-lg ${yesClass}">${yes}</button>`
+          : `<button type="button" data-action="dialog-yes" class="h-14 w-[210px] max-w-[40%] rounded-lg ${yesClass}">${yes}</button>
+             <button type="button" data-action="dialog-no" class="h-14 w-[210px] max-w-[40%] rounded-lg border border-[#d5dde6]">ยกเลิก</button>`}
       </div>
     </div>
   </div>`;
@@ -462,6 +466,8 @@ function onClick(event) {
     const name = action.dataset.action;
     if (name === 'ask-done') state.dialog = 'done';
     if (name === 'ask-clear') state.dialog = 'clear';
+    if (name === 'ask-drop') state.dialog = state.selectedId ? 'piece' : null;
+    if (name === 'door') { state.screen = 'entry'; state.dialog = null; }
     if (name === 'dialog-no') state.dialog = null;
     if (name === 'own-colors') state.teacherPanel = 'colors';
     if (name === 'show-templates') state.teacherPanel = 'templates';
@@ -469,6 +475,12 @@ function onClick(event) {
     if (name === 'otp-submit') { submitOtp(); return; }
     if (name === 'dialog-yes' && state.dialog === 'clear') {
       state.boards[state.form] = [];
+      state.selectedId = null;
+      state.dialog = null;
+    }
+    if (name === 'dialog-yes' && state.dialog === 'piece') {
+      const id = state.selectedId;
+      state.boards[state.form] = activePieces(state).filter((item) => item.id !== id && item.host !== id);
       state.selectedId = null;
       state.dialog = null;
     }

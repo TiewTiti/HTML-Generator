@@ -14,7 +14,7 @@ export function esc(value) {
 }
 
 export function defaultStyle(tag) {
-  if (tag === 'button') return { bg: '#3b82f6', border: '#2563eb', color: '#ffffff', radius: 18, fontSize: 16 };
+  if (tag === 'button') return { bg: '#2563eb', border: '#1d4ed8', color: '#ffffff', radius: 18, fontSize: 16 };
   if (tag === 'p') return { bg: '#eff6ff', border: '#93c5fd', color: '#1e3a8a', radius: 18, fontSize: 22 };
   if (tag === 'a') return { bg: '#f5f3ff', border: '#c4b5fd', color: '#5b21b6', radius: 18, fontSize: 16 };
   if (tag === 'div') return { bg: '#fff7ed', border: '#fdba74', color: '#9a3412', radius: 22, fontSize: 16 };
@@ -92,8 +92,7 @@ export function loadState() {
     state.page = Object.assign({ bg: '#f3f5f8', image: '' }, saved.page || {});
     state.dialog = null;
     state.toast = '';
-    if (state.screen === 'otp') state.screen = 'entry';
-    if (state.role === 'teacher' && !isTeacherUnlocked()) state.screen = 'otp';
+    state.screen = 'entry';
     bumpSeq(state);
     return state;
   } catch (e) {

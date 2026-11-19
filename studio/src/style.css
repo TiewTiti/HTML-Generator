@@ -4,6 +4,22 @@
 html, body, #app {
   height: 100%;
   margin: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+.studio-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e6e8ec;
+  background: #fff;
+}
+.studio-head-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 body {
   font-family: "Sarabun", "Noto Sans Thai", sans-serif;
@@ -108,8 +124,7 @@ button, input, textarea { font-family: inherit; }
 @media (max-width: 900px) {
   .entry-split { flex-direction: column; }
   .entry-split h1 { font-size: 48px !important; }
-  header nav { position: static !important; width: auto !important; margin-left: 12px; }
-  header img[src$="caret.svg"] { display: none; }
   .work-row { flex-direction: column; }
   .side-panel { width: 100%; height: auto; }
+  .stack, .nest { width: 100%; }
 }
