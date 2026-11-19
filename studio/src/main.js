@@ -36,30 +36,52 @@ function brandMark() {
   return `<img src="/crest.jpg" width="28" height="40" alt="" class="object-contain">`;
 }
 
+function stepBtn(id, label) {
+  const on = state.step === id;
+  return `<span class="step-wrap"><button type="button" data-step="${id}" class="step-chip ${stepClass(id)}">${label}</button>${on ? '<i class="step-caret" aria-hidden="true"></i>' : ''}</span>`;
+}
+
+function activeTag() {
+  const piece = selectedPiece(state);
+  return piece ? piece.tag : state.pickedTag;
+}
+
+function toolChip(tag) {
+  const on = activeTag() === tag ? ' is-on' : '';
+  return `<button type="button" data-add="${tag}" class="tool-chip${on}">${icon(tag, 24)}<span>${PIECE_NAME[tag]}</span></button>`;
+}
+
 function nav() {
   const loginOn = state.form === 'login';
+  const tools = state.step === 'code' ? '' : `
+    <div class="studio-tools">
+      ${TAGS.map(toolChip).join('')}
+      <button type="button" data-action="ask-done" class="done-btn">เสร็จสิ้น</button>
+    </div>`;
   return `
   <header class="studio-head">
-    <div class="studio-head-row">
-      ${brandMark()}
-      <div class="flex h-10 items-center rounded-[20px] border border-[#e6e8ec] bg-white px-3 text-sm font-semibold">Design : Login &amp; Register</div>
-      <button type="button" data-action="door" class="h-8 rounded-lg border border-[#d5dde6] px-3 text-sm font-semibold">ทางเข้า</button>
-      <div class="flex h-8 items-center rounded-2xl border border-[#d5dde6] bg-[#f3f5f8] p-px">
-        <button type="button" data-form="login" class="h-7 rounded-[14px] px-3 text-sm ${loginOn ? 'bg-[#1a73e8] text-white' : 'bg-white text-[#3c4450]'}">เข้าสู่ระบบ</button>
-        <button type="button" data-form="register" class="h-7 rounded-[14px] px-3 text-sm ${loginOn ? 'bg-white text-[#3c4450]' : 'bg-[#1a73e8] text-white'}">สมัคร</button>
+    <div class="studio-nav">
+      <div class="nav-brand">
+        ${brandMark()}
+        <div class="name-pill">Design : Login &amp; Register</div>
       </div>
-      <div class="grid size-9 place-items-center rounded-[18px] bg-[#1a73e8] text-sm font-semibold text-white" aria-hidden="true">${state.role === 'teacher' ? 'ค' : 'น'}</div>
-    </div>
-    <div class="studio-head-row">
-      <nav class="flex items-center" aria-label="ลำดับงาน">
-        <button type="button" data-step="html" class="h-8 rounded-2xl border px-3 text-sm ${stepClass('html')}">HTML</button>
-        <span class="mx-1 text-[#5c6570]">→</span>
-        <button type="button" data-step="css" class="h-8 rounded-2xl border px-3 text-sm ${stepClass('css')}">CSS</button>
-        <span class="mx-1 text-[#5c6570]">→</span>
-        <button type="button" data-step="code" class="h-8 rounded-2xl border px-3 text-sm ${stepClass('code')}">code</button>
+      <nav class="nav-steps" aria-label="ลำดับงาน">
+        ${stepBtn('html', 'HTML')}
+        <span class="step-arrow">→</span>
+        ${stepBtn('css', 'CSS')}
+        <span class="step-arrow">→</span>
+        ${stepBtn('code', 'code')}
       </nav>
-      <button type="button" data-action="ask-done" class="h-8 rounded-lg bg-[#1f9d55] px-4 text-[13px] font-semibold text-white">เสร็จสิ้น</button>
+      <div class="nav-end">
+        <button type="button" data-action="door" class="door-btn">ทางเข้า</button>
+        <div class="form-switch">
+          <button type="button" data-form="login" class="${loginOn ? 'is-on' : ''}">เข้าสู่ระบบ</button>
+          <button type="button" data-form="register" class="${loginOn ? '' : 'is-on'}">สมัคร</button>
+        </div>
+        <div class="avatar" aria-hidden="true">${state.role === 'teacher' ? 'ค' : 'น'}</div>
+      </div>
     </div>
+    ${tools}
   </header>`;
 }
 
@@ -92,7 +114,7 @@ function paper() {
   }).join('');
   const end = list.length
     ? ''
-    : `<p class="stack-empty">ลากชิ้นจากทางขวามาวาง<br>มันจะต่อกับชิ้นบนกระดาน</p>`;
+    : `<p class="stack-empty">หน้านี้ยังว่าง — วางชิ้นเอง</p>`;
   return `
   <section class="relative min-w-0 flex-1 overflow-auto" style="background-color:${state.page.bg};background-image:${image};background-size:cover;background-position:center">
     <div class="stack-wrap">
@@ -104,7 +126,8 @@ function paper() {
 }
 
 function tagButton(tag) {
-  return `<button type="button" data-add="${tag}" class="grid h-[92px] w-20 place-items-center gap-1 rounded-xl border-[1.5px] border-[#c9d0da] bg-white text-xs font-semibold text-[#1c2430]">${icon(tag, 28)}<span>${PIECE_NAME[tag]}</span><span class="font-normal text-[#5c6570]">&lt;${tag}&gt;</span></button>`;
+  const on = activeTag() === tag ? ' is-on' : '';
+  return `<button type="button" data-add="${tag}" class="tag-tile${on}">${icon(tag, 28)}<span>${PIECE_NAME[tag]}</span><span class="tag-code">&lt;${tag}&gt;</span></button>`;
 }
 
 function kindButton(kind, label) {
@@ -136,7 +159,7 @@ function htmlPanel() {
       <button type="button" data-move="-1" class="h-10 flex-1 rounded-lg border border-[#d5dde6] text-sm font-semibold" ${!piece || index <= 0 ? 'disabled' : ''}>ขึ้น</button>
       <button type="button" data-move="1" class="h-10 flex-1 rounded-lg border border-[#d5dde6] text-sm font-semibold" ${!piece || index < 0 || index >= list.length - 1 ? 'disabled' : ''}>ลง</button>
     </div>
-    <button type="button" data-action="ask-drop" class="mx-4 mt-3 h-10 w-[268px] rounded-lg border border-[#9f1239] text-sm text-[#9f1239]" ${piece ? '' : 'disabled'}>ลบชิ้นนี้</button>`;
+    <button type="button" data-action="ask-drop" class="mx-4 mt-3 block h-10 w-[calc(100%-2rem)] rounded-lg border border-[#9f1239] text-sm text-[#9f1239]" ${piece ? '' : 'disabled'}>ลบชิ้นนี้</button>`;
   const kinds = piece && piece.tag === 'input' ? `
     <p class="px-4 pt-4 text-sm font-bold">ชนิดช่อง</p>
     <div class="flex gap-2 px-4 pt-2">${kindButton('text', 'ข้อความ')}${kindButton('email', 'อีเมล')}${kindButton('password', 'รหัส')}</div>` : '';
@@ -146,13 +169,14 @@ function htmlPanel() {
       <input data-file="img" type="file" accept="image/*" class="sr-only">
     </label>` : '';
   return `
-  <p class="px-4 pt-4 text-[15px] font-semibold">เพิ่มชิ้น</p>
-  <p class="px-4 pt-1 text-xs text-[#5c6570]">ลากไปวางบนกระดาน วางครบแล้วกด CSS</p>
-  <div class="grid grid-cols-3 gap-2 px-4 pt-3">
+  <p class="px-4 pt-4 text-[15px] font-semibold text-[#1c1917]">แท็ก</p>
+  <p class="px-4 pt-1 text-xs text-[#5c6570]">ลากไปวางบนกระดาน</p>
+  <p class="px-4 pt-3 text-xs font-semibold text-[#5c6570]">พื้นฐาน</p>
+  <div class="grid grid-cols-3 gap-2 px-4 pt-2">
     ${TAGS.map(tagButton).join('')}
   </div>
   <p class="px-4 pt-4 text-sm font-bold">คำบนชิ้น</p>
-  <input data-sample type="text" value="${esc(piece ? piece.text : '')}" placeholder="เลือกชิ้นก่อน" class="mx-4 mt-2 h-11 w-[268px] rounded-lg border border-[#1a73e8] px-3 text-[15px] outline-none" ${piece ? '' : 'disabled'}>
+  <input data-sample type="text" value="${esc(piece ? piece.text : '')}" placeholder="เลือกชิ้นก่อน" class="mx-4 mt-2 block h-11 w-[calc(100%-2rem)] rounded-lg border border-[#1a73e8] px-3 text-[15px] outline-none" ${piece ? '' : 'disabled'}>
   ${kinds}
   ${photo}
   ${move}`;
@@ -171,9 +195,9 @@ function cssPanel() {
   ${back}
   <div class="mx-4 mt-3 flex h-9 items-center rounded-lg border border-[#e6e8ec] px-3 text-sm">${name}</div>
   <div class="grid grid-cols-3 gap-2 px-4 pt-4">
-    ${colorField('bg', 'พื้น', style.bg)}
+    ${colorField('bg', 'พื้นหลัง', style.bg)}
     ${colorField('border', 'กรอบ', style.border)}
-    ${colorField('color', 'ตัวอักษร', style.color)}
+    ${colorField('color', 'ข้อความ', style.color)}
   </div>
   <div class="flex gap-2 px-4 pt-4">
     <label class="h-[72px] flex-1 rounded-xl border border-[#e6e8ec] px-3 pt-2 text-[13px] text-[#5c6570]">ขนาดตัวอักษร
