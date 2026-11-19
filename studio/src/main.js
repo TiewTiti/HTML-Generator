@@ -92,7 +92,7 @@ function paper() {
   }).join('');
   const end = list.length
     ? ''
-    : `<p class="stack-empty">กดชิ้นทางขวา<br>มันจะมาต่อกันให้</p>`;
+    : `<p class="stack-empty">ลากชิ้นจากทางขวามาวาง<br>มันจะต่อกับชิ้นบนกระดาน</p>`;
   return `
   <section class="relative min-w-0 flex-1 overflow-auto" style="background-color:${state.page.bg};background-image:${image};background-size:cover;background-position:center">
     <div class="stack-wrap">
@@ -147,7 +147,7 @@ function htmlPanel() {
     </label>` : '';
   return `
   <p class="px-4 pt-4 text-[15px] font-semibold">เพิ่มชิ้น</p>
-  <p class="px-4 pt-1 text-xs text-[#5c6570]">กดครั้งเดียว ชิ้นไปต่อท้าย</p>
+  <p class="px-4 pt-1 text-xs text-[#5c6570]">ลากไปวางบนกระดาน วางครบแล้วกด CSS</p>
   <div class="grid grid-cols-3 gap-2 px-4 pt-3">
     ${TAGS.map(tagButton).join('')}
   </div>
@@ -340,15 +340,26 @@ function render() {
   app.innerHTML = `<div class="h-full">${screen}${dialog()}${toast()}</div>`;
 }
 
-function addTag(tag) {
+function insertTag(tag, index) {
   const list = activePieces(state);
   const piece = makePiece(tag, list.length, state.form, state.inputKind);
-  list.push(piece);
+  const at = Math.max(0, Math.min(index ?? list.length, list.length));
+  list.splice(at, 0, piece);
   state.selectedId = piece.id;
   state.pickedTag = tag;
   state.step = 'html';
   persist();
   render();
+}
+
+function reorderPiece(id, index) {
+  const list = activePieces(state);
+  const from = list.findIndex((item) => item.id === id);
+  if (from < 0) return;
+  const [item] = list.splice(from, 1);
+  const at = Math.max(0, Math.min(index, list.length));
+  list.splice(at, 0, item);
+  state.selectedId = item.id;
 }
 
 function readOtp() {
@@ -373,8 +384,7 @@ function submitOtp() {
 }
 
 function onClick(event) {
-  const add = event.target.closest('[data-add]');
-  if (add) { addTag(add.dataset.add); return; }
+  if (event.target.closest('[data-add]')) return;
   const go = event.target.closest('[data-go]');
   if (go) {
     if (go.dataset.go === 'student') {
@@ -652,9 +662,86 @@ function onPaste(event) {
   if (digits.length === 6) submitOtp();
 }
 
+let drag = null;
+
+function snapIndex(y, ignoreId) {
+  const nodes = [...app.querySelectorAll('.vex')].filter((node) => node.dataset.piece !== ignoreId);
+  for (let i = 0; i < nodes.length; i += 1) {
+    const rect = nodes[i].getBoundingClientRect();
+    if (y < rect.top + rect.height / 2) return i;
+  }
+  return nodes.length;
+}
+
+function onBoard(x, y) {
+  const el = document.elementFromPoint(x, y);
+  return !!(el && el.closest && (el.closest('[data-stack]') || el.closest('.vex')));
+}
+
+function showSnap(index, ignoreId) {
+  const stack = app.querySelector('[data-stack]');
+  if (!stack) return;
+  let line = stack.querySelector('.snap-line');
+  if (!line) {
+    line = document.createElement('div');
+    line.className = 'snap-line';
+  }
+  const nodes = [...stack.querySelectorAll('.vex')].filter((node) => node.dataset.piece !== ignoreId);
+  const before = nodes[index] || null;
+  if (before) stack.insertBefore(line, before);
+  else stack.appendChild(line);
+}
+
+function onPointerDown(event) {
+  if (event.button !== 0) return;
+  const add = event.target.closest('[data-add]');
+  if (add) {
+    drag = { create: add.dataset.add, sx: event.clientX, sy: event.clientY, moved: false };
+    return;
+  }
+  const block = event.target.closest('.vex');
+  if (!block || event.target.closest('aside')) return;
+  drag = { id: block.dataset.piece, sx: event.clientX, sy: event.clientY, moved: false };
+  block.classList.add('is-dragging');
+  block.setPointerCapture(event.pointerId);
+}
+
+function onPointerMove(event) {
+  if (!drag) return;
+  if (Math.hypot(event.clientX - drag.sx, event.clientY - drag.sy) < 8) return;
+  drag.moved = true;
+  drag.onBoard = onBoard(event.clientX, event.clientY);
+  if (!drag.onBoard) {
+    app.querySelector('.snap-line')?.remove();
+    return;
+  }
+  drag.index = snapIndex(event.clientY, drag.id);
+  showSnap(drag.index, drag.id);
+}
+
+function onPointerUp() {
+  if (!drag) return;
+  const info = drag;
+  drag = null;
+  app.querySelectorAll('.is-dragging').forEach((node) => node.classList.remove('is-dragging'));
+  if (!info.moved || !info.onBoard) return;
+  if (info.create) {
+    insertTag(info.create, info.index);
+    return;
+  }
+  if (info.id) {
+    reorderPiece(info.id, info.index);
+    persist();
+    render();
+  }
+}
+
 app.addEventListener('click', onClick);
 app.addEventListener('input', onInput);
 app.addEventListener('change', onChange);
+app.addEventListener('pointerdown', onPointerDown);
+app.addEventListener('pointermove', onPointerMove);
+app.addEventListener('pointerup', onPointerUp);
 app.addEventListener('keydown', onKeyDown);
 app.addEventListener('paste', onPaste);
 

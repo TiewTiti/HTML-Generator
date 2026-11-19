@@ -120,7 +120,8 @@ button, input, textarea { font-family: inherit; }
   margin-top: 22px;
   font-size: 13px;
 }
-[data-move]:disabled { opacity: 0.35; }
+[data-move]:disabled, [data-action="ask-drop"]:disabled { opacity: 0.35; }
+[data-add] { cursor: grab; touch-action: none; }
 @media (max-width: 900px) {
   .entry-split { flex-direction: column; }
   .entry-split h1 { font-size: 48px !important; }
