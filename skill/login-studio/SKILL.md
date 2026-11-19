@@ -9,7 +9,7 @@ description: Rules for the new Login & Register studio. Use when changing studio
 - Match Figma file `sFgrZ6uT0ryjvuMXiCkU9N`, page `ลำดับขั้น`.
 - Teacher gate is the 6-digit code `759212`. Each box shows a dot, never the digit.
 - The code unlocks เว็บต้นแบบ only. Students can still place tags and set colors.
-- Blocks snap into one vertical stack, like VEXcode. Click adds to the end. Drag reorders and the block locks into the gap.
+- Blocks snap into one vertical stack. The right panel is the only add control. ขึ้น and ลง are the only reorder controls.
 - Export is one offline HTML file with no CDN and no Tailwind.
 - Confirm before clearing a board.
 - Propose the next slice before editing when the user has not already asked for that slice.

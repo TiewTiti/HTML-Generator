@@ -35,7 +35,7 @@ button, input, textarea { font-family: inherit; }
   padding: 16px 18px 22px;
   border: 1.5px solid #d5dde6;
   box-shadow: 0 6px 0 rgba(23, 36, 61, 0.05);
-  cursor: grab;
+  cursor: pointer;
   user-select: none;
 }
 .vex:first-child { margin-top: 0; }
@@ -104,6 +104,7 @@ button, input, textarea { font-family: inherit; }
   margin-top: 22px;
   font-size: 13px;
 }
+[data-move]:disabled { opacity: 0.35; }
 @media (max-width: 900px) {
   .entry-split { flex-direction: column; }
   .entry-split h1 { font-size: 48px !important; }

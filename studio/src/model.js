@@ -64,7 +64,7 @@ export function blankState() {
     boards: { login: [], register: [] },
     selectedId: null,
     pickedTag: 'input',
-    inputKind: 'email',
+    inputKind: 'text',
     page: { bg: '#f3f5f8', image: '' },
     teacherPanel: 'templates',
     dialog: null,

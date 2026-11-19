@@ -51,7 +51,8 @@ function nav() {
       <button type="button" data-step="code" class="h-8 w-[72px] rounded-2xl border text-sm ${stepClass('code')}">code</button>
     </nav>
     <img src="/icons/caret.svg" width="16" height="9" alt="" class="pointer-events-none absolute top-[45px]" style="left:${caretLeft}">
-    <div class="ml-auto flex items-center gap-3">
+    <button type="button" data-action="ask-done" class="ml-auto h-8 rounded-lg bg-[#1f9d55] px-4 text-[13px] font-semibold text-white">เสร็จสิ้น</button>
+    <div class="flex items-center gap-3">
       <div class="flex h-8 w-[208px] items-center rounded-2xl border border-[#d5dde6] bg-[#f3f5f8] p-px">
         <button type="button" data-form="login" class="h-7 flex-1 rounded-[14px] text-sm ${loginOn ? 'bg-[#1a73e8] text-white' : 'bg-white text-[#3c4450]'}">เข้าสู่ระบบ</button>
         <button type="button" data-form="register" class="h-7 w-[84px] rounded-[14px] text-sm ${loginOn ? 'bg-white text-[#3c4450]' : 'bg-[#1a73e8] text-white'}">สมัคร</button>
@@ -61,24 +62,15 @@ function nav() {
   </header>`;
 }
 
-function toolbar() {
-  const buttons = TAGS.map((tag) => {
-    const on = state.pickedTag === tag;
-    return `<button type="button" data-add="${tag}" class="flex h-8 w-[118px] items-center gap-1 rounded-lg border px-1.5 text-[13px] font-semibold ${on ? 'border-[#1a73e8] bg-[#f3f8ff] text-[#1a73e8]' : 'border-[#c9d0da] bg-white text-[#1c2430]'}">${icon(tag, 24)}&lt;${tag}&gt;</button>`;
-  }).join('');
-  return `
-  <div class="flex h-16 shrink-0 items-center gap-2 border-b border-[#e6e8ec] bg-white px-4">
-    ${buttons}
-    <button type="button" data-action="ask-done" class="ml-auto h-8 w-[136px] rounded-lg bg-[#1f9d55] text-[13px] font-semibold text-white">เสร็จสิ้น</button>
-  </div>`;
-}
+const PIECE_NAME = { div: 'กล่อง', p: 'ข้อความ', a: 'ลิงก์', input: 'ช่องกรอก', button: 'ปุ่ม', img: 'รูป' };
 
 function blockBody(p) {
   const s = p.style;
   const nub = `<span class="nub" style="background:${s.bg};border-color:${s.border}"></span>`;
   if (p.tag === 'input') {
     const type = p.inputType === 'password' || p.inputType === 'email' ? p.inputType : 'text';
-    return `<span class="vex-tag">&lt;input&gt;</span><span class="vex-text">${esc(p.text)}</span><span class="vex-kind">${type}</span>${nub}`;
+    const kindName = { text: 'ข้อความ', email: 'อีเมล', password: 'รหัส' }[type];
+    return `<span class="vex-tag">&lt;input&gt;</span><span class="vex-text">${esc(p.text)}</span><span class="vex-kind">${kindName}</span>${nub}`;
   }
   if (p.tag === 'img') {
     const face = p.src
@@ -98,8 +90,8 @@ function paper() {
     return `<article class="vex vex-${p.tag}${on}" data-piece="${p.id}" style="background:${s.bg};color:${s.color};border-color:${s.border};border-radius:${s.radius}px;font-size:${s.fontSize}px">${blockBody(p)}</article>`;
   }).join('');
   const end = list.length
-    ? `<p class="stack-note">ลากบล็อกเพื่อสลับที่ บล็อกจะต่อกันเอง</p>`
-    : `<p class="stack-empty">กดชิ้นด้านบน<br>มันจะมาต่อกันให้</p>`;
+    ? ''
+    : `<p class="stack-empty">กดชิ้นทางขวา<br>มันจะมาต่อกันให้</p>`;
   return `
   <section class="relative min-w-0 flex-1 overflow-auto" style="background-color:${state.page.bg};background-image:${image};background-size:cover;background-position:center">
     <div class="stack-wrap">
@@ -111,13 +103,13 @@ function paper() {
 }
 
 function tagButton(tag) {
-  const on = state.pickedTag === tag;
-  return `<button type="button" data-add="${tag}" class="grid h-[108px] w-20 place-items-center rounded-xl border-[1.5px] text-xs font-semibold ${on ? 'border-[#1a73e8] bg-[#f3f8ff] text-[#1a73e8]' : 'border-[#c9d0da] bg-white text-[#1c2430]'}">${icon(tag, 36)}&lt;${tag}&gt;</button>`;
+  return `<button type="button" data-add="${tag}" class="grid h-[92px] w-20 place-items-center gap-1 rounded-xl border-[1.5px] border-[#c9d0da] bg-white text-xs font-semibold text-[#1c2430]">${icon(tag, 28)}<span>${PIECE_NAME[tag]}</span><span class="font-normal text-[#5c6570]">&lt;${tag}&gt;</span></button>`;
 }
 
-function kindButton(kind) {
-  const on = state.inputKind === kind;
-  return `<button type="button" data-kind="${kind}" class="h-9 w-20 rounded-lg border text-xs font-semibold ${on ? 'border-[#1a73e8] bg-[#1a73e8] text-white' : 'border-[#d5dde6] bg-white text-[#1c2430]'}">${kind}</button>`;
+function kindButton(kind, label) {
+  const piece = selectedPiece(state);
+  const on = piece && piece.tag === 'input' && piece.inputType === kind;
+  return `<button type="button" data-kind="${kind}" class="h-9 flex-1 rounded-lg border text-xs font-semibold ${on ? 'border-[#1a73e8] bg-[#1a73e8] text-white' : 'border-[#d5dde6] bg-white text-[#1c2430]'}">${label}</button>`;
 }
 
 function colorField(key, label, value) {
@@ -134,59 +126,60 @@ function safeHex(value) {
 
 function htmlPanel() {
   const piece = selectedPiece(state);
-  const sample = piece ? piece.text : '';
+  const list = activePieces(state);
+  const index = piece ? list.findIndex((item) => item.id === piece.id) : -1;
+  const move = piece ? `
+    <p class="px-4 pt-4 text-sm font-bold">สลับที่</p>
+    <div class="flex gap-2 px-4 pt-2">
+      <button type="button" data-move="-1" class="h-10 flex-1 rounded-lg border border-[#d5dde6] text-sm font-semibold" ${index <= 0 ? 'disabled' : ''}>ขึ้น</button>
+      <button type="button" data-move="1" class="h-10 flex-1 rounded-lg border border-[#d5dde6] text-sm font-semibold" ${index < 0 || index >= list.length - 1 ? 'disabled' : ''}>ลง</button>
+    </div>` : '';
+  const kinds = piece && piece.tag === 'input' ? `
+    <p class="px-4 pt-4 text-sm font-bold">ชนิดช่อง</p>
+    <div class="flex gap-2 px-4 pt-2">${kindButton('text', 'ข้อความ')}${kindButton('email', 'อีเมล')}${kindButton('password', 'รหัส')}</div>` : '';
+  const photo = piece && piece.tag === 'img' ? `
+    <label class="mx-4 mt-4 flex h-10 cursor-pointer items-center justify-center rounded-lg border border-[#d5dde6] text-sm font-semibold">
+      ใส่รูป
+      <input data-file="img" type="file" accept="image/*" class="sr-only">
+    </label>` : '';
   return `
-  <p class="px-4 pt-4 text-[15px] font-semibold">แท็ก</p>
-  <p class="px-4 pt-1 text-xs text-[#5c6570]">กดแล้วบล็อกจะต่อท้ายให้</p>
-  <div class="mx-4 mt-3 flex h-9 items-center rounded-lg border border-[#e6e8ec] px-3 text-[13px]">พื้นฐาน</div>
-  <div class="grid grid-cols-3 gap-3.5 px-4 pt-4">
+  <p class="px-4 pt-4 text-[15px] font-semibold">เพิ่มชิ้น</p>
+  <p class="px-4 pt-1 text-xs text-[#5c6570]">กดครั้งเดียว ชิ้นไปต่อท้าย</p>
+  <div class="grid grid-cols-3 gap-2 px-4 pt-3">
     ${TAGS.map(tagButton).join('')}
   </div>
-  <p class="px-6 pt-4 text-[13px] font-medium text-[#1a73e8]">รูปแบบของ &lt;input&gt;</p>
-  <div class="flex gap-3.5 px-4 pt-2">${['text', 'email', 'password'].map(kindButton).join('')}</div>
-  <label class="mx-4 mt-4 flex h-10 cursor-pointer items-center justify-center rounded-lg border-[1.5px] border-[#c9d0da] text-[13px] font-semibold">
-    นำเข้ารูปบน &lt;img&gt;
-    <input data-file="img" type="file" accept="image/*" class="hidden">
-  </label>
-  <p class="px-6 pt-4 text-sm font-bold">ข้อความในช่อง</p>
-  <input data-sample type="text" value="${esc(sample)}" placeholder="พิมพ์ข้อความของชิ้นที่เลือก" class="mx-4 mt-2 h-11 w-[268px] rounded-lg border-[1.5px] border-[#1a73e8] px-3 text-[15px] outline-none">
-  <p class="px-4 pt-2 text-xs text-[#5c6570]">พิมพ์เอง แล้วดูคำนี้ในช่องบนกระดาน</p>`;
+  <p class="px-4 pt-4 text-sm font-bold">คำบนชิ้น</p>
+  <input data-sample type="text" value="${esc(piece ? piece.text : '')}" placeholder="เลือกชิ้นก่อน" class="mx-4 mt-2 h-11 w-[268px] rounded-lg border border-[#1a73e8] px-3 text-[15px] outline-none" ${piece ? '' : 'disabled'}>
+  ${kinds}
+  ${photo}
+  ${move}`;
 }
 
 function cssPanel() {
   const piece = selectedPiece(state);
   const style = piece ? piece.style : { bg: state.page.bg, border: '#1a73e8', color: '#1c2430', radius: 8, fontSize: 28 };
-  const name = piece ? `ชิ้นที่เลือก · &lt;${piece.tag}&gt;` : 'พื้นของหน้า';
+  const name = piece ? PIECE_NAME[piece.tag] : 'พื้นของหน้า';
   const back = state.role === 'teacher'
-    ? `<button type="button" data-action="show-templates" class="mx-4 mt-3 text-left text-sm font-semibold text-[#1a73e8]">กลับไปเว็บต้นแบบ</button>`
+    ? `<button type="button" data-action="show-templates" class="mx-4 mt-3 text-left text-sm font-semibold text-[#1a73e8]">เว็บต้นแบบ</button>`
     : '';
   return `
   <p class="px-4 pt-4 text-[15px] font-semibold">สี</p>
+  <p class="px-4 pt-1 text-xs text-[#5c6570]">เลือกชิ้น แล้วเปลี่ยนสี</p>
   ${back}
   <div class="mx-4 mt-3 flex h-9 items-center rounded-lg border border-[#e6e8ec] px-3 text-sm">${name}</div>
-  <div class="grid grid-cols-3 gap-3.5 px-4 pt-4">
-    ${colorField('bg', 'พื้นหลัง', style.bg)}
+  <div class="grid grid-cols-3 gap-2 px-4 pt-4">
+    ${colorField('bg', 'พื้น', style.bg)}
     ${colorField('border', 'กรอบ', style.border)}
-    ${colorField('color', 'ข้อความ', style.color)}
-    ${colorField('button', 'ปุ่ม', piece && piece.tag === 'button' ? style.bg : '#1a73e8')}
-    <label class="grid h-[104px] w-20 place-items-center rounded-xl border-[1.5px] border-[#c9d0da] bg-white text-xs font-semibold">
-      <span class="grid size-10 place-items-center rounded-lg border border-[#1a73e8]"><span class="h-2 w-7 rounded bg-[#1a73e8]"></span></span>
-      ขนาดปุ่ม
-      <input data-number="h" type="number" min="32" max="120" value="${piece ? piece.h : 52}" class="h-6 w-14 text-center text-sm">
-    </label>
+    ${colorField('color', 'ตัวอักษร', style.color)}
   </div>
-  <p class="px-6 pt-4 text-[15px] font-bold">ขนาด</p>
-  <div class="flex gap-2 px-6 pt-2">
-    <label class="h-[72px] w-[122px] rounded-xl border border-[#e6e8ec] px-3 pt-2 text-[13px] text-[#5c6570]">ตัวอักษร
+  <div class="flex gap-2 px-4 pt-4">
+    <label class="h-[72px] flex-1 rounded-xl border border-[#e6e8ec] px-3 pt-2 text-[13px] text-[#5c6570]">ขนาดตัวอักษร
       <input data-number="fontSize" type="number" min="12" max="72" value="${style.fontSize}" class="mt-1 block w-full bg-transparent text-lg font-bold text-[#1c2430] outline-none">
     </label>
-    <label class="h-[72px] w-[122px] rounded-xl border border-[#e6e8ec] px-3 pt-2 text-[13px] text-[#5c6570]">มุมโค้ง
+    <label class="h-[72px] flex-1 rounded-xl border border-[#e6e8ec] px-3 pt-2 text-[13px] text-[#5c6570]">มุมโค้ง
       <input data-number="radius" type="number" min="0" max="40" value="${style.radius}" class="mt-1 block w-full bg-transparent text-lg font-bold text-[#1c2430] outline-none">
     </label>
   </div>
-  <p class="px-6 pt-4 text-sm font-bold">ข้อความในช่อง</p>
-  <input data-sample type="text" value="${esc(piece ? piece.text : '')}" class="mx-4 mt-2 h-11 w-[268px] rounded-lg border-[1.5px] border-[#1a73e8] px-3 text-[15px] outline-none">
-  <p class="px-4 pt-2 text-xs text-[#5c6570]">พิมพ์เอง แล้วดูคำนี้ในช่องบนกระดาน</p>
   <p class="px-4 pt-4 text-sm font-bold">รูปพื้นหลัง</p>
   <label class="mx-4 mt-2 flex h-[88px] cursor-pointer flex-col items-center justify-center rounded-[10px] border border-dashed border-[#1a73e8] text-center">
     <span class="text-sm text-[#1a73e8]">วางรูปของคุณ</span>
@@ -201,7 +194,7 @@ function templatePanel() {
       <span class="grid size-7 place-items-center rounded-md text-xs font-bold text-white" style="background:${brand.accent}">${esc(brand.mark)}</span>
       <span>
         <span class="block text-sm font-semibold">${esc(brand.name)}</span>
-        <span class="block text-xs text-[#5c6570]">เว็บต้นแบบ · ใส่โครงให้</span>
+        <span class="block text-xs text-[#5c6570]">ใส่ให้เลย</span>
       </span>
     </button>`).join('');
   return `
@@ -227,7 +220,6 @@ function workScreen() {
   return `
   <div class="flex h-full min-h-0 flex-col">
     ${nav()}
-    ${state.step === 'code' ? '' : toolbar()}
     <div class="work-row flex min-h-0 flex-1">
       ${state.step === 'code' ? codeBody() : paper()}
       ${state.step === 'code' ? '' : side()}
@@ -241,7 +233,7 @@ function codeBody() {
   const css = cssSource(state.page, pieces);
   return `
   <section class="min-w-0 flex-1 overflow-auto bg-[#f3f5f8] px-10 py-8">
-    <p class="mb-6 text-center text-sm text-[#5c6570]">คัดลอกโครงกับสีไปวางในโปรเจกต์</p>
+    <p class="mb-6 text-center text-sm text-[#5c6570]">กด code ด้านบนเพื่อมาหน้านี้</p>
     <div class="mx-auto grid max-w-[1160px] gap-8 lg:grid-cols-2">
       ${codeCard('โครง HTML', html, 'html')}
       ${codeCard('สี CSS', css, 'css')}
@@ -355,15 +347,6 @@ function addTag(tag) {
   render();
 }
 
-function reorderPiece(id, index) {
-  const list = activePieces(state);
-  const from = list.findIndex((item) => item.id === id);
-  if (from < 0) return;
-  const [item] = list.splice(from, 1);
-  const dest = Math.max(0, Math.min(index, list.length));
-  list.splice(dest, 0, item);
-}
-
 function readOtp() {
   return otp.join('');
 }
@@ -386,17 +369,6 @@ function submitOtp() {
 }
 
 function onClick(event) {
-  const moved = dragMoved;
-  dragMoved = false;
-  if (moved) {
-    const pieceEl = event.target.closest('[data-piece]');
-    if (pieceEl && !event.target.closest('aside')) {
-      state.selectedId = pieceEl.dataset.piece;
-      persist();
-      render();
-    }
-    return;
-  }
   const add = event.target.closest('[data-add]');
   if (add) { addTag(add.dataset.add); return; }
   const go = event.target.closest('[data-go]');
@@ -440,11 +412,25 @@ function onClick(event) {
   }
   const kind = event.target.closest('[data-kind]');
   if (kind) {
-    state.inputKind = kind.dataset.kind;
     const piece = selectedPiece(state);
-    if (piece && piece.tag === 'input') piece.inputType = state.inputKind;
-    persist();
-    render();
+    if (piece && piece.tag === 'input') {
+      piece.inputType = kind.dataset.kind;
+      persist();
+      render();
+    }
+    return;
+  }
+  const move = event.target.closest('[data-move]');
+  if (move && !move.disabled) {
+    const list = activePieces(state);
+    const from = list.findIndex((item) => item.id === state.selectedId);
+    const to = from + Number(move.dataset.move);
+    if (from >= 0 && to >= 0 && to < list.length) {
+      const [item] = list.splice(from, 1);
+      list.splice(to, 0, item);
+      persist();
+      render();
+    }
     return;
   }
   const template = event.target.closest('[data-template]');
@@ -628,61 +614,6 @@ function onChange(event) {
   });
 }
 
-let drag = null;
-let dragMoved = false;
-
-function snapIndex(clientY, ignoreId) {
-  const nodes = [...app.querySelectorAll('.vex')].filter((el) => el.dataset.piece !== ignoreId);
-  for (let i = 0; i < nodes.length; i += 1) {
-    const rect = nodes[i].getBoundingClientRect();
-    if (clientY < rect.top + rect.height / 2) return i;
-  }
-  return nodes.length;
-}
-
-function showSnap(index) {
-  const stack = app.querySelector('[data-stack]');
-  if (!stack) return;
-  let line = stack.querySelector('.snap-line');
-  if (!line) {
-    line = document.createElement('div');
-    line.className = 'snap-line';
-  }
-  const nodes = [...stack.querySelectorAll('.vex')].filter((el) => el.dataset.piece !== drag.id);
-  const before = nodes[index] || stack.querySelector('.stack-note') || stack.querySelector('.stack-empty');
-  if (before) stack.insertBefore(line, before);
-  else stack.appendChild(line);
-}
-
-function onPointerDown(event) {
-  if (event.button !== 0) return;
-  const pieceEl = event.target.closest('.vex');
-  if (!pieceEl) return;
-  drag = { id: pieceEl.dataset.piece, index: snapIndex(event.clientY, pieceEl.dataset.piece) };
-  dragMoved = false;
-  pieceEl.classList.add('is-dragging');
-  pieceEl.setPointerCapture(event.pointerId);
-}
-
-function onPointerMove(event) {
-  if (!drag) return;
-  const index = snapIndex(event.clientY, drag.id);
-  if (index !== drag.index) dragMoved = true;
-  drag.index = index;
-  showSnap(index);
-  dragMoved = true;
-}
-
-function onPointerUp() {
-  if (!drag) return;
-  if (dragMoved) reorderPiece(drag.id, drag.index);
-  const id = drag.id;
-  drag = null;
-  state.selectedId = id;
-  persist();
-  render();
-}
-
 function onKeyDown(event) {
   const otpInput = event.target.closest('[data-otp]');
   if (!otpInput) return;
@@ -712,9 +643,6 @@ function onPaste(event) {
 app.addEventListener('click', onClick);
 app.addEventListener('input', onInput);
 app.addEventListener('change', onChange);
-app.addEventListener('pointerdown', onPointerDown);
-app.addEventListener('pointermove', onPointerMove);
-app.addEventListener('pointerup', onPointerUp);
 app.addEventListener('keydown', onKeyDown);
 app.addEventListener('paste', onPaste);
 
